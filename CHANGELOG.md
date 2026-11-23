@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.2.0] - 2026-11-23
+
+### Minor
+- BL-01: Simulator Tes Kraepelin / Pauli (Tes Ketelitian Angka) dengan preset latihan, input keyboard/keypad 0-9, dan kurva kecepatan & ketelitian per kolom
+
+---
+
 ## [1.1.0] - 2026-11-23
 
 ### Minor
