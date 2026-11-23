@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import pkg from '../../../package.json';
 import { useAuthStore } from '../../features/auth/useAuthStore';
 import { useThemeStore } from '../stores/useThemeStore';
 import { Badge } from '../ui/Badge';
@@ -270,7 +271,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] py-6 mt-12 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#71717A] dark:text-slate-400">
-          <p>LokaTalenta — Akademi Bahasa, Asesmen &amp; Kesiapan Karier</p>
+          <p>
+            LokaTalenta <span className="font-mono-tabular">v{pkg.version}</span> — Akademi Bahasa, Asesmen &amp; Kesiapan Karier
+          </p>
           <p>Belajar terstruktur dan ukur kesiapan Anda secara objektif.</p>
         </div>
       </footer>

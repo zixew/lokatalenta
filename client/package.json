@@ -1,7 +1,7 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,10 @@
     "test": "vitest run",
     "preview": "vite preview",
     "deploy:dev": "bash ../scripts/deploy.sh dev",
-    "deploy:prod": "bash ../scripts/deploy.sh prod"
+    "deploy:prod": "bash ../scripts/deploy.sh prod",
+    "release:patch": "bash ../scripts/release.sh patch",
+    "release:minor": "bash ../scripts/release.sh minor",
+    "release:major": "bash ../scripts/release.sh major"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",
