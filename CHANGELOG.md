@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.7.0] - 2026-11-23
+
+### Minor
+- Sprint 4: Code-Splitting Vendor < 250kB (BL-11), Callback Reset Password (BL-12), Persistensi & Filter Tryout Akbar (BL-13), dan E2E Recovery Suite (BL-14)
+
+---
+
 ## [1.6.1] - 2026-11-23
 
 ### Patch
