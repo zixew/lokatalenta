@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.5.0] - 2026-11-23
+
+### Minor
+- Sprint 2: Quick Check & Catatan Pribadi (BL-04), Bulk CSV Import Soal (BL-05), dan Analitik Teacher Studio (BL-06)
+
+---
+
 ## [1.4.0] - 2026-11-23
 
 ### Minor
