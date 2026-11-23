@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.4.0] - 2026-11-23
+
+### Minor
+- BL-03: Global Leaderboard RPC (get_public_leaderboard) untuk peringkat XP, level, materi selesai, dan kuis lulus lintas siswa secara real-time
+
+---
+
 ## [1.3.0] - 2026-11-23
 
 ### Minor
