@@ -38,7 +38,7 @@ COM-02,Student,Komunitas,Sad Flow,Guard Dukung 1x & double-click cepat,Ada topik
 COM-03,Student,Komunitas,Happy Flow,Deep-link Tanyakan Soal Ini ke Komunitas,Berada di QuizResultPage,Klik Tanyakan Soal Ini ke Komunitas,Composer /community otomatis terbuka terisi kutipan soal,PASS
 MNT-01,Student/Teacher,Interaksi Mentor,Happy Flow,Q&A berulir pesan privat & Sesi Live,Sudah gabung kursus,Kirim pertanyaan/balasan & daftar sesi,Tersimpan & notifikasi terkirim,PASS
 MNT-02,Student,Sesi Live,Sad Flow,Booking Sesi Live kuota penuh,Sesi mencapai max_participants,Coba daftar sesi penuh,Ditolak dengan pesan Kuota sesi sudah penuh,PASS
-PRF-01,Student,Profil & Gamifikasi,Happy Flow,Konsistensi XP Streak Leaderboard & Riwayat,Sudah belajar & ikut kuis,Buka /profile dan bandingkan header Leaderboard & Tes Dikerjakan,XP materi dan tes dikerjakan konsisten di semua bagian,FAIL (Leaderboard/Riwayat 0)
+PRF-01,Student,Profil & Gamifikasi,Happy Flow,Konsistensi XP Streak Global Leaderboard & Riwayat,Sudah belajar & ikut kuis,Buka /profile dan bandingkan header Leaderboard & Tes Dikerjakan,XP materi dan tes dikerjakan konsisten lintas siswa via get_public_leaderboard,PENDING SIT/UAT
 PRF-02,Student/Guest,Profil,Happy/Sad Flow,Edit bio & akses /profile saat logout,Login / Logout,Edit bio + reload; buka /profile saat logout,Perubahan bio tersimpan; guest diarahkan ke /auth,PARTIAL FAIL (Guest blank)
 CRT-01,Public,Sertifikat,Happy Flow,Verifikasi Sertifikat Valid,Kode sertifikat terdaftar,Buka /verify/:certCode,Tampil badge Sertifikat Asli & Terverifikasi,PASS
 CRT-02,Public,Sertifikat,Sad Flow,Verifikasi Sertifikat Tidak Ditemukan,Kode tidak terdaftar,Buka /verify/LT-INVALID-999,Tampil pesan Sertifikat Tidak Ditemukan,PASS
