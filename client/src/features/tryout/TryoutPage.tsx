@@ -31,7 +31,7 @@ export function TryoutPage() {
 
   const { data: leaderboard = [] } = useQuery({
     queryKey: ['public-leaderboard'],
-    queryFn: () => lmsApi.getPublicLeaderboard(10),
+    queryFn: async () => (await lmsApi.listLeaderboard()).slice(0, 10),
   });
 
   // Find a valid published quiz ID to launch when user starts a live tryout
@@ -177,7 +177,7 @@ export function TryoutPage() {
             <div className="space-y-2.5">
               {leaderboard.map((entry, idx) => (
                 <div
-                  key={entry.id}
+                  key={entry.user_id}
                   className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2 text-xs"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">

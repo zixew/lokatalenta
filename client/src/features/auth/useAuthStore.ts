@@ -375,7 +375,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       throw new Error('Format email tidak valid.');
     }
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${window.location.origin}/auth`,
       });
