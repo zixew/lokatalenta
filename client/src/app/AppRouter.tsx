@@ -28,6 +28,9 @@ const CommunityPage = lazy(() =>
 const CatalogPage = lazy(() =>
   import('../features/courses/CatalogPage').then((m) => ({ default: m.CatalogPage }))
 );
+const KraepelinPage = lazy(() =>
+  import('../features/kraepelin/KraepelinPage').then((m) => ({ default: m.KraepelinPage }))
+);
 const CoursePlayerPage = lazy(() =>
   import('../features/player/CoursePlayerPage').then((m) => ({
     default: m.CoursePlayerPage,
@@ -92,6 +95,7 @@ export function AppRouter() {
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<CatalogPage />} />
+                  <Route path="/kraepelin" element={<KraepelinPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/community" element={<CommunityPage />} />
                   <Route path="/verify" element={<VerifyCertificatePage />} />

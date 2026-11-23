@@ -187,6 +187,11 @@ export function CatalogPage() {
                 {isLoading ? 'Jelajahi Program' : `Jelajahi ${courses.length}+ Program`}
               </Button>
             </a>
+            <Link to="/kraepelin">
+              <Button variant="secondary" size="lg">
+                Simulator Kraepelin / Pauli
+              </Button>
+            </Link>
           </div>
         </div>
 
