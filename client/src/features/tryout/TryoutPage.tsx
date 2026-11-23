@@ -10,7 +10,8 @@ import {
   buildScheduledTryoutEvents,
   getRegisteredTryoutIds,
   getTryoutEventStatus,
-  toggleTryoutRegistration,
+  syncTryoutRegistrationsFromServer,
+  toggleTryoutRegistrationAsync,
 } from './tryoutEvents';
 
 export function TryoutPage() {
@@ -19,10 +20,20 @@ export function TryoutPage() {
   const userKey = user?.id ?? 'guest';
 
   const [nowMs] = useState(() => Date.now());
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const events = useMemo(() => buildScheduledTryoutEvents(nowMs), [nowMs]);
   const [registeredIds, setRegisteredIds] = useState<string[]>(() =>
     getRegisteredTryoutIds(userKey)
   );
+
+  useQuery({
+    queryKey: ['tryout-registrations', userKey],
+    queryFn: async () => {
+      const synced = await syncTryoutRegistrationsFromServer(userKey);
+      setRegisteredIds(synced);
+      return synced;
+    },
+  });
 
   const { data: courses = [] } = useQuery({
     queryKey: ['courses', 'published'],
@@ -34,7 +45,19 @@ export function TryoutPage() {
     queryFn: async () => (await lmsApi.listLeaderboard()).slice(0, 10),
   });
 
-  // Find a valid published quiz ID to launch when user starts a live tryout
+  const categories = useMemo(
+    () => ['ALL', ...Array.from(new Set(events.map((e) => e.category)))],
+    [events]
+  );
+
+  const filteredEvents = useMemo(
+    () =>
+      selectedCategory === 'ALL'
+        ? events
+        : events.filter((ev) => ev.category === selectedCategory),
+    [events, selectedCategory]
+  );
+
   const defaultQuizId = useMemo(() => {
     for (const c of courses) {
       for (const m of c.modules ?? []) {
@@ -48,26 +71,45 @@ export function TryoutPage() {
     return '';
   }, [courses]);
 
-  const handleToggleRegister = (eventId: string) => {
-    const updated = toggleTryoutRegistration(userKey, eventId);
+  const handleToggleRegister = async (eventId: string) => {
+    const updated = await toggleTryoutRegistrationAsync(userKey, eventId);
     setRegisteredIds(updated);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-8">
-      <div className="space-y-2">
-        <Badge tone="emerald">Event Kompetisi Nasional</Badge>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#18181B] dark:text-white tracking-tight">
-          Tryout Akbar &amp; Peringkat Event
-        </h1>
-        <p className="text-sm text-[#52525B] dark:text-slate-400 max-w-2xl">
-          Ikuti jadwal simulasi serentak, daftarkan kursi Anda sebelum kuota penuh, dan pantau peringkat nasional di papan skor event.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="space-y-2">
+          <Badge tone="emerald">Event Kompetisi Nasional</Badge>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#18181B] dark:text-white tracking-tight">
+            Tryout Akbar &amp; Peringkat Event
+          </h1>
+          <p className="text-sm text-[#52525B] dark:text-slate-400 max-w-2xl">
+            Ikuti jadwal simulasi serentak, daftarkan kursi Anda sebelum kuota penuh, dan pantau peringkat nasional di papan skor event.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                selectedCategory === cat
+                  ? 'bg-[#0F766E] text-white'
+                  : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              }`}
+            >
+              {cat === 'ALL' ? 'Semua Kategori' : cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-8 space-y-4">
-          {events.map((ev) => {
+          {filteredEvents.map((ev) => {
             const status = getTryoutEventStatus(ev, nowMs);
             const isRegistered = registeredIds.includes(ev.id);
             const displayCount = ev.registeredCount + (isRegistered ? 1 : 0);

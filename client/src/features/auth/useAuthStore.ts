@@ -69,6 +69,7 @@ interface AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (fullName: string, email: string, password: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
   signOut: (expired?: boolean) => Promise<void>;
   checkActiveSession: () => Promise<boolean>;
   setProfile: (profile: Profile) => void;
@@ -377,7 +378,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     if (isSupabaseConfigured && supabase) {
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: `${window.location.origin}/auth?type=recovery`,
       });
       if (error) {
         throw new Error(error.message || 'Gagal mengirim tautan reset password.');
@@ -387,5 +388,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     // Demo mode simulation: succeed cleanly without leaking account existence
     return;
+  },
+
+  updatePassword: async (newPassword) => {
+    if (!newPassword || newPassword.trim().length < 6) {
+      throw new Error('Password baru minimal 6 karakter.');
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        throw new Error(error.message || 'Gagal memperbarui password.');
+      }
+      return;
+    }
+
+    const currentUser = get().user;
+    if (currentUser?.email) {
+      const passwords = getStoredPasswords();
+      passwords[currentUser.email.toLowerCase()] = newPassword;
+      localStorage.setItem(PASSWORDS_STORAGE_KEY, JSON.stringify(passwords));
+    }
   },
 }));
