@@ -1,6 +1,6 @@
 /**
- * Database Seeder for Supabase Backend
- * Usage:
+ * Database Seeder for Supabase Backend (Idempotent)
+ * Usage (from client/):
  *   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npx tsx ../supabase/seed/seedSupabase.ts
  */
 import { createClient } from '@supabase/supabase-js';
@@ -8,6 +8,7 @@ import { DEMO_COURSES, DEMO_PROFILES } from '../../client/src/shared/data/demoSe
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const defaultPassword = process.env.SEED_USER_PASSWORD ?? 'LokaTalentaDemo123!';
 
 if (!supabaseUrl || !serviceKey) {
   console.error('Error: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables are required.');
@@ -15,33 +16,96 @@ if (!supabaseUrl || !serviceKey) {
 }
 
 const supabase = createClient(supabaseUrl, serviceKey, {
-  auth: { persistSession: false },
+  auth: { persistSession: false, autoRefreshToken: false },
 });
 
-async function seed() {
-  console.log(`Seeding ${DEMO_PROFILES.length} profiles and ${DEMO_COURSES.length} courses...`);
+async function ensureAuthUserMap(): Promise<Map<string, string>> {
+  const emailToUid = new Map<string, string>();
+  const { data: listed, error: listErr } = await supabase.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+  if (listErr) {
+    throw new Error(`Failed listing auth users: ${listErr.message}`);
+  }
+
+  for (const user of listed?.users ?? []) {
+    if (user.email) {
+      emailToUid.set(user.email.toLowerCase(), user.id);
+    }
+  }
+
+  const demoIdToUid = new Map<string, string>();
 
   for (const p of DEMO_PROFILES) {
-    await supabase.from('profiles').upsert(
+    const emailKey = p.email.toLowerCase();
+    let uid = emailToUid.get(emailKey);
+
+    if (!uid) {
+      const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+        email: p.email,
+        password: defaultPassword,
+        email_confirm: true,
+        user_metadata: { full_name: p.full_name },
+      });
+      if (createErr || !created.user) {
+        throw new Error(`Failed creating auth user ${p.email}: ${createErr?.message}`);
+      }
+      uid = created.user.id;
+      emailToUid.set(emailKey, uid);
+    }
+
+    const { error: profErr } = await supabase.from('profiles').upsert(
       {
-        id: p.id,
+        id: uid,
         full_name: p.full_name,
         email: p.email,
         role: p.role,
         bio: p.bio ?? '',
         is_active: p.is_active ?? true,
       },
-      { onConflict: 'email' }
+      { onConflict: 'id' }
     );
+    if (profErr) {
+      throw new Error(`Failed upserting profile ${p.email}: ${profErr.message}`);
+    }
+
+    demoIdToUid.set(p.id, uid);
   }
 
+  return demoIdToUid;
+}
+
+async function seed() {
+  console.log(`Seeding ${DEMO_PROFILES.length} profiles and ${DEMO_COURSES.length} courses into ${supabaseUrl}...`);
+
+  const demoIdToUid = await ensureAuthUserMap();
+  const fallbackTeacherId = demoIdToUid.get('demo-teacher-1') ?? Array.from(demoIdToUid.values())[0];
+
+  if (!fallbackTeacherId) {
+    throw new Error('No teacher profile available after seeding profiles.');
+  }
+
+  let coursesInserted = 0;
+  let coursesSkipped = 0;
+
   for (const course of DEMO_COURSES) {
-    const { data: cRow, error: cErr } = await supabase
+    const teacherUuid = demoIdToUid.get(course.teacher_id) ?? fallbackTeacherId;
+
+    const { data: existingCourse } = await supabase
       .from('courses')
-      .upsert(
-        {
+      .select('id')
+      .eq('slug', course.slug)
+      .maybeSingle();
+
+    let courseId = existingCourse?.id;
+
+    if (!courseId) {
+      const { data: cRow, error: cErr } = await supabase
+        .from('courses')
+        .insert({
           slug: course.slug,
-          teacher_id: course.teacher_id,
+          teacher_id: teacherUuid,
           title: course.title,
           description: course.description,
           category: course.category,
@@ -49,29 +113,44 @@ async function seed() {
           estimated_hours: course.estimated_hours,
           thumbnail_url: course.thumbnail_url ?? null,
           is_published: course.is_published,
-        },
-        { onConflict: 'slug' }
-      )
-      .select('id')
-      .single();
+        })
+        .select('id')
+        .single();
 
-    if (cErr || !cRow) {
-      console.error(`Failed course ${course.slug}:`, cErr?.message);
-      continue;
+      if (cErr || !cRow) {
+        console.error(`Failed course ${course.slug}:`, cErr?.message);
+        continue;
+      }
+      courseId = cRow.id;
+    } else {
+      const { count } = await supabase
+        .from('modules')
+        .select('id', { count: 'exact', head: true })
+        .eq('course_id', courseId);
+
+      if ((count ?? 0) > 0) {
+        coursesSkipped += 1;
+        continue;
+      }
     }
+
+    coursesInserted += 1;
 
     for (const mod of course.modules ?? []) {
       const { data: mRow, error: mErr } = await supabase
         .from('modules')
         .insert({
-          course_id: cRow.id,
+          course_id: courseId,
           title: mod.title,
           order_index: mod.order_index,
         })
         .select('id')
         .single();
 
-      if (mErr || !mRow) continue;
+      if (mErr || !mRow) {
+        console.error(`Failed module ${mod.title}:`, mErr?.message);
+        continue;
+      }
 
       for (const les of mod.lessons ?? []) {
         const { data: lRow, error: lErr } = await supabase
@@ -120,12 +199,15 @@ async function seed() {
           order_index: q.order_index,
         }));
 
-        await supabase.from('questions').insert(questionRows);
+        const { error: qErr } = await supabase.from('questions').insert(questionRows);
+        if (qErr) {
+          console.error(`Failed questions for quiz ${les.quiz.title}:`, qErr.message);
+        }
       }
     }
   }
 
-  console.log('Supabase seed completed.');
+  console.log(`Supabase seed completed. Seeded: ${coursesInserted}, Skipped (already seeded): ${coursesSkipped}.`);
 }
 
 seed().catch((err) => {
