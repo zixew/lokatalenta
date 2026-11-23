@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.8.0] - 2026-11-23
+
+### Minor
+- Sprint 5: Target Karier & XP Harian (BL-15), Resume Last Lesson & Shortcut Hint (BL-16), dan Duel 1v1 Score Comparison (BL-17)
+
+---
+
 ## [1.7.0] - 2026-11-23
 
 ### Minor
