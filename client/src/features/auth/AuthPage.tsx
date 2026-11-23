@@ -19,7 +19,9 @@ export function AuthPage() {
     requestSignUpOtp,
     verifyAndSignUp,
     sessionExpired,
+    sessionDisplaced,
     clearSessionExpired,
+    clearSessionDisplaced,
   } = useAuthStore();
   const navigate = useNavigate();
 
@@ -54,6 +56,7 @@ export function AuthPage() {
         await signIn(email, password);
       }
       clearSessionExpired();
+      clearSessionDisplaced();
       const role = useAuthStore.getState().user?.role;
       if (role === 'teacher') navigate('/teacher');
       else if (role === 'admin') navigate('/admin');
@@ -83,6 +86,12 @@ export function AuthPage() {
           {sessionExpired && (
             <div className="mb-4 p-3.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-sm">
               Sesi anda telah habis.
+            </div>
+          )}
+
+          {sessionDisplaced && (
+            <div className="mb-4 p-3.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-sm">
+              Akun Anda telah masuk di perangkat atau sesi lain, sehingga sesi ini otomatis keluar.
             </div>
           )}
 

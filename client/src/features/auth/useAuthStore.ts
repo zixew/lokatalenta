@@ -7,9 +7,18 @@ export const SESSION_IDLE_TIMEOUT_MS = 60 * 60 * 1000; // 1 jam
 
 const SESSION_USER_ID_KEY = 'ruanglatih_session_user_id_v1';
 const LAST_ACTIVITY_KEY = 'ruanglatih_last_activity_v1';
+const ACTIVE_SESSION_TOKEN_KEY = 'lokatalenta_active_session_token_v1';
+const DEMO_ACTIVE_SESSION_PREFIX = 'lokatalenta_demo_active_session_';
 const PROFILES_STORAGE_KEY = 'ruanglatih_demo_profiles_v13';
 const PASSWORDS_STORAGE_KEY = 'ruanglatih_demo_passwords_v1';
 const OTP_STORAGE_KEY = 'lokatalenta_signup_otp_v1';
+
+function generateSessionToken(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `sess-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 interface PendingOtpRecord {
   code: string;
@@ -62,6 +71,7 @@ interface AuthState {
   loading: boolean;
   initialized: boolean;
   sessionExpired: boolean;
+  sessionDisplaced: boolean;
   init: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   requestSignUpOtp: (email: string) => Promise<{ devOtpPreview?: string }>;
@@ -73,15 +83,18 @@ interface AuthState {
   ) => Promise<void>;
   signUp: (fullName: string, email: string, password: string) => Promise<void>;
   signOut: (expired?: boolean) => Promise<void>;
+  checkActiveSession: () => Promise<boolean>;
   setProfile: (profile: Profile) => void;
   clearSessionExpired: () => void;
+  clearSessionDisplaced: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: false,
   initialized: false,
   sessionExpired: false,
+  sessionDisplaced: false,
 
   init: async () => {
     const expired = isSessionIdleExpired();
@@ -107,9 +120,23 @@ export const useAuthStore = create<AuthState>((set) => ({
           .eq('id', session.user.id)
           .single();
         if (profile?.is_active === false) {
-          await supabase.auth.signOut();
+          await supabase.auth.signOut({ scope: 'local' });
+          localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
           set({ user: null, loading: false, initialized: true });
           return;
+        }
+        const localToken = localStorage.getItem(ACTIVE_SESSION_TOKEN_KEY);
+        const remoteToken = (profile as (Profile & { active_session_id?: string | null }) | null)
+          ?.active_session_id;
+        if (localToken && remoteToken && remoteToken !== localToken) {
+          await supabase.auth.signOut({ scope: 'local' });
+          localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
+          localStorage.removeItem(LAST_ACTIVITY_KEY);
+          set({ user: null, loading: false, initialized: true, sessionDisplaced: true });
+          return;
+        }
+        if (!localToken && remoteToken) {
+          localStorage.setItem(ACTIVE_SESSION_TOKEN_KEY, remoteToken);
         }
         set({ user: profile ?? null, loading: false, initialized: true });
       } else {
@@ -148,8 +175,18 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const profiles = getStoredProfiles();
     const found = profiles.find((p) => p.id === activeUserId);
+    const localToken = localStorage.getItem(ACTIVE_SESSION_TOKEN_KEY);
+    const remoteDemoToken = localStorage.getItem(`${DEMO_ACTIVE_SESSION_PREFIX}${activeUserId}`);
+    if (localToken && remoteDemoToken && remoteDemoToken !== localToken) {
+      localStorage.removeItem(SESSION_USER_ID_KEY);
+      localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
+      localStorage.removeItem(LAST_ACTIVITY_KEY);
+      set({ user: null, loading: false, initialized: true, sessionDisplaced: true });
+      return;
+    }
     if (!found || found.is_active === false) {
       localStorage.removeItem(SESSION_USER_ID_KEY);
+      localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
       localStorage.removeItem(LAST_ACTIVITY_KEY);
       set({ user: null, loading: false, initialized: true });
       return;
@@ -160,6 +197,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signIn: async (email, password) => {
+    const nextSessionToken = generateSessionToken();
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -170,12 +208,18 @@ export const useAuthStore = create<AuthState>((set) => ({
           .eq('id', data.user.id)
           .single();
         if (profile?.is_active === false) {
-          await supabase.auth.signOut();
+          await supabase.auth.signOut({ scope: 'local' });
           throw new Error('Akun Anda sedang dinonaktifkan oleh Admin.');
         }
+        localStorage.setItem(ACTIVE_SESSION_TOKEN_KEY, nextSessionToken);
+        await supabase
+          .from('profiles')
+          .update({ active_session_id: nextSessionToken })
+          .eq('id', data.user.id);
+        await supabase.auth.signOut({ scope: 'others' }).catch(() => {});
       }
       touchLastActivity();
-      set({ sessionExpired: false });
+      set({ sessionExpired: false, sessionDisplaced: false });
       return;
     }
 
@@ -192,8 +236,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     localStorage.setItem(SESSION_USER_ID_KEY, found.id);
+    localStorage.setItem(ACTIVE_SESSION_TOKEN_KEY, nextSessionToken);
+    localStorage.setItem(`${DEMO_ACTIVE_SESSION_PREFIX}${found.id}`, nextSessionToken);
     touchLastActivity();
-    set({ user: found, sessionExpired: false });
+    set({ user: found, sessionExpired: false, sessionDisplaced: false });
   },
 
   requestSignUpOtp: async (email) => {
@@ -331,10 +377,50 @@ export const useAuthStore = create<AuthState>((set) => ({
   signOut: async (expired = false) => {
     localStorage.removeItem(LAST_ACTIVITY_KEY);
     localStorage.removeItem(SESSION_USER_ID_KEY);
+    localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
     if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: 'local' });
     }
     set({ user: null, sessionExpired: expired });
+  },
+
+  checkActiveSession: async () => {
+    const currentUser = get().user;
+    if (!currentUser) return false;
+    const localToken = localStorage.getItem(ACTIVE_SESSION_TOKEN_KEY);
+
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('active_session_id, is_active')
+        .eq('id', currentUser.id)
+        .single();
+      if (error) return false;
+
+      const remoteToken = (data as { active_session_id?: string | null; is_active?: boolean } | null)
+        ?.active_session_id;
+      const isDeactivated = data?.is_active === false;
+      const isDisplaced = Boolean(localToken && remoteToken && remoteToken !== localToken);
+
+      if (isDeactivated || isDisplaced) {
+        localStorage.removeItem(LAST_ACTIVITY_KEY);
+        localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
+        await supabase.auth.signOut({ scope: 'local' });
+        set({ user: null, sessionDisplaced: isDisplaced });
+        return true;
+      }
+      return false;
+    }
+
+    const remoteDemoToken = localStorage.getItem(`${DEMO_ACTIVE_SESSION_PREFIX}${currentUser.id}`);
+    if (localToken && remoteDemoToken && remoteDemoToken !== localToken) {
+      localStorage.removeItem(LAST_ACTIVITY_KEY);
+      localStorage.removeItem(SESSION_USER_ID_KEY);
+      localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
+      set({ user: null, sessionDisplaced: true });
+      return true;
+    }
+    return false;
   },
 
   setProfile: (profile) => {
@@ -343,5 +429,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearSessionExpired: () => {
     set({ sessionExpired: false });
+  },
+
+  clearSessionDisplaced: () => {
+    set({ sessionDisplaced: false });
   },
 }));
