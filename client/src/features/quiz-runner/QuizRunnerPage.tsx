@@ -41,6 +41,26 @@ export function QuizRunnerPage() {
   const [showLeaveWarning, setShowLeaveWarning] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [navFilter, setNavFilter] = useState<'all' | 'unanswered' | 'flagged'>('all');
+  const [practiceMode, setPracticeMode] = useState(false);
+  const [practiceFeedback, setPracticeFeedback] = useState<
+    Record<string, { is_correct: boolean; correct_option: string; explanation: string }>
+  >({});
+  const [checkingPractice, setCheckingPractice] = useState(false);
+
+  const handleCheckPractice = async () => {
+    if (!quizId || !currentQuestion) return;
+    const selected = answers[currentQuestion.id];
+    if (!selected || checkingPractice) return;
+    setCheckingPractice(true);
+    try {
+      const res = await lmsApi.checkPracticeAnswer(quizId, currentQuestion.id, selected);
+      setPracticeFeedback((prev) => ({ ...prev, [currentQuestion.id]: res }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCheckingPractice(false);
+    }
+  };
 
   const playQuestionAudio = (text: string, lang: 'ja-JP' | 'en-US' | 'ko-KR', rate: number) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -248,6 +268,19 @@ export function QuizRunnerPage() {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               type="button"
+              onClick={() => setPracticeMode((m) => !m)}
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+                practiceMode
+                  ? 'bg-[#0F766E] border-[#0F766E] text-white'
+                  : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+              title="Beralih antara Mode Ujian ketat dan Mode Latihan (cek pembahasan langsung)"
+            >
+              {practiceMode ? 'Mode Latihan' : 'Mode Ujian'}
+            </button>
+
+            <button
+              type="button"
               onClick={toggleTheme}
               aria-label="Ganti tema terang atau gelap"
               className="p-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
@@ -396,6 +429,42 @@ export function QuizRunnerPage() {
               );
             })}
           </div>
+
+          {/* BL-02: Practice Mode Instant Feedback */}
+          {practiceMode && (
+            <div className="space-y-3">
+              {answers[currentQuestion.id] && !practiceFeedback[currentQuestion.id] && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  disabled={checkingPractice}
+                  onClick={() => void handleCheckPractice()}
+                >
+                  {checkingPractice ? 'Memeriksa...' : 'Cek Jawaban & Pembahasan'}
+                </Button>
+              )}
+
+              {practiceFeedback[currentQuestion.id] && (
+                <div
+                  className={`p-4 rounded-xl border text-sm space-y-1.5 ${
+                    practiceFeedback[currentQuestion.id].is_correct
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100'
+                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-100'
+                  }`}
+                >
+                  <p className="font-bold text-xs uppercase tracking-wider">
+                    {practiceFeedback[currentQuestion.id].is_correct
+                      ? 'Jawaban Benar!'
+                      : `Kurang Tepat — Jawaban Benar: ${practiceFeedback[currentQuestion.id].correct_option}`}
+                  </p>
+                  <p className="text-xs sm:text-sm leading-relaxed">
+                    {practiceFeedback[currentQuestion.id].explanation}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Prev / Next Controls */}
           <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2">
