@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.6.1] - 2026-11-23
+
+### Patch
+- Perbaikan UI Topbar dengan komponen TopbarNav dan menu dropdown Lainnya agar bebas tabrakan
+
+---
+
 ## [1.6.0] - 2026-11-23
 
 ### Minor
