@@ -231,7 +231,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <p>
             LokaTalenta <span className="font-mono-tabular">v{pkg.version}</span> — Akademi Bahasa, Asesmen &amp; Kesiapan Karier
           </p>
-          <p>Belajar terstruktur dan ukur kesiapan Anda secara objektif.</p>
+          <div className="flex items-center gap-2">
+            <Badge tone="emerald">PWA Ready</Badge>
+            <span>Belajar terstruktur dan ukur kesiapan Anda secara objektif.</span>
+          </div>
         </div>
       </footer>
     </div>

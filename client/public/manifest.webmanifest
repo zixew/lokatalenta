@@ -13,5 +13,19 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Simulasi Tes Kraepelin",
+      "short_name": "Kraepelin",
+      "description": "Latihan ketelitian & ketahanan kerja",
+      "url": "/kraepelin"
+    },
+    {
+      "name": "Tryout Akbar Nasional",
+      "short_name": "Tryout",
+      "description": "Jadwal simulasi & papan peringkat nasional",
+      "url": "/tryout"
+    }
   ]
 }

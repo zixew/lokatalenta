@@ -26,6 +26,10 @@ import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
 import { BulkCsvImportPanel } from './BulkCsvImportPanel';
+import {
+  extractUniqueCategories,
+  filterQuestionsBySearchAndCategory,
+} from './questionBankHelpers';
 import { TeacherAnalyticsPanel } from './TeacherAnalyticsPanel';
 import { TeacherAssignmentsTab } from './TeacherAssignmentsTab';
 import { TeacherInteractionTab } from './TeacherInteractionTab';
@@ -85,6 +89,8 @@ export function TeacherStudioPage() {
   const [optE, setOptE] = useState('');
   const [correctOpt, setCorrectOpt] = useState<QuizOption['key']>('A');
   const [explanation, setExplanation] = useState('');
+  const [questionSearch, setQuestionSearch] = useState('');
+  const [questionCategoryFilter, setQuestionCategoryFilter] = useState('ALL');
 
   const showSuccess = (msg: string) => {
     setErrorBanner('');
@@ -491,8 +497,32 @@ export function TeacherStudioPage() {
                 <h3 className="text-sm font-bold text-[#18181B] dark:text-white">Daftar Soal Saat Ini</h3>
                 <Badge tone="blue">{activeQuestions.length} Soal</Badge>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  value={questionSearch}
+                  onChange={(e) => setQuestionSearch(e.target.value)}
+                  placeholder="Cari teks soal..."
+                  className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+                <select
+                  value={questionCategoryFilter}
+                  onChange={(e) => setQuestionCategoryFilter(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                >
+                  {extractUniqueCategories(activeQuestions).map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat === 'ALL' ? 'Semua Kategori' : cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                {activeQuestions.map((q, idx) => (
+                {filterQuestionsBySearchAndCategory(
+                  activeQuestions,
+                  questionSearch,
+                  questionCategoryFilter
+                ).map((q, idx) => (
                   <div
                     key={q.id}
                     className="p-3 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex items-start justify-between gap-2"
@@ -509,14 +539,37 @@ export function TeacherStudioPage() {
                       </div>
                       <p className="text-xs text-[#18181B] dark:text-white line-clamp-2">{q.question_text}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => deleteQuestionMut.mutate(q.id)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 cursor-pointer"
-                      title="Hapus soal"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQCategory(q.category_tag);
+                          setQText(q.question_text);
+                          setQImageUrl(q.image_url ?? '');
+                          setQAudioText(q.audio_text ?? '');
+                          setOptA(q.options.find((o) => o.key === 'A')?.text ?? '');
+                          setOptB(q.options.find((o) => o.key === 'B')?.text ?? '');
+                          setOptC(q.options.find((o) => o.key === 'C')?.text ?? '');
+                          setOptD(q.options.find((o) => o.key === 'D')?.text ?? '');
+                          setOptE(q.options.find((o) => o.key === 'E')?.text ?? '');
+                          setCorrectOpt(q.correct_option);
+                          setExplanation(q.explanation);
+                          showSuccess('Soal dimuat ke form editor untuk diedit atau diduplikasi.');
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-[#0F766E] cursor-pointer"
+                        title="Muat ke form editor"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteQuestionMut.mutate(q.id)}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 cursor-pointer"
+                        title="Hapus soal"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
