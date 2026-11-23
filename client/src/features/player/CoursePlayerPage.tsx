@@ -27,6 +27,7 @@ import { LessonNotesAndCheckPanel } from './LessonNotesAndCheckPanel';
 import { LessonExtrasPanel } from './LessonExtrasPanel';
 import { SpeechPracticeBox } from './SpeechPracticeBox';
 import { WritingCanvas } from './WritingCanvas';
+import { getLastOpenedLessonId, saveLastOpenedLessonId } from './lastLessonStorage';
 
 export function CoursePlayerPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -121,10 +122,20 @@ export function CoursePlayerPage() {
   };
 
   const firstIncompleteLesson = allLessons.find((l) => !isLessonDone(l));
+  const savedLastLessonId =
+    user && course ? getLastOpenedLessonId(user.id, course.id) : null;
   const activeLesson: Lesson | undefined =
-    allLessons.find((l) => l.id === (activeLessonId ?? requestedLessonId)) ??
+    allLessons.find(
+      (l) => l.id === (activeLessonId ?? requestedLessonId ?? savedLastLessonId)
+    ) ??
     firstIncompleteLesson ??
     allLessons[0];
+
+  useEffect(() => {
+    if (user?.id && course?.id && activeLesson?.id) {
+      saveLastOpenedLessonId(user.id, course.id, activeLesson.id);
+    }
+  }, [user?.id, course?.id, activeLesson?.id]);
 
   const isEnrolled = course ? enrolledIds.includes(course.id) : false;
 
