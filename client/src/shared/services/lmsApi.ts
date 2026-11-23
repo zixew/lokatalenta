@@ -2391,6 +2391,18 @@ export const lmsApi = {
 
   async listLeaderboard(): Promise<LeaderboardEntry[]> {
     if (isSupabaseConfigured && supabase) {
+      const { data: rpcRows, error: rpcErr } = await supabase.rpc('get_public_leaderboard');
+      if (!rpcErr && Array.isArray(rpcRows)) {
+        return rpcRows.map((row: any) => ({
+          user_id: row.user_id,
+          full_name: row.full_name,
+          xp: Number(row.xp ?? 0),
+          level: Number(row.level ?? 1),
+          completed_lessons: Number(row.completed_lessons ?? 0),
+          passed_quizzes: Number(row.passed_quizzes ?? 0),
+        }));
+      }
+
       const { data: students } = await supabase
         .from('profiles')
         .select('id, full_name')
