@@ -105,3 +105,7 @@
 | AUTH-04 | Public | Happy | Lupa Password / Reset Password Flow (BL-08) | Klik `Lupa Password?` di `/auth`, isi email valid & submit | Konfirmasi pengiriman tautan reset password tampil | **READY FOR SIT** |
 | TRY-01 | Public/Student | Happy | Tryout Akbar Terjadwal & Leaderboard Event (BL-09) | Buka `/tryout`, daftar event aktif, cek status & Leaderboard | Event Live/Upcoming/Ended tampil, daftar berhasil, & Top 10 tampil | **READY FOR SIT** |
 | E2E-01 | All | Happy | Regression Suite Playwright & CI (BL-10) | Jalankan `client/e2e/lms-flows.spec.ts` & unit tests | Seluruh skenario inti lulus | **READY FOR SIT** |
+| PRF-03 | System | Happy | Code-Splitting Vendor Bundle < 250 kB (BL-11) | Jalankan `npm run build` | Seluruh chunk (`index`, `react-vendor`, `supabase-vendor`, `query-vendor`) < 250 kB tanpa warning | **PASS** |
+| AUTH-05 | Public | Happy | Callback Form Buat Password Baru (`?type=recovery`) (BL-12) | Buka `/auth?type=recovery`, isi password baru & konfirmasi | Form Buat Password Baru tampil & validasi min 6 karakter bekerja | **READY FOR SIT** |
+| TRY-02 | Student | Happy | Filter Kategori & Sync Pendaftaran Tryout Akbar (BL-13) | Buka `/tryout`, filter kategori `CPNS & Kedinasan`, daftar event | Daftar event terfilter sesuai kategori & status Terdaftar persisten | **READY FOR SIT** |
+| E2E-02 | System | Happy | Suite E2E Recovery & Topbar Navigation (BL-14) | Jalankan `npm test` & verifikasi E2E | Seluruh unit test & skenario recovery lulus | **READY FOR SIT** |
