@@ -87,12 +87,15 @@ END;
 $$;
 
 -- 2. UPDATE get_attempt_review TO RETURN ONLY DRAWN question_ids
+DROP FUNCTION IF EXISTS public.get_attempt_review(UUID);
 CREATE OR REPLACE FUNCTION public.get_attempt_review(p_attempt_id UUID)
 RETURNS TABLE (
   question_id UUID,
   category_tag TEXT,
   question_text TEXT,
   image_url TEXT,
+  audio_text TEXT,
+  audio_lang TEXT,
   options JSONB,
   correct_option TEXT,
   explanation TEXT,
@@ -117,7 +120,7 @@ BEGIN
   END IF;
 
   RETURN QUERY
-  SELECT q.id, q.category_tag, q.question_text, q.image_url, q.options, q.correct_option, q.explanation, q.order_index
+  SELECT q.id, q.category_tag, q.question_text, q.image_url, q.audio_text, q.audio_lang, q.options, q.correct_option, q.explanation, q.order_index
   FROM public.questions q
   WHERE q.quiz_id = v_attempt.quiz_id
     AND (
