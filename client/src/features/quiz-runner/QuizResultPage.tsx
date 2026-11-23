@@ -4,8 +4,10 @@ import {
   ArrowRight,
   Award,
   CheckCircle2,
+  Copy,
   MessageSquare,
   RotateCcw,
+  Share2,
   Target,
   Volume2,
   XCircle,
@@ -16,13 +18,21 @@ import { lmsApi } from '../../shared/services/lmsApi';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
+import { useAuthStore } from '../auth/useAuthStore';
+import {
+  buildChallengeUrl,
+  buildLinkedInShareUrl,
+  buildWhatsAppShareUrl,
+} from './shareAndChallenge';
 
 export function QuizResultPage() {
   const { quizId, attemptId } = useParams<{ quizId: string; attemptId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [filterMode, setFilterMode] = useState<'all' | 'wrong'>('all');
   const [selectedSubtest, setSelectedSubtest] = useState<string>('ALL');
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [copiedChallenge, setCopiedChallenge] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setNowMs(Date.now()), 1000);
@@ -259,6 +269,72 @@ export function QuizResultPage() {
           </div>
         )}
       </div>
+
+      {/* Tantang Teman 1v1 & Bagikan Skor */}
+      {quizId && (
+        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h2 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-[#0F766E]" />
+              Tantang Teman 1v1 &amp; Bagikan Skor
+            </h2>
+            <p className="text-xs text-[#71717A] dark:text-slate-400">
+              Bagikan skor Anda ({score}/100) atau kirim tautan tantangan 1v1 agar teman mencoba mengalahkan rekor Anda.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                const url = buildChallengeUrl(
+                  window.location.origin,
+                  quizId,
+                  score,
+                  user?.full_name || 'Teman'
+                );
+                navigator.clipboard?.writeText(url);
+                setCopiedChallenge(true);
+                setTimeout(() => setCopiedChallenge(false), 2500);
+              }}
+            >
+              <Copy className="w-3.5 h-3.5" />
+              {copiedChallenge ? 'Link Tantangan Disalin!' : 'Salin Link Tantangan 1v1'}
+            </Button>
+            <a
+              href={buildWhatsAppShareUrl(
+                `Saya meraih skor ${score}/100 di ${quizMeta?.title ?? 'Simulasi LokaTalenta'}! Berani kalahkan skor saya? ${buildChallengeUrl(
+                  typeof window !== 'undefined' ? window.location.origin : 'https://lokatalenta.vercel.app',
+                  quizId,
+                  score,
+                  user?.full_name || 'Teman'
+                )}`
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+            >
+              Bagikan ke WhatsApp
+            </a>
+            <a
+              href={buildLinkedInShareUrl(
+                buildChallengeUrl(
+                  typeof window !== 'undefined' ? window.location.origin : 'https://lokatalenta.vercel.app',
+                  quizId,
+                  score,
+                  user?.full_name || 'Teman'
+                )
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0A66C2] hover:bg-[#004182] text-white transition-colors"
+            >
+              Bagikan ke LinkedIn
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Ringkasan Jawaban: Jawaban Salah & Jawaban yang Seharusnya Benar */}
       <section id="quiz-review-section" className="space-y-4">
