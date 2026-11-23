@@ -23,6 +23,7 @@ import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
 import { CourseOverviewGate } from './CourseOverviewGate';
 import { FlashcardDeck } from './FlashcardDeck';
+import { LessonNotesAndCheckPanel } from './LessonNotesAndCheckPanel';
 import { LessonExtrasPanel } from './LessonExtrasPanel';
 import { SpeechPracticeBox } from './SpeechPracticeBox';
 import { WritingCanvas } from './WritingCanvas';
@@ -620,6 +621,15 @@ export function CoursePlayerPage() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* BL-04: Interactive Quick Check & Personal Notes */}
+              {activeLesson.type !== 'quiz' && (
+                <LessonNotesAndCheckPanel
+                  key={activeLesson.id}
+                  userId={user?.id ?? 'guest'}
+                  lesson={activeLesson}
+                />
               )}
 
               {/* Coursera / Dicoding Bottom Back & Continue Bar */}
