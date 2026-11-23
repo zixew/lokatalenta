@@ -6,26 +6,28 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 
-type LearningGoalId = 'psikotes' | 'japanese' | 'korean' | 'english';
-const GOAL_STORAGE_KEY = 'lokatalenta_learning_goal_v1';
+import {
+  getSavedDailyXpTarget,
+  getSavedLearningGoal,
+  saveDailyXpTarget,
+  saveLearningGoal,
+  type DailyXpTarget,
+  type LearningGoalId,
+} from './learningGoalStorage';
 
 const GOALS: { id: LearningGoalId; label: string; desc: string }[] = [
-  { id: 'psikotes', label: 'Lolos Psikotes Kerja', desc: 'Ritel modern, BUMN & korporasi' },
+  { id: 'psikotes', label: 'Lolos Psikotes Kerja', desc: 'Ritel modern & korporasi swasta' },
+  { id: 'cpns_bumn', label: 'Seleksi BUMN & CPNS', desc: 'TKD, Core Values & SKD CAT' },
   { id: 'japanese', label: 'Bahasa Jepang dari 0', desc: 'Hiragana, Katakana, Kanji & JLPT' },
   { id: 'korean', label: 'Bahasa Korea dari 0', desc: 'Hangeul, kosakata & TOPIK' },
   { id: 'english', label: 'Bahasa Inggris & Karier', desc: 'Grammar, speaking & dunia kerja' },
 ];
 
-function readSavedGoal(): LearningGoalId | null {
-  try {
-    const val = localStorage.getItem(GOAL_STORAGE_KEY);
-    return val === 'psikotes' || val === 'japanese' || val === 'korean' || val === 'english'
-      ? val
-      : null;
-  } catch {
-    return null;
-  }
-}
+const XP_TARGETS: { value: DailyXpTarget; label: string }[] = [
+  { value: 30, label: '30 XP Santai' },
+  { value: 60, label: '60 XP Fokus' },
+  { value: 100, label: '100 XP Intensif' },
+];
 
 export function CatalogPersonalizationSection({
   courses,
@@ -42,32 +44,34 @@ export function CatalogPersonalizationSection({
   isLoggedIn: boolean;
   onOpenTarget: (e: React.MouseEvent, path: string) => void;
 }) {
-  const [goal, setGoal] = useState<LearningGoalId | null>(() => readSavedGoal());
+  const [goal, setGoal] = useState<LearningGoalId>(() => getSavedLearningGoal());
+  const [xpTarget, setXpTarget] = useState<DailyXpTarget>(() => getSavedDailyXpTarget());
 
   const selectGoal = (next: LearningGoalId) => {
     setGoal(next);
-    try {
-      localStorage.setItem(GOAL_STORAGE_KEY, next);
-    } catch {
-      // ignore storage errors
-    }
+    saveLearningGoal(next);
+  };
+
+  const selectXpTarget = (next: DailyXpTarget) => {
+    setXpTarget(next);
+    saveDailyXpTarget(next);
   };
 
   const enrolledCourses = courses
     .filter((c) => enrolledIds.includes(c.id))
     .slice(0, 3);
 
-  const recommendedCourses = goal
-    ? courses
-        .filter((c) => {
-          const text = `${c.category} ${c.title}`.toLowerCase();
-          if (goal === 'psikotes') return text.includes('psikotes') || text.includes('retail');
-          if (goal === 'japanese') return text.includes('jepang') || text.includes('hiragana');
-          if (goal === 'korean') return text.includes('korea') || text.includes('hangeul');
-          return text.includes('inggris') || text.includes('karier') || text.includes('kerja');
-        })
-        .slice(0, 3)
-    : [];
+  const recommendedCourses = courses
+    .filter((c) => {
+      const text = `${c.category} ${c.title}`.toLowerCase();
+      if (goal === 'psikotes') return text.includes('psikotes') || text.includes('retail');
+      if (goal === 'cpns_bumn')
+        return text.includes('bumn') || text.includes('cpns') || text.includes('psikotes');
+      if (goal === 'japanese') return text.includes('jepang') || text.includes('hiragana');
+      if (goal === 'korean') return text.includes('korea') || text.includes('hangeul');
+      return text.includes('inggris') || text.includes('karier') || text.includes('kerja');
+    })
+    .slice(0, 3);
 
   const quests = [
     {
@@ -196,14 +200,32 @@ export function CatalogPersonalizationSection({
               Rekomendasi Jalur Belajar Sesuai Tujuan Anda
             </h2>
           </div>
-          {goal && (
-            <Badge tone="emerald">
-              Fokus: {GOALS.find((g) => g.id === goal)?.label}
-            </Badge>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 bg-[#F6F5F1] dark:bg-slate-800 p-1 rounded-lg border border-[#E5E3DC] dark:border-slate-700">
+              {XP_TARGETS.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => selectXpTarget(item.value)}
+                  className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
+                    xpTarget === item.value
+                      ? 'bg-[#0F766E] text-white'
+                      : 'text-[#52525B] dark:text-slate-300'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            {goal && (
+              <Badge tone="emerald">
+                Fokus: {GOALS.find((g) => g.id === goal)?.label}
+              </Badge>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
           {GOALS.map((g) => {
             const active = goal === g.id;
             return (
