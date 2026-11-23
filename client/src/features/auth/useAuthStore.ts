@@ -282,12 +282,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   verifyAndSignUp: async (fullName, email, password, otpCode) => {
     const normalizedEmail = email.trim().toLowerCase();
     const cleanOtp = otpCode.trim();
-    if (!/^\d{6}$/.test(cleanOtp)) {
-      throw new Error('Kode OTP harus berupa 6 digit angka.');
+    if (!/^\d{6,8}$/.test(cleanOtp)) {
+      throw new Error('Kode OTP harus berupa 6 hingga 8 digit angka.');
     }
 
     if (isSupabaseConfigured && supabase) {
-      const { error: vErr } = await supabase.auth.verifyOtp({
+      const { data: verifyData, error: vErr } = await supabase.auth.verifyOtp({
         email: normalizedEmail,
         token: cleanOtp,
         type: 'email',
@@ -298,8 +298,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         data: { full_name: fullName.trim() },
       });
       if (uErr) throw uErr;
+
+      const nextSessionToken = generateSessionToken();
+      localStorage.setItem(ACTIVE_SESSION_TOKEN_KEY, nextSessionToken);
+      if (verifyData.user) {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: fullName.trim(),
+            active_session_id: nextSessionToken,
+          })
+          .eq('id', verifyData.user.id);
+        const { data: freshProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', verifyData.user.id)
+          .single();
+        if (freshProfile) {
+          set({ user: freshProfile });
+        }
+      }
       touchLastActivity();
-      set({ sessionExpired: false });
+      set({ sessionExpired: false, sessionDisplaced: false });
       return;
     }
 
