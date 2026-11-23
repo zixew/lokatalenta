@@ -25,6 +25,8 @@ import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
+import { BulkCsvImportPanel } from './BulkCsvImportPanel';
+import { TeacherAnalyticsPanel } from './TeacherAnalyticsPanel';
 import { TeacherAssignmentsTab } from './TeacherAssignmentsTab';
 import { TeacherInteractionTab } from './TeacherInteractionTab';
 
@@ -698,6 +700,14 @@ export function TeacherStudioPage() {
               </Button>
             </form>
           </div>
+
+          <div className="lg:col-span-12">
+            <BulkCsvImportPanel
+              selectedQuizId={selectedQuizId}
+              onImported={(count) => showSuccess(`${count} soal berhasil diimpor dari CSV ke bank soal.`)}
+              onError={(msg) => setErrorBanner(msg)}
+            />
+          </div>
         </div>
       )}
 
@@ -1141,9 +1151,12 @@ export function TeacherStudioPage() {
         </div>
       )}
 
-      {/* TAB 3: PROGRES SISWA */}
+      {/* TAB 3: PROGRES SISWA & ANALITIK */}
       {activeTab === 'students' && (
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+        <div className="space-y-6">
+          <TeacherAnalyticsPanel studentProgress={studentProgress} courses={courses} />
+
+          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-[#18181B] dark:text-white">Progres Belajar Siswa</h2>
@@ -1285,6 +1298,7 @@ export function TeacherStudioPage() {
               </table>
             </div>
           )}
+        </div>
         </div>
       )}
 
