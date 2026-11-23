@@ -12,16 +12,19 @@ import {
   Volume2,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
 import { useThemeStore } from '../../shared/stores/useThemeStore';
 import type { QuizAttempt, SafeQuestion } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
+import { parseChallengeParams } from './shareAndChallenge';
 
 export function QuizRunnerPage() {
   const { quizId } = useParams<{ quizId: string }>();
+  const [searchParams] = useSearchParams();
+  const challengeInfo = parseChallengeParams(searchParams.toString());
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
@@ -306,6 +309,18 @@ export function QuizRunnerPage() {
           </div>
         </div>
       </header>
+
+      {challengeInfo && (
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-4">
+          <div className="px-4 py-2.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-xs sm:text-sm text-teal-900 dark:text-teal-100 flex flex-wrap items-center justify-between gap-2">
+            <span>
+              Tantangan 1v1 dari <strong>{challengeInfo.challenger}</strong> — Target untuk menang:{' '}
+              <strong className="font-mono-tabular">&gt; {challengeInfo.targetScore}%</strong>
+            </span>
+            <Badge tone="emerald">Mode Tantangan</Badge>
+          </div>
+        </div>
+      )}
 
       {/* Main Exam Workspace */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
