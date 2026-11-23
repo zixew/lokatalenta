@@ -19,13 +19,19 @@ import type { QuizAttempt, SafeQuestion } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
-import { parseChallengeParams } from './shareAndChallenge';
+import { parseChallengeParams, saveActiveChallengeForQuiz } from './shareAndChallenge';
 
 export function QuizRunnerPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const [searchParams] = useSearchParams();
   const challengeInfo = parseChallengeParams(searchParams.toString());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (quizId && challengeInfo) {
+      saveActiveChallengeForQuiz(quizId, challengeInfo);
+    }
+  }, [quizId, challengeInfo]);
   const { user } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
 
