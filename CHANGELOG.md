@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.9.0] - 2026-11-23
+
+### Minor
+- Sprint 6: Search/Filter & Load-to-Editor Bank Soal (BL-18), Admin Audit Log (BL-19), dan PWA Manifest Shortcuts & Offline Cache v2 (BL-20)
+
+---
+
 ## [1.8.0] - 2026-11-23
 
 ### Minor
