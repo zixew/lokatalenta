@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getLessonNote, saveLessonNote } from '../features/player/lessonNotesStorage';
+import { parseQuestionsCsv, SAMPLE_QUESTIONS_CSV_TEMPLATE } from '../features/teacher/csvQuestionParser';
 
 function createMemoryStorage(): Storage {
   const store = new Map<string, string>();
@@ -42,5 +43,29 @@ describe('Sprint 2 Features — Lesson Notes (BL-04)', () => {
     expect(getLessonNote('user-1', 'lesson-1')).toBe('Fokus ke pola deret angka genap.');
     expect(getLessonNote('user-1', 'lesson-2')).toBe('Catatan modul kedua.');
     expect(getLessonNote('user-2', 'lesson-1')).toBe('Catatan user berbeda.');
+  });
+});
+
+describe('Sprint 2 Features — Bulk CSV Question Parser (BL-05)', () => {
+  it('parses valid CSV template with quoted fields and header row', () => {
+    const result = parseQuestionsCsv(SAMPLE_QUESTIONS_CSV_TEMPLATE);
+    expect(result.errors).toEqual([]);
+    expect(result.questions).toHaveLength(2);
+    expect(result.questions[0].category_tag).toBe('Verbal');
+    expect(result.questions[0].correct_option).toBe('B');
+    expect(result.questions[1].category_tag).toBe('Numerik');
+    expect(result.questions[1].correct_option).toBe('C');
+  });
+
+  it('reports validation errors for invalid correct_option or missing columns', () => {
+    const badCsv = [
+      'category_tag,question_text,option_a,option_b,option_c,option_d,option_e,correct_option,explanation',
+      'Logika,"Pertanyaan 1",A,B,C,D,E,Z,"Invalid key"',
+      'Logika,"Kurang kolom",A,B',
+    ].join('\n');
+
+    const result = parseQuestionsCsv(badCsv);
+    expect(result.questions).toHaveLength(0);
+    expect(result.errors).toHaveLength(2);
   });
 });

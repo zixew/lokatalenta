@@ -25,6 +25,7 @@ import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
+import { BulkCsvImportPanel } from './BulkCsvImportPanel';
 import { TeacherAssignmentsTab } from './TeacherAssignmentsTab';
 import { TeacherInteractionTab } from './TeacherInteractionTab';
 
@@ -697,6 +698,14 @@ export function TeacherStudioPage() {
                 {addQuestionMut.isPending ? 'Menambahkan...' : 'Simpan Soal ke Bank Soal'}
               </Button>
             </form>
+          </div>
+
+          <div className="lg:col-span-12">
+            <BulkCsvImportPanel
+              selectedQuizId={selectedQuizId}
+              onImported={(count) => showSuccess(`${count} soal berhasil diimpor dari CSV ke bank soal.`)}
+              onError={(msg) => setErrorBanner(msg)}
+            />
           </div>
         </div>
       )}
