@@ -19,13 +19,19 @@ import type { QuizAttempt, SafeQuestion } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
-import { parseChallengeParams } from './shareAndChallenge';
+import { parseChallengeParams, saveActiveChallengeForQuiz } from './shareAndChallenge';
 
 export function QuizRunnerPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const [searchParams] = useSearchParams();
   const challengeInfo = parseChallengeParams(searchParams.toString());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (quizId && challengeInfo) {
+      saveActiveChallengeForQuiz(quizId, challengeInfo);
+    }
+  }, [quizId, challengeInfo]);
   const { user } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
 
@@ -172,9 +178,9 @@ export function QuizRunnerPage() {
   useEffect(() => {
     if (!currentQuestion || showConfirm) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'n') {
         setCurrentIndex((i) => Math.min(questions.length - 1, i + 1));
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'p') {
         setCurrentIndex((i) => Math.max(0, i - 1));
       } else if (e.key.toLowerCase() === 'f') {
         setFlagged((prev) => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }));
@@ -351,6 +357,13 @@ export function QuizRunnerPage() {
               <Flag className="w-3.5 h-3.5" />
               {flagged[currentQuestion.id] ? 'Ditandai Ragu-ragu' : 'Tandai Ragu-ragu'}
             </button>
+          </div>
+
+          <div className="hidden sm:flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 text-[11px] text-[#71717A] dark:text-slate-400">
+            <span>Shortcut Cepat:</span>
+            <span className="font-mono-tabular">
+              [1–5 / A–E] Pilih Opsi • [←/→ atau P/N] Navigasi • [F] Tandai Ragu
+            </span>
           </div>
 
           {/* Prompt */}
