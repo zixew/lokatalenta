@@ -40,6 +40,7 @@ export function QuizRunnerPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showLeaveWarning, setShowLeaveWarning] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [navFilter, setNavFilter] = useState<'all' | 'unanswered' | 'flagged'>('all');
 
   const playQuestionAudio = (text: string, lang: 'ja-JP' | 'en-US' | 'ko-KR', rate: number) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -428,25 +429,65 @@ export function QuizRunnerPage() {
         </section>
 
         {/* Right Panel: Question Navigator Grid */}
-        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-5 lg:sticky lg:top-24">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[#18181B] dark:text-white">Navigasi Soal</h2>
-            <span className="text-xs font-mono-tabular text-[#71717A] dark:text-slate-400">
-              {answeredCount}/{questions.length} Terjawab
-            </span>
+        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-4 lg:sticky lg:top-24">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-bold text-[#18181B] dark:text-white">Navigasi Soal</h2>
+              <span className="text-xs font-mono-tabular text-[#71717A] dark:text-slate-400">
+                {answeredCount}/{questions.length} Terjawab
+              </span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-[#0F766E] transition-all duration-300"
+                style={{
+                  width: `${questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0}%`,
+                }}
+              />
+            </div>
           </div>
 
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto p-1.5">
+          <div className="flex flex-wrap gap-1.5">
+            {(
+              [
+                { id: 'all', label: `Semua (${questions.length})` },
+                { id: 'unanswered', label: `Kosong (${unansweredCount})` },
+                { id: 'flagged', label: `Ragu (${flaggedCount})` },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setNavFilter(tab.id)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer ${
+                  navFilter === tab.id
+                    ? 'bg-[#18181B] dark:bg-white text-white dark:text-[#18181B] border-[#18181B] dark:border-white'
+                    : 'bg-[#F6F5F1] dark:bg-slate-900 text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700 hover:border-[#0F766E]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-4 max-h-[55vh] overflow-y-auto p-1.5">
             {(useSubtests
               ? Array.from(new Set(questions.map((q) => q.category_tag)))
               : ['__FLAT__']
             ).map((subtestName) => {
-              const subQuestions =
+              const subQuestions = (
                 subtestName === '__FLAT__'
                   ? questions.map((q, idx) => ({ q, idx }))
                   : questions
                       .map((q, idx) => ({ q, idx }))
-                      .filter(({ q }) => q.category_tag === subtestName);
+                      .filter(({ q }) => q.category_tag === subtestName)
+              ).filter(({ q }) => {
+                if (navFilter === 'unanswered') return !answers[q.id];
+                if (navFilter === 'flagged') return Boolean(flagged[q.id]);
+                return true;
+              });
+
+              if (subQuestions.length === 0) return null;
 
               return (
                 <div key={subtestName} className="space-y-2">

@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Compass, PlayCircle } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Circle, Compass, Flame, PlayCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Course } from '../../shared/types/lms';
@@ -31,12 +31,14 @@ export function CatalogPersonalizationSection({
   courses,
   enrolledIds,
   completedIds,
+  attemptsCount = 0,
   isLoggedIn,
   onOpenTarget,
 }: {
   courses: Course[];
   enrolledIds: string[];
   completedIds: string[];
+  attemptsCount?: number;
   isLoggedIn: boolean;
   onOpenTarget: (e: React.MouseEvent, path: string) => void;
 }) {
@@ -67,8 +69,67 @@ export function CatalogPersonalizationSection({
         .slice(0, 3)
     : [];
 
+  const quests = [
+    {
+      id: 'enroll',
+      label: 'Ikuti minimal 1 kursus atau simulasi',
+      done: enrolledIds.length >= 1,
+    },
+    {
+      id: 'lesson',
+      label: 'Selesaikan minimal 1 materi belajar',
+      done: completedIds.length >= 1,
+    },
+    {
+      id: 'quiz',
+      label: 'Kerjakan minimal 1 evaluasi / psikotes',
+      done: attemptsCount >= 1,
+    },
+  ];
+  const questsDone = quests.filter((q) => q.done).length;
+
   return (
     <div className="space-y-6">
+      {/* Interactive Daily Quests / Learning Checklist (Logged-in Students) */}
+      {isLoggedIn && (
+        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-[#D97706]" />
+              <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                Misi Belajar Aktif
+              </h2>
+            </div>
+            <Badge tone={questsDone === quests.length ? 'emerald' : 'amber'}>
+              {questsDone}/{quests.length} Selesai
+            </Badge>
+          </div>
+          <ProgressBar
+            value={Math.round((questsDone / quests.length) * 100)}
+            tone={questsDone === quests.length ? 'emerald' : 'amber'}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {quests.map((q) => (
+              <div
+                key={q.id}
+                className={`p-3 rounded-xl border text-xs flex items-center gap-2.5 ${
+                  q.done
+                    ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                    : 'bg-[#F6F5F1] dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+                }`}
+              >
+                {q.done ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                ) : (
+                  <Circle className="w-4 h-4 text-[#A1A1AA] shrink-0" />
+                )}
+                <span className={q.done ? 'font-semibold' : 'font-medium'}>{q.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Continue Learning Bar (Logged-in Students) */}
       {isLoggedIn && enrolledCourses.length > 0 && (
         <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">

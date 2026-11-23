@@ -1,5 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, Award, CheckCircle2, RotateCcw, Volume2, XCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Award,
+  CheckCircle2,
+  MessageSquare,
+  RotateCcw,
+  Target,
+  Volume2,
+  XCircle,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
@@ -11,6 +21,7 @@ export function QuizResultPage() {
   const { quizId, attemptId } = useParams<{ quizId: string; attemptId: string }>();
   const navigate = useNavigate();
   const [filterMode, setFilterMode] = useState<'all' | 'wrong'>('all');
+  const [selectedSubtest, setSelectedSubtest] = useState<string>('ALL');
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
@@ -70,11 +81,25 @@ export function QuizResultPage() {
   const wrongCount = review.length - correctCount;
 
   const filteredReview = review.filter((q) => {
+    if (selectedSubtest !== 'ALL' && q.category_tag !== selectedSubtest) {
+      return false;
+    }
     if (filterMode === 'wrong') {
       return attempt.answers[q.id] !== q.correct_option;
     }
     return true;
   });
+
+  const subtestEntries = Object.entries(breakdown).filter(([, stats]) => stats.total > 0);
+  const weakestSubtest = subtestEntries
+    .map(([name, stats]) => ({
+      name,
+      correct: stats.correct,
+      total: stats.total,
+      pct: Math.round((stats.correct / stats.total) * 100),
+    }))
+    .filter((item) => item.correct < item.total)
+    .sort((a, b) => a.pct - b.pct)[0];
 
   const showSubtests = quizMeta?.use_subtests ?? true;
 
@@ -203,12 +228,40 @@ export function QuizResultPage() {
                 );
               })}
             </div>
+
+            {weakestSubtest && (
+              <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <Target className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+                  <p className="text-xs text-[#52525B] dark:text-slate-300 leading-relaxed">
+                    <strong className="text-[#18181B] dark:text-white">Rekomendasi Fokus:</strong>{' '}
+                    Bagian <strong>{weakestSubtest.name}</strong> masih di angka{' '}
+                    <span className="font-mono-tabular font-semibold">{weakestSubtest.pct}%</span>{' '}
+                    ({weakestSubtest.total - weakestSubtest.correct} soal perlu diperbaiki).
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shrink-0"
+                  onClick={() => {
+                    setFilterMode('wrong');
+                    setSelectedSubtest(weakestSubtest.name);
+                    document
+                      .getElementById('quiz-review-section')
+                      ?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Fokus Soal {weakestSubtest.name}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
 
       {/* Ringkasan Jawaban: Jawaban Salah & Jawaban yang Seharusnya Benar */}
-      <section className="space-y-4">
+      <section id="quiz-review-section" className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-[#18181B] dark:text-white">Ringkasan Jawaban</h2>
@@ -216,7 +269,7 @@ export function QuizResultPage() {
             Menampilkan perbandingan jawaban Anda dengan jawaban yang seharusnya benar.
           </p>
         </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setFilterMode('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer ${
@@ -239,6 +292,36 @@ export function QuizResultPage() {
             </button>
           </div>
         </div>
+
+        {showSubtests && subtestEntries.length > 1 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setSelectedSubtest('ALL')}
+              className={`px-2.5 py-1 rounded-full text-xs font-semibold border cursor-pointer transition-colors ${
+                selectedSubtest === 'ALL'
+                  ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700'
+              }`}
+            >
+              Semua Subtes
+            </button>
+            {subtestEntries.map(([name]) => (
+              <button
+                key={name}
+                type="button"
+                onClick={() => setSelectedSubtest(name)}
+                className={`px-2.5 py-1 rounded-full text-xs font-semibold border cursor-pointer transition-colors ${
+                  selectedSubtest === name
+                    ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                    : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700'
+                }`}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="space-y-4">
           {filteredReview.length === 0 ? (
@@ -349,11 +432,36 @@ export function QuizResultPage() {
                     </div>
                   )}
 
-                  <div className="bg-teal-50/60 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-900 rounded-xl p-4 text-sm text-[#1E293B] dark:text-slate-200">
-                    <span className="font-bold text-[#0F766E] dark:text-teal-400 block text-xs uppercase tracking-wider mb-1">
-                      Penjelasan
-                    </span>
-                    {q.explanation}
+                  <div className="bg-teal-50/60 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-900 rounded-xl p-4 text-sm text-[#1E293B] dark:text-slate-200 space-y-3">
+                    <div>
+                      <span className="font-bold text-[#0F766E] dark:text-teal-400 block text-xs uppercase tracking-wider mb-1">
+                        Penjelasan
+                      </span>
+                      {q.explanation}
+                    </div>
+                    <div className="pt-2 border-t border-teal-200/70 dark:border-teal-800/70 flex justify-end">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          const snippet =
+                            q.question_text.length > 70
+                              ? `${q.question_text.slice(0, 70)}...`
+                              : q.question_text;
+                          const optsText = q.options.map((o) => `${o.key}. ${o.text}`).join('\n');
+                          navigate('/community', {
+                            state: {
+                              draftCategory: 'Tips Psikotes',
+                              draftTitle: `[Tanya Soal ${q.category_tag}] ${snippet}`,
+                              draftContent: `Halo mentor & teman-teman, saya ingin berdiskusi tentang soal ${q.category_tag} berikut:\n\n"${q.question_text}"\n\nOpsi:\n${optsText}\n\nBagian yang masih membingungkan bagi saya adalah...`,
+                            },
+                          });
+                        }}
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        Tanyakan Soal Ini ke Komunitas
+                      </Button>
+                    </div>
                   </div>
                 </div>
               );

@@ -223,6 +223,7 @@ export function CatalogPage() {
         courses={courses}
         enrolledIds={enrolledIds}
         completedIds={completedLessonIds}
+        attemptsCount={userAttempts.length}
         isLoggedIn={Boolean(user)}
         onOpenTarget={handleOpenTarget}
       />

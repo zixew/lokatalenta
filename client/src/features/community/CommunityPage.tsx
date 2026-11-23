@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MessageSquare, PlusCircle, Send, ThumbsUp, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
 import type { CommunityPost } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
@@ -16,14 +16,22 @@ const CATEGORIES = [
   'Study Group',
 ];
 
+type DraftCommunityState = {
+  draftTitle?: string;
+  draftCategory?: string;
+  draftContent?: string;
+} | null;
+
 export function CommunityPage() {
   const { user } = useAuthStore();
+  const location = useLocation();
+  const draft = (location.state as DraftCommunityState) ?? null;
   const queryClient = useQueryClient();
   const [selectedCat, setSelectedCat] = useState('Semua');
-  const [showComposer, setShowComposer] = useState(false);
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Tips Psikotes');
-  const [content, setContent] = useState('');
+  const [showComposer, setShowComposer] = useState(() => Boolean(draft?.draftTitle || draft?.draftContent));
+  const [title, setTitle] = useState(() => draft?.draftTitle ?? '');
+  const [category, setCategory] = useState(() => draft?.draftCategory ?? 'Tips Psikotes');
+  const [content, setContent] = useState(() => draft?.draftContent ?? '');
 
   const { data: posts = [] } = useQuery({
     queryKey: ['community-posts'],
