@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ruanglatih-cache-v1';
+const CACHE_NAME = 'lokatalenta-cache-v2';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/favicon.svg'];
 
 self.addEventListener('install', (event) => {
