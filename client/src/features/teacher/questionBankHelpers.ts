@@ -1,6 +1,6 @@
-import type { QuizQuestion } from '../../shared/types/lms';
+import type { Question } from '../../shared/types/lms';
 
-export function extractUniqueCategories(questions: QuizQuestion[]): string[] {
+export function extractUniqueCategories(questions: Question[]): string[] {
   const tags = new Set<string>();
   for (const q of questions) {
     if (q.category_tag) tags.add(q.category_tag);
@@ -9,10 +9,10 @@ export function extractUniqueCategories(questions: QuizQuestion[]): string[] {
 }
 
 export function filterQuestionsBySearchAndCategory(
-  questions: QuizQuestion[],
+  questions: Question[],
   search: string,
   category: string
-): QuizQuestion[] {
+): Question[] {
   const qLower = search.trim().toLowerCase();
   return questions.filter((q) => {
     const matchCategory = category === 'ALL' || q.category_tag === category;
