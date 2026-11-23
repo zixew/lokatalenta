@@ -68,6 +68,7 @@ interface AuthState {
   init: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (fullName: string, email: string, password: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
   signOut: (expired?: boolean) => Promise<void>;
   checkActiveSession: () => Promise<boolean>;
   setProfile: (profile: Profile) => void;
@@ -366,5 +367,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearSessionDisplaced: () => {
     set({ sessionDisplaced: false });
+  },
+
+  requestPasswordReset: async (email) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      throw new Error('Format email tidak valid.');
+    }
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+      if (error) {
+        throw new Error(error.message || 'Gagal mengirim tautan reset password.');
+      }
+      return;
+    }
+
+    // Demo mode simulation: succeed cleanly without leaking account existence
+    return;
   },
 }));
