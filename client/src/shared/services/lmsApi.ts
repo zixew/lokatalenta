@@ -675,7 +675,13 @@ export const lmsApi = {
         p_attempt_id: attemptId,
       });
       if (rErr) throw rErr;
-      return { attempt, review: review ?? [] };
+      const normalizedReview: ReviewQuestion[] = (review ?? []).map(
+        (r: ReviewQuestion & { question_id?: string }) => ({
+          ...r,
+          id: r.id ?? r.question_id ?? '',
+        })
+      );
+      return { attempt, review: normalizedReview };
     }
 
     const attempts = readLocal<QuizAttempt[]>(STORAGE_KEYS.attempts, []);

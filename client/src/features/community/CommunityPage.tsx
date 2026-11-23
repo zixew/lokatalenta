@@ -193,7 +193,10 @@ export function CommunityPage() {
               post={post}
               isLiked={likedPostIds.includes(post.id)}
               canLike={Boolean(user)}
-              onLike={() => likeMut.mutate(post.id)}
+              isLiking={likeMut.isPending && likeMut.variables === post.id}
+              onLike={() => {
+                if (!likeMut.isPending) likeMut.mutate(post.id);
+              }}
               onDelete={() => deleteMut.mutate(post.id)}
             />
           ))}
@@ -207,12 +210,14 @@ function CommunityPostCard({
   post,
   isLiked,
   canLike,
+  isLiking,
   onLike,
   onDelete,
 }: {
   post: CommunityPost;
   isLiked: boolean;
   canLike: boolean;
+  isLiking: boolean;
   onLike: () => void;
   onDelete: () => void;
 }) {
@@ -281,11 +286,11 @@ function CommunityPostCard({
       <div className="flex flex-wrap items-center gap-3 pt-1">
         <button
           type="button"
-          disabled={!canLike}
+          disabled={!canLike || isLiking}
           onClick={onLike}
           title={canLike ? (isLiked ? 'Batalkan dukungan' : 'Dukung topik ini') : 'Masuk untuk mendukung'}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
-            !canLike
+            !canLike || isLiking
               ? 'bg-[#F6F5F1] dark:bg-slate-800 text-[#71717A] opacity-60 cursor-not-allowed'
               : isLiked
               ? 'bg-[#0F766E] text-white cursor-pointer'

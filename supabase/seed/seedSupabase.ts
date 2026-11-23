@@ -123,14 +123,29 @@ async function seed() {
       }
       courseId = cRow.id;
     } else {
-      const { count } = await supabase
+      const { data: mods } = await supabase
         .from('modules')
-        .select('id', { count: 'exact', head: true })
+        .select('id')
         .eq('course_id', courseId);
 
-      if ((count ?? 0) > 0) {
+      const modIds = (mods ?? []).map((m) => m.id);
+      let lessonCount = 0;
+      if (modIds.length > 0) {
+        const { count } = await supabase
+          .from('lessons')
+          .select('id', { count: 'exact', head: true })
+          .in('module_id', modIds);
+        lessonCount = count ?? 0;
+      }
+
+      if (modIds.length > 0 && lessonCount > 0) {
         coursesSkipped += 1;
         continue;
+      }
+
+      // Clean up incomplete modules (0 lessons) before re-seeding
+      if (modIds.length > 0 && lessonCount === 0) {
+        await supabase.from('modules').delete().eq('course_id', courseId);
       }
     }
 
@@ -161,14 +176,18 @@ async function seed() {
             type: les.type,
             content: les.content,
             video_url: les.video_url ?? null,
-            voice_lines: les.voice_lines ?? null,
+            voice_lines: les.voice_lines ?? [],
             duration_minutes: les.duration_minutes,
             order_index: les.order_index,
           })
           .select('id')
           .single();
 
-        if (lErr || !lRow || !les.quiz) continue;
+        if (lErr) {
+          console.error(`Failed lesson "${les.title}" (${course.slug}):`, lErr.message);
+          continue;
+        }
+        if (!lRow || !les.quiz) continue;
 
         const { data: qzRow, error: qzErr } = await supabase
           .from('quizzes')
@@ -184,7 +203,11 @@ async function seed() {
           .select('id')
           .single();
 
-        if (qzErr || !qzRow || !les.quiz.questions?.length) continue;
+        if (qzErr) {
+          console.error(`Failed quiz "${les.quiz.title}" (${course.slug}):`, qzErr.message);
+          continue;
+        }
+        if (!qzRow || !les.quiz.questions?.length) continue;
 
         const questionRows = les.quiz.questions.map((q) => ({
           quiz_id: qzRow.id,
