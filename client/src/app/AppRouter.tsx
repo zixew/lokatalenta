@@ -54,6 +54,11 @@ const TeacherStudioPage = lazy(() =>
     default: m.TeacherStudioPage,
   }))
 );
+const TryoutPage = lazy(() =>
+  import('../features/tryout/TryoutPage').then((m) => ({
+    default: m.TryoutPage,
+  }))
+);
 
 function PageLoader() {
   return (
@@ -96,6 +101,7 @@ export function AppRouter() {
                 <Routes>
                   <Route path="/" element={<CatalogPage />} />
                   <Route path="/kraepelin" element={<KraepelinPage />} />
+                  <Route path="/tryout" element={<TryoutPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/community" element={<CommunityPage />} />
                   <Route path="/verify" element={<VerifyCertificatePage />} />
