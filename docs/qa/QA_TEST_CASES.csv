@@ -2,13 +2,13 @@
 POST-01,Guest,Post-Deployment,Happy Flow,Beranda Production & muat 123 program,Deploy live di Vercel,Buka https://lokatalenta.vercel.app/,Halaman termuat HTTP 200 dengan 123 program dan 0 error,FAIL (HTTP 500 timeout)
 POST-02,Guest,Post-Deployment,Happy Flow,SPA Rewrite / Direct Deep-Link & Refresh,Deploy live di Vercel,Buka langsung dan refresh /verify/LT-INVALID-999,Vercel mengembalikan HTTP 200 (bukan 404) dan tampil pesan Sertifikat Tidak Ditemukan,PASS
 POST-03,Guest,Post-Deployment,Happy Flow,Isolasi Environment Dev vs Production,Dev & Prod terdeploy,Buka https://lokatalenta-git-dev-zixew.vercel.app/,Terhubung ke Supabase Dev (mbhvnmtyaccjganddeyt) terpisah dari Prod,PASS
-AUTH-01,Guest,Autentikasi & OTP,Happy Flow,Registrasi akun pelajar baru + OTP Email,Berada di /auth,Klik Gabung Sekarang -> isi Nama Email valid Password >= 6 -> Kirim Kode OTP ke Email,Akun terbuat setelah verifikasi OTP dan masuk sebagai Pelajar,PASS (UI OTP aktif)
+AUTH-01,Guest,Autentikasi,Happy Flow,Registrasi akun pelajar baru tanpa OTP,Berada di /auth,Klik Gabung Sekarang -> isi Nama Email valid baru Password >= 6 -> klik Daftar Sekarang,Akun terbuat dan langsung masuk sebagai Pelajar redirect ke /,PENDING RE-TEST
 AUTH-02,Guest,Autentikasi,Sad Flow,Login dengan password salah,Akun terdaftar,Masukkan email valid dan password salah -> klik Masuk,Muncul error Invalid login credentials dan tetap di /auth,PASS
-AUTH-03,Guest,Autentikasi,Sad Flow,Registrasi dengan email duplikat,Email sudah terdaftar,Daftar ulang memakai email yang sudah terdaftar,Registrasi ditolak dengan pesan email sudah terdaftar,PASS
+AUTH-03,Guest,Autentikasi,Sad Flow,Registrasi dengan email duplikat,Email sudah terdaftar,Daftar ulang memakai email yang sudah terdaftar,Registrasi ditolak dengan pesan Email sudah terdaftar. Silakan masuk.,PENDING RE-TEST
 AUTH-04,All,Autentikasi,Sad Flow,Login akun nonaktif,Akun dinonaktifkan Admin,Coba login dengan akun nonaktif,Login ditolak dengan pesan Akun Anda sedang dinonaktifkan oleh Admin,PASS
 AUTH-05,Guest,Autentikasi,Happy Flow,Pembersihan input password saat ganti mode,Berada di /auth,Isi password di mode Masuk -> klik Gabung Sekarang,Input password otomatis dikosongkan,PASS
-AUTH-06,Guest,Autentikasi,Sad Flow,Validasi email tidak valid & password < 6,Berada di /auth,Isi email bukanemail dan password 123 lalu submit,Form menolak submit sebelum request jaringan,PASS
-AUTH-07,Guest,Autentikasi & OTP,Sad Flow,Verifikasi OTP kode salah,Berada di tahap OTP,Masukkan kode OTP salah pada tahap verifikasi,Verifikasi ditolak dengan pesan error jelas,NOT RUN
+AUTH-06,Guest,Autentikasi,Sad Flow,Validasi email tidak valid & password < 6,Berada di /auth,Isi email bukanemail dan password 123 lalu submit,Form menolak submit dengan pesan validasi yang jelas,PASS
+AUTH-07,All,Autentikasi,Happy Flow,Single Active Session antar sesi/perangkat,Akun login di sesi 1,Login akun yang sama di sesi/perangkat ke-2,Sesi lama otomatis keluar dan redirect ke /auth,PASS
 AUTH-08,Student,RBAC,Sad Flow,Pelajar mencoba akses /admin & /teacher,Login sebagai Pelajar,Navigasi langsung ke /admin dan /teacher,Otomatis dialihkan ke /,PASS
 CAT-01,Guest/Student,Katalog & Filter,Happy Flow,Filter kategori tipe program & kesulitan,Berada di /,Pilih Latihan Soal Langsung kategori dan tingkat kesulitan,Kartu dan jumlah hasil sesuai filter,PASS
 CAT-02,Guest/Student,Katalog & Filter,Sad Flow,Pencarian tidak ditemukan & Reset Filter,Berada di /,Ketik zzzznotfound -> klik Reset Filter,Tampil empty state lalu semua 123 program kembali tampil,PASS

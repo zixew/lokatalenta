@@ -14,16 +14,16 @@
 
 ---
 
-## 2. Autentikasi, OTP & Keamanan Sesi (`AUTH`)
+## 2. Autentikasi, Validasi Email & Keamanan Sesi (`AUTH`)
 | ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
 |---|---|---|---|---|---|---|
-| AUTH-01 | Guest | Happy | Registrasi akun pelajar baru + OTP Email | Buka `/auth` → **Gabung Sekarang** → isi Nama, Email valid, Password ≥ 6 → klik **Kirim Kode OTP ke Email** → verifikasi OTP | Akun terbuat, masuk sebagai Pelajar, redirect ke `/` | **PASS** *(UI OTP aktif; end-to-end inbox tidak diuji otomatis)* |
+| AUTH-01 | Guest | Happy | Registrasi akun pelajar baru tanpa OTP | Buka `/auth` → **Gabung Sekarang** → isi Nama, Email valid baru, Password ≥ 6 → klik **Daftar Sekarang** | Akun terbuat, langsung masuk sebagai Pelajar, redirect ke `/` | **PENDING RE-TEST** |
 | AUTH-02 | Guest | Sad | Login dengan password salah | Buka `/auth` → isi email valid + password salah → klik **Masuk** | Muncul error `"Invalid login credentials"`, tetap di `/auth` | **PASS** |
-| AUTH-03 | Guest | Sad | Registrasi dengan email duplikat | Daftar ulang memakai email yang sudah terdaftar | Registrasi ditolak dengan pesan email sudah terdaftar | **PASS** |
+| AUTH-03 | Guest | Sad | Registrasi dengan email duplikat | Daftar ulang memakai email yang sudah terdaftar (`nadia@pelajar.id`) | Registrasi ditolak dengan pesan `"Email sudah terdaftar. Silakan masuk."` | **PENDING RE-TEST** |
 | AUTH-04 | All | Sad | Login akun yang dinonaktifkan Admin | Admin menonaktifkan akun → user mencoba login | Login ditolak dengan pesan `"Akun Anda sedang dinonaktifkan oleh Admin."` | **PASS** |
 | AUTH-05 | Guest | Happy | Pembersihan input password saat ganti mode | Isi password di mode Masuk → klik **Gabung Sekarang** | Input password otomatis dikosongkan | **PASS** |
-| AUTH-06 | Guest | Sad | Validasi format email & panjang password < 6 | Isi `"bukanemail"` / password `"123"` saat daftar | Form menolak submit sebelum mengirim request | **PASS** |
-| AUTH-07 | Guest | Sad | Verifikasi OTP dengan kode salah / tidak lengkap | Masukkan kode OTP salah pada tahap verifikasi | Verifikasi ditolak dengan pesan error jelas | **NOT RUN** *(Perlu inbox email test)* |
+| AUTH-06 | Guest | Sad | Validasi format email & panjang password < 6 | Isi `"bukanemail"` / password `"123"` saat daftar | Form menolak submit dengan pesan validasi yang jelas | **PASS** |
+| AUTH-07 | All | Happy | Single Active Session (Login perangkat/sesi lain) | Login akun yang sama di sesi/browser kedua | Sesi lama otomatis keluar dan redirect ke `/auth` dengan notifikasi sesi berpindah | **PASS** |
 | AUTH-08 | Student | Sad | RBAC Guard akses `/admin` & `/teacher` | Login sebagai Pelajar → akses langsung `/admin` dan `/teacher` | Otomatis dialihkan ke `/` | **PASS** |
 
 ---

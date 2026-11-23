@@ -11,19 +11,12 @@ const ACTIVE_SESSION_TOKEN_KEY = 'lokatalenta_active_session_token_v1';
 const DEMO_ACTIVE_SESSION_PREFIX = 'lokatalenta_demo_active_session_';
 const PROFILES_STORAGE_KEY = 'ruanglatih_demo_profiles_v13';
 const PASSWORDS_STORAGE_KEY = 'ruanglatih_demo_passwords_v1';
-const OTP_STORAGE_KEY = 'lokatalenta_signup_otp_v1';
 
 function generateSessionToken(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
   return `sess-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-interface PendingOtpRecord {
-  code: string;
-  expiresAt: number;
-  attempts: number;
 }
 
 const DEFAULT_PASSWORDS: Record<string, string> = {
@@ -74,13 +67,6 @@ interface AuthState {
   sessionDisplaced: boolean;
   init: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  requestSignUpOtp: (email: string) => Promise<{ devOtpPreview?: string }>;
-  verifyAndSignUp: (
-    fullName: string,
-    email: string,
-    password: string,
-    otpCode: string
-  ) => Promise<void>;
   signUp: (fullName: string, email: string, password: string) => Promise<void>;
   signOut: (expired?: boolean) => Promise<void>;
   checkActiveSession: () => Promise<boolean>;
@@ -242,77 +228,50 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ user: found, sessionExpired: false, sessionDisplaced: false });
   },
 
-  requestSignUpOtp: async (email) => {
+  signUp: async (fullName, email, password) => {
+    const cleanName = fullName.trim();
     const normalizedEmail = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+    if (!cleanName) {
+      throw new Error('Nama lengkap wajib diisi.');
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       throw new Error('Format email tidak valid.');
     }
+    if (password.length < 6) {
+      throw new Error('Password minimal 6 karakter.');
+    }
+
+    const nextSessionToken = generateSessionToken();
 
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
-        options: { shouldCreateUser: true },
-      });
-      if (error) throw error;
-      return {};
-    }
-
-    const profiles = getStoredProfiles();
-    if (profiles.some((p) => p.email.toLowerCase() === normalizedEmail)) {
-      throw new Error('Email sudah terdaftar. Silakan masuk.');
-    }
-
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    let otpMap: Record<string, PendingOtpRecord> = {};
-    try {
-      const raw = localStorage.getItem(OTP_STORAGE_KEY);
-      if (raw) otpMap = JSON.parse(raw) as Record<string, PendingOtpRecord>;
-    } catch {
-      otpMap = {};
-    }
-    otpMap[normalizedEmail] = {
-      code,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-      attempts: 0,
-    };
-    localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otpMap));
-    return { devOtpPreview: code };
-  },
-
-  verifyAndSignUp: async (fullName, email, password, otpCode) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    const cleanOtp = otpCode.trim();
-    if (!/^\d{6,8}$/.test(cleanOtp)) {
-      throw new Error('Kode OTP harus berupa 6 hingga 8 digit angka.');
-    }
-
-    if (isSupabaseConfigured && supabase) {
-      const { data: verifyData, error: vErr } = await supabase.auth.verifyOtp({
-        email: normalizedEmail,
-        token: cleanOtp,
-        type: 'email',
-      });
-      if (vErr) throw vErr;
-      const { error: uErr } = await supabase.auth.updateUser({
         password,
-        data: { full_name: fullName.trim() },
+        options: { data: { full_name: cleanName } },
       });
-      if (uErr) throw uErr;
+      if (error) {
+        if (/already\s*registered|already\s*exists/i.test(error.message)) {
+          throw new Error('Email sudah terdaftar. Silakan masuk.');
+        }
+        throw error;
+      }
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        throw new Error('Email sudah terdaftar. Silakan masuk.');
+      }
 
-      const nextSessionToken = generateSessionToken();
       localStorage.setItem(ACTIVE_SESSION_TOKEN_KEY, nextSessionToken);
-      if (verifyData.user) {
+      if (data.user) {
         await supabase
           .from('profiles')
           .update({
-            full_name: fullName.trim(),
+            full_name: cleanName,
             active_session_id: nextSessionToken,
           })
-          .eq('id', verifyData.user.id);
+          .eq('id', data.user.id);
         const { data: freshProfile } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', verifyData.user.id)
+          .eq('id', data.user.id)
           .single();
         if (freshProfile) {
           set({ user: freshProfile });
@@ -323,54 +282,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return;
     }
 
-    let otpMap: Record<string, PendingOtpRecord> = {};
-    try {
-      const raw = localStorage.getItem(OTP_STORAGE_KEY);
-      if (raw) otpMap = JSON.parse(raw) as Record<string, PendingOtpRecord>;
-    } catch {
-      otpMap = {};
-    }
-
-    const rec = otpMap[normalizedEmail];
-    if (!rec) {
-      throw new Error('Silakan kirim kode OTP ke email terlebih dahulu.');
-    }
-    if (Date.now() > rec.expiresAt) {
-      delete otpMap[normalizedEmail];
-      localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otpMap));
-      throw new Error('Kode OTP telah kedaluwarsa. Silakan kirim ulang.');
-    }
-    if (rec.code !== cleanOtp) {
-      rec.attempts += 1;
-      if (rec.attempts >= 5) {
-        delete otpMap[normalizedEmail];
-        localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otpMap));
-        throw new Error('Terlalu banyak percobaan OTP salah. Silakan kirim ulang kode baru.');
-      }
-      otpMap[normalizedEmail] = rec;
-      localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otpMap));
-      throw new Error('Kode OTP tidak valid.');
-    }
-
-    delete otpMap[normalizedEmail];
-    localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otpMap));
-    await useAuthStore.getState().signUp(fullName, normalizedEmail, password);
-  },
-
-  signUp: async (fullName, email, password) => {
-    if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName } },
-      });
-      if (error) throw error;
-      touchLastActivity();
-      set({ sessionExpired: false });
-      return;
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
     const profiles = getStoredProfiles();
     if (profiles.some((p) => p.email.toLowerCase() === normalizedEmail)) {
       throw new Error('Email sudah terdaftar. Silakan masuk.');
@@ -378,7 +289,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     const newUser: Profile = {
       id: `user-${Date.now()}`,
-      full_name: fullName.trim(),
+      full_name: cleanName,
       email: normalizedEmail,
       role: 'student',
       bio: '',
@@ -390,8 +301,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify([...profiles, newUser]));
     localStorage.setItem(PASSWORDS_STORAGE_KEY, JSON.stringify(passwords));
     localStorage.setItem(SESSION_USER_ID_KEY, newUser.id);
+    localStorage.setItem(ACTIVE_SESSION_TOKEN_KEY, nextSessionToken);
+    localStorage.setItem(`${DEMO_ACTIVE_SESSION_PREFIX}${newUser.id}`, nextSessionToken);
     touchLastActivity();
-    set({ user: newUser, sessionExpired: false });
+    set({ user: newUser, sessionExpired: false, sessionDisplaced: false });
   },
 
   signOut: async (expired = false) => {

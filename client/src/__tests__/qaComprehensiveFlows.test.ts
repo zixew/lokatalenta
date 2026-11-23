@@ -191,26 +191,26 @@ describe('QA Lead Comprehensive Suite — Happy & Sad Flows', () => {
     expect(list.filter((n) => !n.is_read)).toHaveLength(0);
   });
 
-  it('Registration Email OTP: validates format, rejects wrong OTP, and registers on valid OTP', async () => {
+  it('Registration: validates email format, rejects duplicate email, and registers valid account', async () => {
     const store = useAuthStore.getState();
 
     // Sad: invalid email format
-    await expect(store.requestSignUpOtp('bukan-email')).rejects.toThrow(/Format email tidak valid/i);
+    await expect(store.signUp('User Baru', 'bukan-email', 'password123')).rejects.toThrow(
+      /Format email tidak valid/i
+    );
 
     // Sad: already registered email
-    await expect(store.requestSignUpOtp('nadia@pelajar.id')).rejects.toThrow(/sudah terdaftar/i);
+    await expect(store.signUp('Nadia Duplikat', 'nadia@pelajar.id', 'password123')).rejects.toThrow(
+      /sudah terdaftar/i
+    );
 
-    // Happy: request OTP for new email
-    const { devOtpPreview } = await store.requestSignUpOtp('baru@lokatalenta.id');
-    expect(devOtpPreview).toMatch(/^\d{6}$/);
+    // Sad: password too short
+    await expect(store.signUp('User Baru', 'baru@lokatalenta.id', '123')).rejects.toThrow(
+      /minimal 6 karakter/i
+    );
 
-    // Sad: wrong OTP rejected
-    await expect(
-      store.verifyAndSignUp('User Baru', 'baru@lokatalenta.id', 'password123', '000000')
-    ).rejects.toThrow(/tidak valid/i);
-
-    // Happy: valid OTP completes registration
-    await store.verifyAndSignUp('User Baru', 'baru@lokatalenta.id', 'password123', devOtpPreview!);
+    // Happy: valid email & password completes registration
+    await store.signUp('User Baru', 'baru@lokatalenta.id', 'password123');
     expect(useAuthStore.getState().user?.email).toBe('baru@lokatalenta.id');
   });
 });
