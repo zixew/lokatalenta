@@ -19,6 +19,7 @@ import { useThemeStore } from '../stores/useThemeStore';
 import { Badge } from '../ui/Badge';
 import { BrandLogo } from '../ui/BrandLogo';
 import { Button } from '../ui/Button';
+import { TopbarNav } from './TopbarNav';
 import { NotificationBell } from '../ui/NotificationBell';
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -36,108 +37,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#161B22]/95 backdrop-blur border-b border-[#E5E3DC] dark:border-slate-800 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           {/* Brand + Desktop Nav */}
-          <div className="flex items-center gap-6 lg:gap-8 min-w-0">
+          <div className="flex items-center gap-4 xl:gap-7 min-w-0 flex-1">
             <Link to="/" className="flex items-center gap-2.5 shrink-0">
               <BrandLogo className="w-9 h-9 shrink-0" />
               <div className="leading-tight">
                 <span className="font-bold text-base tracking-tight text-[#18181B] dark:text-white block">
                   LokaTalenta
                 </span>
-                <span className="text-[11px] text-[#71717A] dark:text-slate-400 font-medium hidden sm:block">
+                <span className="text-[11px] text-[#71717A] dark:text-slate-400 font-medium hidden xl:block">
                   Akademi Bahasa &amp; Karier
                 </span>
               </div>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-1">
-              <Link
-                to="/"
-                className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                  isActive('/')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-              >
-                <BookOpen className="w-4 h-4 shrink-0" />
-                Katalog
-              </Link>
-
-              <Link
-                to="/kraepelin"
-                className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                  isActive('/kraepelin')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-              >
-                Tes Kraepelin
-              </Link>
-
-              <Link
-                to="/tryout"
-                className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                  isActive('/tryout')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-              >
-                Tryout Akbar
-              </Link>
-
-              <Link
-                to="/community"
-                className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                  isActive('/community')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-              >
-                <Users className="w-4 h-4 shrink-0" />
-                Komunitas
-              </Link>
-
-              {(user?.role === 'teacher' || user?.role === 'admin') && (
-                <Link
-                  to="/teacher"
-                  className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                    isActive('/teacher')
-                      ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                      : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4 shrink-0" />
-                  Teacher Studio
-                </Link>
-              )}
-
-              {user?.role === 'admin' && (
-                <Link
-                  to="/admin"
-                  className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                    isActive('/admin')
-                      ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                      : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  Admin Panel
-                </Link>
-              )}
-
-              {user && (
-                <Link
-                  to="/profile"
-                  className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                    isActive('/profile')
-                      ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                      : 'text-[#52525B] dark:text-slate-300 hover:text-[#18181B] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <User className="w-4 h-4 shrink-0" />
-                  Profil &amp; Progres
-                </Link>
-              )}
-            </nav>
+            <TopbarNav role={user?.role} isLoggedIn={Boolean(user)} isActive={isActive} />
           </div>
 
           {/* Right Controls */}
@@ -162,7 +75,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   to="/profile"
                   className="hidden sm:block text-right leading-tight hover:opacity-80 transition-opacity"
                 >
-                  <p className="text-sm font-semibold text-[#18181B] dark:text-white">
+                  <p className="text-sm font-semibold text-[#18181B] dark:text-white max-w-[140px] truncate">
                     {user.full_name}
                   </p>
                   <div className="flex items-center justify-end gap-1 mt-0.5">
