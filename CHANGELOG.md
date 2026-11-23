@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.3.0] - 2026-11-23
+
+### Minor
+- BL-02: Mode Latihan (Instant Feedback) vs Mode Ujian dengan RPC check_practice_answer dan pembahasan langsung per soal
+
+---
+
 ## [1.2.0] - 2026-11-23
 
 ### Minor
