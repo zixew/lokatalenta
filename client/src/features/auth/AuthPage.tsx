@@ -1,24 +1,31 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../shared/ui/Button';
+import { isRecoverySearchOrHash } from './authRecovery';
 import { useAuthStore } from './useAuthStore';
 
 export function AuthPage() {
-  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
+  const location = useLocation();
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'recovery'>(() =>
+    isRecoverySearchOrHash(location.search, location.hash) ? 'recovery' : 'login'
+  );
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const isRegister = mode === 'register';
   const isForgot = mode === 'forgot';
+  const isRecovery = mode === 'recovery';
 
   const {
     signIn,
     signUp,
     requestPasswordReset,
+    updatePassword,
     sessionExpired,
     sessionDisplaced,
     clearSessionExpired,
@@ -33,6 +40,17 @@ export function AuthPage() {
     setSubmitting(true);
 
     try {
+      if (isRecovery) {
+        if (password !== confirmPassword) {
+          throw new Error('Konfirmasi password baru tidak cocok.');
+        }
+        await updatePassword(password);
+        setPassword('');
+        setConfirmPassword('');
+        setMode('login');
+        setSuccessMsg('Password berhasil diperbarui! Silakan masuk dengan password baru Anda.');
+        return;
+      }
       if (isForgot) {
         await requestPasswordReset(email);
         setSuccessMsg(
@@ -64,18 +82,22 @@ export function AuthPage() {
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">
-              {isForgot
-                ? 'Reset Password'
-                : isRegister
-                  ? 'Gabung ke LokaTalenta'
-                  : 'Masuk ke LokaTalenta'}
+              {isRecovery
+                ? 'Buat Password Baru'
+                : isForgot
+                  ? 'Reset Password'
+                  : isRegister
+                    ? 'Gabung ke LokaTalenta'
+                    : 'Masuk ke LokaTalenta'}
             </h1>
             <p className="text-sm text-[#52525B] dark:text-slate-400 mt-1">
-              {isForgot
-                ? 'Masukkan email akun Anda untuk menerima tautan pemulihan kata sandi.'
-                : isRegister
-                  ? 'Daftar dengan email aktif Anda untuk mulai belajar dan simulasi tes.'
-                  : 'Lanjutkan kursus, latihan soal, dan ringkasan hasil Anda.'}
+              {isRecovery
+                ? 'Masukkan password baru minimal 6 karakter untuk mengamankan akun Anda.'
+                : isForgot
+                  ? 'Masukkan email akun Anda untuk menerima tautan pemulihan kata sandi.'
+                  : isRegister
+                    ? 'Daftar dengan email aktif Anda untuk mulai belajar dan simulasi tes.'
+                    : 'Lanjutkan kursus, latihan soal, dan ringkasan hasil Anda.'}
             </p>
           </div>
 
@@ -118,29 +140,31 @@ export function AuthPage() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Contoh: Nadia Kusuma"
+                  placeholder="Contoh: Rizco Renova"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="auth-email"
-                className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5"
-              >
-                Email
-              </label>
-              <input
-                id="auth-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@email.com"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-              />
-            </div>
+            {!isRecovery && (
+              <div>
+                <label
+                  htmlFor="auth-email"
+                  className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5"
+                >
+                  Email
+                </label>
+                <input
+                  id="auth-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="nama@email.com"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+            )}
 
             {!isForgot && (
               <div>
@@ -149,9 +173,9 @@ export function AuthPage() {
                     htmlFor="auth-password"
                     className="block text-xs font-semibold text-[#18181B] dark:text-slate-200"
                   >
-                    Password
+                    {isRecovery ? 'Password Baru' : 'Password'}
                   </label>
-                  {!isRegister && (
+                  {!isRegister && !isRecovery && (
                     <button
                       type="button"
                       onClick={() => {
@@ -178,30 +202,58 @@ export function AuthPage() {
               </div>
             )}
 
+            {isRecovery && (
+              <div>
+                <label
+                  htmlFor="auth-confirm-password"
+                  className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5"
+                >
+                  Konfirmasi Password Baru
+                </label>
+                <input
+                  id="auth-confirm-password"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Ulangi password baru"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+            )}
+
             <Button type="submit" className="w-full" size="lg" disabled={submitting}>
               {submitting
                 ? 'Memproses...'
-                : isForgot
-                  ? 'Kirim Tautan Reset Password'
-                  : isRegister
-                    ? 'Daftar Sekarang'
-                    : 'Masuk'}
+                : isRecovery
+                  ? 'Simpan Password Baru'
+                  : isForgot
+                    ? 'Kirim Tautan Reset Password'
+                    : isRegister
+                      ? 'Daftar Sekarang'
+                      : 'Masuk'}
             </Button>
           </form>
 
           <div className="mt-6 pt-5 border-t border-[#E5E3DC] dark:border-slate-800 text-center text-sm text-[#52525B] dark:text-slate-400">
-            {isForgot ? 'Ingat kata sandi Anda?' : isRegister ? 'Sudah punya akun?' : 'Belum punya akun?'}{' '}
+            {isForgot || isRecovery
+              ? 'Ingat kata sandi Anda?'
+              : isRegister
+                ? 'Sudah punya akun?'
+                : 'Belum punya akun?'}{' '}
             <button
               type="button"
               onClick={() => {
                 setError('');
                 setSuccessMsg('');
                 setPassword('');
-                setMode(isRegister || isForgot ? 'login' : 'register');
+                setConfirmPassword('');
+                setMode(isRegister || isForgot || isRecovery ? 'login' : 'register');
               }}
               className="text-[#0F766E] dark:text-teal-400 font-semibold hover:underline cursor-pointer"
             >
-              {isForgot || isRegister ? 'Masuk di sini' : 'Gabung Sekarang'}
+              {isForgot || isRecovery || isRegister ? 'Masuk di sini' : 'Gabung Sekarang'}
             </button>
           </div>
         </div>
