@@ -68,7 +68,9 @@
 | QUZ-05 | Student | Happy | Filter Navigasi Soal (`Semua`/`Kosong`/`Ragu`) | Klik pill `Ragu`, `Kosong`, `Semua` saat kuis | Grid nomor soal terfilter akurat | **PASS** |
 | QUZ-06 | Student | Happy | Keyboard Shortcuts (`A`–`E`, `←`/`→`, `F`) | Tekan `A`/`B`, `ArrowRight`, dan `F` saat kuis | Opsi terpilih, pindah soal, & soal ditandai Ragu-ragu | **FAIL** *(Tombol `F` tidak menandai Ragu-ragu)* |
 | QUZ-07 | Student | Happy | Rekomendasi Fokus Subtes Terlemah & Filter Subtes | Klik **Fokus Soal [Subtes]** di `QuizResultPage` | List pembahasan otomatis terfilter ke soal salah subtes terlemah | **PASS** |
-| QUZ-08 | Student | Happy | Klik **Ulangi Latihan** setelah cooldown habis | Tunggu cooldown 60 dtk → klik **Ulangi Latihan** | Layar berpindah ke Quiz Runner dan memuat soal baru | **FAIL** *(URL berubah, UI tetap di Ringkasan Hasil)* |
+| QUZ-08 | Student | Happy | Klik **Ulangi Latihan** setelah cooldown habis | Tunggu cooldown 60 dtk → klik **Ulangi Latihan** | Layar berpindah ke Quiz Runner dan memuat soal baru | **PASS** |
+| KRP-01 | Public/Student | Happy | Simulator Tes Kraepelin / Pauli (`/kraepelin`) | Pilih preset → klik **Mulai Simulasi Sekarang** → jawab beberapa pasangan dengan keypad/keyboard → klik **Selesai** | Tampil hasil Total Terjawab, Akurasi %, Kecepatan rata-rata, Konsistensi %, & Kurva per kolom | **PASS** |
+| KRP-02 | Public/Student | Sad/Mobile | Kraepelin Mobile `390×844` & selesai 0 jawaban | Buka `/kraepelin` di `390×844`, mulai lalu klik **Selesai** tanpa menjawab | `0px` horizontal overflow dan semua metrik tampil `0%` (tanpa `NaN`) | **PASS** |
 
 ---
 
