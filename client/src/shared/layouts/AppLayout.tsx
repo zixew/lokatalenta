@@ -64,7 +64,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
               <Link
                 to="/kraepelin"
-                onClick={() => setMobileMenuOpen(false)}
                 className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                   isActive('/kraepelin')
                     ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
@@ -72,18 +71,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 }`}
               >
                 Tes Kraepelin
-              </Link>
-
-              <Link
-                to="/tryout"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                  isActive('/tryout')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300'
-                }`}
-              >
-                Tryout Akbar
               </Link>
 
               <Link
@@ -245,7 +232,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </Link>
               <Link
                 to="/kraepelin"
-                onClick={() => setMobileMenuOpen(false)}
                 className={`px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                   isActive('/kraepelin')
                     ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
@@ -253,18 +239,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 }`}
               >
                 Tes Kraepelin
-              </Link>
-
-              <Link
-                to="/tryout"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                  isActive('/tryout')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300'
-                }`}
-              >
-                Tryout Akbar
               </Link>
 
               <Link
