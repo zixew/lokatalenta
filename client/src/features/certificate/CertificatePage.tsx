@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Award, CheckCircle2, Printer } from 'lucide-react';
+import { ArrowLeft, Award, CheckCircle2, Printer, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
 import { BrandLogo } from '../../shared/ui/BrandLogo';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
+import { buildLinkedInShareUrl, buildWhatsAppShareUrl } from '../quiz-runner/shareAndChallenge';
 
 export function CertificatePage() {
   const { courseId } = useParams<{ courseId: string }>();
@@ -122,6 +123,31 @@ export function CertificatePage() {
               Verifikasi Publik
             </Button>
           </Link>
+          <a
+            href={buildWhatsAppShareUrl(
+              `Alhamdulillah, saya baru saja menyelesaikan "${course.title}" di LokaTalenta! Verifikasi sertifikat (${certNumber}): ${
+                typeof window !== 'undefined' ? window.location.origin : 'https://lokatalenta.vercel.app'
+              }/verify/${certNumber}`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            WhatsApp
+          </a>
+          <a
+            href={buildLinkedInShareUrl(
+              `${
+                typeof window !== 'undefined' ? window.location.origin : 'https://lokatalenta.vercel.app'
+              }/verify/${certNumber}`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#0A66C2] hover:bg-[#004182] text-white transition-colors"
+          >
+            LinkedIn
+          </a>
           <Button onClick={() => window.print()}>
             <Printer className="w-4 h-4" />
             Cetak / Simpan PDF
