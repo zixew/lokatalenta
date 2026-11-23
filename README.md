@@ -1,69 +1,54 @@
-# LokaTalenta — LMS & Simulasi Psikotes Kerja
+# ✨ LokaTalenta
 
-Platform Learning Management System (LMS) dengan kursus unggulan **Latihan Psikotes Persiapan Melamar Kerja** (Verbal, Numerik, Logika, dan Spasial), dilengkapi gamifikasi XP/Streak, Flashcard SRS, Sertifikat & Verifikasi Publik, Komunitas Diskusi, serta Dashboard Pengajar & Admin.
+**Platform Belajar Interaktif & Simulasi Psikotes Persiapan Karier**
 
-- **Frontend:** React 19 (Vite + TypeScript + Tailwind CSS v4 + TanStack Query + Zustand + React Router)
-- **Backend:** Supabase (PostgreSQL + Auth + Row Level Security + Secure RPCs)
-- **Testing & Quality:** Oxlint, Vitest, dan Playwright E2E
+LokaTalenta hadir untuk membantu pencari kerja, mahasiswa, dan profesional mempersiapkan diri menghadapi seleksi kerja dengan lebih percaya diri. Dari latihan psikotes terstruktur hingga penguasaan keterampilan kerja dan bahasa, seluruh proses belajar dirancang agar terasa terarah, terukur, dan menyenangkan.
 
-## Struktur Proyek
+---
 
-```text
-lms-psikotes/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                # GitHub Actions (lint, test, build)
-├── client/                       # Aplikasi frontend React + Vite + TypeScript
-│   ├── e2e/                      # Playwright end-to-end tests
-│   ├── public/                   # PWA manifest, service worker, favicon
-│   ├── src/
-│   │   ├── __tests__/            # Unit & integration tests (Vitest)
-│   │   ├── app/                  # Router & RBAC ProtectedRoute
-│   │   ├── features/             # Modul fitur (admin, auth, certificate, community,
-│   │   │                         # courses, player, profile, quiz-runner, teacher)
-│   │   └── shared/               # Data, layouts, lib, services, stores, types, UI kit
-│   ├── .env.example              # Template environment variables Supabase
-│   └── package.json
-├── docs/
-│   └── qa/                       # Dokumentasi & spreadsheet QA test cases
-│       ├── QA_TEST_CASES.md
-│       ├── QA_TEST_CASES.csv
-│       └── QA_TEST_CASES_LOKATALENTA.xlsx
-└── supabase/
-    ├── migrations/               # Skema PostgreSQL, RLS, dan RPC secara berurutan
-    └── seed/                     # Script seeder database (seedSupabase.ts)
-```
+## 🎯 Untuk Siapa LokaTalenta?
 
-## Cara Menjalankan (Mode Demo Lokal)
+- **Pencari Kerja & Fresh Graduate** — Berlatih menghadapi pola tes seleksi perusahaan ritel nasional maupun korporasi besar dengan simulasi waktu nyata dan pembahasan lengkap.
+- **Pembelajar Mandiri** — Mengasah kemampuan komunikasi, bahasa, dan kesiapan kerja melalui materi ringkas serta latihan bertahap.
+- **Pengajar & Mentor** — Menyusun kurikulum, membagikan pengumuman kelas, memberi nilai dan masukan tugas, serta mendampingi perkembangan peserta secara langsung.
 
-Aplikasi dilengkapi **Mode Demo Lokal** sehingga seluruh alur (Pelajar, Pengajar, dan Admin) dapat langsung dijalankan tanpa konfigurasi `.env`:
+---
 
-```bash
-cd client
-npm install
-npm run dev
-```
+## 🌟 Fitur Unggulan
 
-## Quality Checks & Testing
+### 🧠 Simulasi Psikotes & Evaluasi Terarah
+- **Beragam Kategori Tes:** Verbal, Numerik, Logika, Spasial/Figural, hingga ketelitian kerja.
+- **Pengalaman Ujian Nyata:** Dilengkapi pengatur waktu, navigasi soal yang jelas, serta variasi paket soal agar latihan selalu menantang.
+- **Pembahasan Lengkap:** Setiap selesai mengerjakan latihan, peserta langsung mendapatkan skor, ringkasan hasil, dan penjelasan jawaban.
 
-```bash
-cd client
-npm run lint     # Oxlint
-npm test         # Vitest unit tests
-npm run build    # TypeScript check + Vite production build
-```
+### 📚 Pembelajaran Bertahap & Interaktif
+- **Kurikulum Terstruktur:** Materi disusun per modul dan topik sehingga mudah diikuti dari dasar hingga mahir.
+- **Variasi Format Belajar:** Artikel ringkas, video materi, latihan audio, serta kartu pengingat (*flashcard*) untuk memperkuat daya ingat.
 
-Untuk E2E tests (Playwright):
+### 🏆 Gamifikasi yang Menjaga Semangat
+- **Poin Pengalaman (XP) & Streak Harian:** Konsistensi belajar tercatat setiap hari.
+- **Pencapaian & Papan Peringkat:** Kumpulkan lencana dari setiap progres dan lihat posisi belajar bersama peserta lain.
 
-```bash
-cd client
-npx playwright test
-```
+### 🎓 Sertifikat Kelulusan & Verifikasi Keaslian
+- Peserta yang menyelesaikan kelas berhak mendapatkan **sertifikat digital**.
+- Setiap sertifikat memiliki **kode verifikasi unik** yang keasliannya dapat dicek secara terbuka oleh perekrut maupun perusahaan.
 
-## Menghubungkan ke Supabase Production
+### 💬 Komunitas Diskusi & Bimbingan Mentor
+- Ruang diskusi interaktif untuk saling bertukar pikiran, bertanya seputar materi, dan memberi dukungan antarpelajar.
+- Komunikasi langsung dengan pengajar melalui tanya jawab materi, pengumuman kelas, serta penilaian tugas yang disertai umpan balik.
 
-1. Buat project baru di [Supabase](https://supabase.com).
-2. Jalankan seluruh file migrasi SQL di `supabase/migrations/` secara berurutan (`202611230001_initial_schema.sql` hingga `202611230010_like_uniqueness_and_guards.sql`) melalui **SQL Editor** atau Supabase CLI.
-3. Jalankan seeder di `supabase/seed/seedSupabase.ts` jika memerlukan data awal.
-4. Salin `client/.env.example` menjadi `client/.env` dan isi `VITE_SUPABASE_URL` serta `VITE_SUPABASE_ANON_KEY`.
-5. Restart `npm run dev` — aplikasi otomatis beralih dari Mode Demo Lokal ke Supabase live.
+---
+
+## 👥 Pengalaman Sesuai Peran
+
+| Peran | Fokus Utama |
+| :--- | :--- |
+| **Pelajar** | Menjelajahi katalog kelas, belajar mandiri, mengerjakan simulasi psikotes, berdiskusi di komunitas, dan meraih sertifikat. |
+| **Pengajar / Mentor** | Mengelola kelas dan modul, menyusun bank soal latihan, memantau progres peserta, serta menilai tugas. |
+| **Pengelola** | Menjaga kualitas konten, mengelola peran pengguna, dan memastikan seluruh aktivitas belajar berjalan lancar. |
+
+---
+
+<p align="center">
+  <strong>LokaTalenta</strong> — <em>Siapkan Langkah Terbaik Menuju Karier Impianmu.</em>
+</p>
