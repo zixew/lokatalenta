@@ -1,4 +1,5 @@
-import { RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { Check, RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { Button } from '../../shared/ui/Button';
 
 export type ProgramTypeFilter = 'Semua' | 'Kursus' | 'Latihan';
 
@@ -14,6 +15,9 @@ interface CatalogFilterPanelProps {
   onSelectCategory: (cat: string) => void;
   onSelectLevel: (lvl: string) => void;
   onReset: () => void;
+  onApply?: () => void;
+  previewCount?: number;
+  hasPendingChanges?: boolean;
 }
 
 export function CatalogFilterPanel({
@@ -28,6 +32,9 @@ export function CatalogFilterPanel({
   onSelectCategory,
   onSelectLevel,
   onReset,
+  onApply,
+  previewCount,
+  hasPendingChanges,
 }: CatalogFilterPanelProps) {
   return (
     <div className="space-y-6">
@@ -49,7 +56,7 @@ export function CatalogFilterPanel({
       </div>
 
       {/* Tipe Program */}
-      <div className="space-y-2.5">
+      <div className="space-y-2" role="radiogroup" aria-label="Tipe Program">
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
           Tipe Program
         </h3>
@@ -60,26 +67,43 @@ export function CatalogFilterPanel({
               { id: 'Kursus', label: 'Kursus Terstruktur' },
               { id: 'Latihan', label: 'Latihan Soal Langsung' },
             ] as { id: ProgramTypeFilter; label: string }[]
-          ).map((t) => (
-            <label
-              key={t.id}
-              className="flex items-center gap-2.5 text-sm text-[#18181B] dark:text-slate-200 cursor-pointer py-1"
-            >
-              <input
-                type="radio"
-                name="programType"
-                checked={selectedType === t.id}
-                onChange={() => onSelectType(t.id)}
-                className="w-4 h-4 accent-[#0F766E] cursor-pointer"
-              />
-              <span>{t.label}</span>
-            </label>
-          ))}
+          ).map((t) => {
+            const active = selectedType === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => onSelectType(t.id)}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-colors cursor-pointer text-left border ${
+                  active
+                    ? 'bg-teal-50 dark:bg-teal-950/60 border-[#0F766E] text-[#0F766E] dark:text-teal-300 font-semibold'
+                    : 'border-transparent text-[#18181B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
+                }`}
+              >
+                <span
+                  className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                    active
+                      ? 'border-[#0F766E] bg-[#0F766E] text-white'
+                      : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                  }`}
+                >
+                  {active && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                </span>
+                <span>{t.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Kategori */}
-      <div className="space-y-2.5 pt-4 border-t border-[#E5E3DC] dark:border-slate-800">
+      <div
+        className="space-y-2 pt-4 border-t border-[#E5E3DC] dark:border-slate-800"
+        role="radiogroup"
+        aria-label="Kategori"
+      >
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
           Kategori
         </h3>
@@ -90,14 +114,27 @@ export function CatalogFilterPanel({
               <button
                 key={cat}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => onSelectCategory(cat)}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs transition-colors cursor-pointer border ${
                   active
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-300 font-semibold'
-                    : 'text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'bg-teal-50 dark:bg-teal-950/60 border-[#0F766E] text-[#0F766E] dark:text-teal-300 font-semibold'
+                    : 'border-transparent text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
                 }`}
               >
-                <span className="truncate">{cat === 'Semua' ? 'Semua Kategori' : cat}</span>
+                <span className="flex items-center gap-2 min-w-0">
+                  <span
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                      active
+                        ? 'border-[#0F766E] bg-[#0F766E] text-white'
+                        : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                    }`}
+                  >
+                    {active && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                  </span>
+                  <span className="truncate">{cat === 'Semua' ? 'Semua Kategori' : cat}</span>
+                </span>
                 <span className="font-mono-tabular text-[11px] opacity-80 ml-2 shrink-0">
                   {categoryCounts[cat]}
                 </span>
@@ -108,28 +145,58 @@ export function CatalogFilterPanel({
       </div>
 
       {/* Tingkat Kesulitan */}
-      <div className="space-y-2.5 pt-4 border-t border-[#E5E3DC] dark:border-slate-800">
+      <div
+        className="space-y-2 pt-4 border-t border-[#E5E3DC] dark:border-slate-800"
+        role="radiogroup"
+        aria-label="Tingkat Kesulitan"
+      >
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
           Tingkat Kesulitan
         </h3>
         <div className="space-y-1.5">
-          {levels.map((lvl) => (
-            <label
-              key={lvl}
-              className="flex items-center gap-2.5 text-sm text-[#18181B] dark:text-slate-200 cursor-pointer py-1"
-            >
-              <input
-                type="radio"
-                name="courseLevel"
-                checked={selectedLevel === lvl}
-                onChange={() => onSelectLevel(lvl)}
-                className="w-4 h-4 accent-[#0F766E] cursor-pointer"
-              />
-              <span>{lvl === 'Semua' ? 'Semua Tingkat' : lvl}</span>
-            </label>
-          ))}
+          {levels.map((lvl) => {
+            const active = selectedLevel === lvl;
+            return (
+              <button
+                key={lvl}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => onSelectLevel(lvl)}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-colors cursor-pointer text-left border ${
+                  active
+                    ? 'bg-teal-50 dark:bg-teal-950/60 border-[#0F766E] text-[#0F766E] dark:text-teal-300 font-semibold'
+                    : 'border-transparent text-[#18181B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
+                }`}
+              >
+                <span
+                  className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                    active
+                      ? 'border-[#0F766E] bg-[#0F766E] text-white'
+                      : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                  }`}
+                >
+                  {active && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                </span>
+                <span>{lvl === 'Semua' ? 'Semua Tingkat' : lvl}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {onApply && (
+        <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800">
+          <Button
+            type="button"
+            className="w-full"
+            variant={hasPendingChanges ? 'primary' : 'secondary'}
+            onClick={onApply}
+          >
+            Terapkan ({previewCount ?? 0} Program)
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

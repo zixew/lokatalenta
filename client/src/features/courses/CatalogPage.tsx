@@ -37,18 +37,51 @@ export function CatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [selectedType, setSelectedType] = useState<ProgramTypeFilter>('Semua');
   const [selectedLevel, setSelectedLevel] = useState('Semua');
+
+  // Staged (draft) filter state — only committed when user clicks "Terapkan"
+  const [draftCategory, setDraftCategory] = useState('Semua');
+  const [draftType, setDraftType] = useState<ProgramTypeFilter>('Semua');
+  const [draftLevel, setDraftLevel] = useState('Semua');
+
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  const openMobileFilter = () => {
+    setDraftCategory(selectedCategory);
+    setDraftType(selectedType);
+    setDraftLevel(selectedLevel);
+    setMobileFilterOpen(true);
+  };
+
+  const closeMobileFilterWithoutApplying = () => {
+    setDraftCategory(selectedCategory);
+    setDraftType(selectedType);
+    setDraftLevel(selectedLevel);
+    setMobileFilterOpen(false);
+  };
+
+  const applyDraftFilters = () => {
+    setSelectedCategory(draftCategory);
+    setSelectedType(draftType);
+    setSelectedLevel(draftLevel);
+    setCurrentPage(1);
+    setMobileFilterOpen(false);
+  };
+
   useEffect(() => {
     if (!mobileFilterOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileFilterOpen(false);
+      if (e.key === 'Escape') {
+        setDraftCategory(selectedCategory);
+        setDraftType(selectedType);
+        setDraftLevel(selectedLevel);
+        setMobileFilterOpen(false);
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [mobileFilterOpen]);
+  }, [mobileFilterOpen, selectedCategory, selectedType, selectedLevel]);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const handleOpenTarget = (e: React.MouseEvent, targetUrl: string) => {
@@ -140,10 +173,45 @@ export function CatalogPage() {
     (selectedType !== 'Semua' ? 1 : 0) +
     (selectedLevel !== 'Semua' ? 1 : 0);
 
+  const draftFilterCount =
+    (draftCategory !== 'Semua' ? 1 : 0) +
+    (draftType !== 'Semua' ? 1 : 0) +
+    (draftLevel !== 'Semua' ? 1 : 0);
+
+  const hasPendingFilterChanges =
+    draftCategory !== selectedCategory ||
+    draftType !== selectedType ||
+    draftLevel !== selectedLevel;
+
+  const draftMatchedCount = useMemo(() => {
+    return courses.filter((c) => {
+      const isDirect = Boolean(getDirectQuiz(c));
+      const matchCat = draftCategory === 'Semua' || c.category === draftCategory;
+      const matchType =
+        draftType === 'Semua' ||
+        (draftType === 'Latihan' && isDirect) ||
+        (draftType === 'Kursus' && !isDirect);
+      const matchLevel = draftLevel === 'Semua' || c.level === draftLevel;
+      const matchSearch =
+        c.title.toLowerCase().includes(search.toLowerCase()) ||
+        c.description.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchType && matchLevel && matchSearch;
+    }).length;
+  }, [courses, draftCategory, draftType, draftLevel, search]);
+
+  const resetDraftFilters = () => {
+    setDraftCategory('Semua');
+    setDraftType('Semua');
+    setDraftLevel('Semua');
+  };
+
   const resetAllFilters = () => {
     setSelectedCategory('Semua');
     setSelectedType('Semua');
     setSelectedLevel('Semua');
+    setDraftCategory('Semua');
+    setDraftType('Semua');
+    setDraftLevel('Semua');
     setSearch('');
     setSortBy('default');
     setCurrentPage(1);
@@ -248,26 +316,20 @@ export function CatalogPage() {
           {/* Desktop Marketplace Left Filter Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sticky top-24">
             <CatalogFilterPanel
-              activeFilterCount={activeFilterCount}
-              selectedType={selectedType}
-              selectedCategory={selectedCategory}
-              selectedLevel={selectedLevel}
+              activeFilterCount={draftFilterCount}
+              selectedType={draftType}
+              selectedCategory={draftCategory}
+              selectedLevel={draftLevel}
               categories={categories}
               categoryCounts={categoryCounts}
               levels={levels}
-              onSelectType={(t) => {
-                setSelectedType(t);
-                setCurrentPage(1);
-              }}
-              onSelectCategory={(c) => {
-                setSelectedCategory(c);
-                setCurrentPage(1);
-              }}
-              onSelectLevel={(l) => {
-                setSelectedLevel(l);
-                setCurrentPage(1);
-              }}
+              onSelectType={(t) => setDraftType(t)}
+              onSelectCategory={(c) => setDraftCategory(c)}
+              onSelectLevel={(l) => setDraftLevel(l)}
               onReset={resetAllFilters}
+              onApply={applyDraftFilters}
+              previewCount={draftMatchedCount}
+              hasPendingChanges={hasPendingFilterChanges}
             />
           </aside>
 
@@ -278,7 +340,7 @@ export function CatalogPage() {
               <div className="flex items-center gap-2 flex-1">
                 <button
                   type="button"
-                  onClick={() => setMobileFilterOpen(true)}
+                  onClick={openMobileFilter}
                   className="lg:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800 text-xs font-semibold text-[#18181B] dark:text-white shrink-0 cursor-pointer"
                 >
                   <Filter className="w-3.5 h-3.5" />
@@ -339,7 +401,10 @@ export function CatalogPage() {
                 {selectedType !== 'Semua' && (
                   <button
                     type="button"
-                    onClick={() => setSelectedType('Semua')}
+                    onClick={() => {
+                      setSelectedType('Semua');
+                      setDraftType('Semua');
+                    }}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs font-medium text-[#0F766E] dark:text-teal-300 cursor-pointer"
                   >
                     Tipe: {selectedType === 'Kursus' ? 'Kursus Terstruktur' : 'Latihan Langsung'}
@@ -349,7 +414,10 @@ export function CatalogPage() {
                 {selectedCategory !== 'Semua' && (
                   <button
                     type="button"
-                    onClick={() => setSelectedCategory('Semua')}
+                    onClick={() => {
+                      setSelectedCategory('Semua');
+                      setDraftCategory('Semua');
+                    }}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs font-medium text-[#0F766E] dark:text-teal-300 cursor-pointer"
                   >
                     Kategori: {selectedCategory}
@@ -359,7 +427,10 @@ export function CatalogPage() {
                 {selectedLevel !== 'Semua' && (
                   <button
                     type="button"
-                    onClick={() => setSelectedLevel('Semua')}
+                    onClick={() => {
+                      setSelectedLevel('Semua');
+                      setDraftLevel('Semua');
+                    }}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs font-medium text-[#0F766E] dark:text-teal-300 cursor-pointer"
                   >
                     Level: {selectedLevel}
@@ -627,9 +698,13 @@ export function CatalogPage() {
           role="dialog"
           aria-modal="true"
           aria-label="Filter Marketplace"
+          onClick={closeMobileFilterWithoutApplying}
           className="fixed inset-0 z-50 lg:hidden bg-slate-900/60 backdrop-blur-xs flex justify-end"
         >
-          <div className="w-full max-w-xs bg-white dark:bg-[#161B22] h-full flex flex-col shadow-xl">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-xs bg-white dark:bg-[#161B22] h-full flex flex-col shadow-xl"
+          >
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 shrink-0">
               <span className="font-bold text-base text-[#18181B] dark:text-white">
                 Filter Marketplace
@@ -637,7 +712,7 @@ export function CatalogPage() {
               <button
                 type="button"
                 aria-label="Tutup filter"
-                onClick={() => setMobileFilterOpen(false)}
+                onClick={closeMobileFilterWithoutApplying}
                 className="p-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -645,31 +720,22 @@ export function CatalogPage() {
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <CatalogFilterPanel
-                activeFilterCount={activeFilterCount}
-                selectedType={selectedType}
-                selectedCategory={selectedCategory}
-                selectedLevel={selectedLevel}
+                activeFilterCount={draftFilterCount}
+                selectedType={draftType}
+                selectedCategory={draftCategory}
+                selectedLevel={draftLevel}
                 categories={categories}
                 categoryCounts={categoryCounts}
                 levels={levels}
-                onSelectType={(t) => {
-                  setSelectedType(t);
-                  setCurrentPage(1);
-                }}
-                onSelectCategory={(c) => {
-                  setSelectedCategory(c);
-                  setCurrentPage(1);
-                }}
-                onSelectLevel={(l) => {
-                  setSelectedLevel(l);
-                  setCurrentPage(1);
-                }}
-                onReset={resetAllFilters}
+                onSelectType={(t) => setDraftType(t)}
+                onSelectCategory={(c) => setDraftCategory(c)}
+                onSelectLevel={(l) => setDraftLevel(l)}
+                onReset={resetDraftFilters}
               />
             </div>
             <div className="p-4 border-t border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] shrink-0">
-              <Button className="w-full" onClick={() => setMobileFilterOpen(false)}>
-                Terapkan ({filteredCourses.length} Program)
+              <Button type="button" className="w-full" onClick={applyDraftFilters}>
+                Terapkan ({draftMatchedCount} Program)
               </Button>
             </div>
           </div>
