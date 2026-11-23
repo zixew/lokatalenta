@@ -736,6 +736,36 @@ export const lmsApi = {
     return { attempt, review };
   },
 
+  async checkPracticeAnswer(
+    quizId: string,
+    questionId: string,
+    selectedOption: string
+  ): Promise<{ is_correct: boolean; correct_option: string; explanation: string }> {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase.rpc('check_practice_answer', {
+        p_question_id: questionId,
+        p_selected_option: selectedOption,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) throw new Error('Jawaban soal tidak ditemukan');
+      return {
+        is_correct: Boolean(row.is_correct),
+        correct_option: row.correct_option,
+        explanation: row.explanation ?? '',
+      };
+    }
+
+    const quiz = await this.getQuizMeta(quizId);
+    const q = quiz?.questions?.find((item) => item.id === questionId);
+    if (!q) throw new Error('Soal tidak ditemukan');
+    return {
+      is_correct: q.correct_option === selectedOption,
+      correct_option: q.correct_option,
+      explanation: q.explanation,
+    };
+  },
+
   async listUserAttempts(userId: string): Promise<QuizAttempt[]> {
     await this.syncExpiredAttempts(userId);
     if (isSupabaseConfigured && supabase) {
