@@ -6,6 +6,39 @@ LokaTalenta hadir untuk membantu pencari kerja, mahasiswa, dan profesional mempe
 
 ---
 
+## 📱 Preview UI LokaTalenta
+
+Tampilan antarmuka **LokaTalenta** dirancang bersih, responsif, dan fokus pada kenyamanan belajar di desktop maupun perangkat mobile:
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h4 align="center">1. Katalog Program &amp; Misi Belajar</h4>
+      <img src="docs/images/preview-catalog-desktop.png" alt="Preview Katalog LokaTalenta Desktop" />
+      <p align="center"><sub>Jelajahi 120+ program persiapan psikotes, bahasa, dan keterampilan kerja dengan filter pintar &amp; misi harian.</sub></p>
+    </td>
+    <td width="50%" valign="top">
+      <h4 align="center">2. Simulasi Tes Kraepelin / Pauli</h4>
+      <img src="docs/images/preview-kraepelin-desktop.png" alt="Preview Tes Kraepelin LokaTalenta" />
+      <p align="center"><sub>Latihan ketelitian &amp; ketahanan kerja dengan timer per kolom, numpad cepat, serta grafik akurasi.</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h4 align="center">3. Tryout Akbar &amp; Leaderboard</h4>
+      <img src="docs/images/preview-tryout-desktop.png" alt="Preview Tryout Akbar LokaTalenta" />
+      <p align="center"><sub>Ikuti jadwal simulasi nasional serentak, daftarkan kursi event, dan pantau papan peringkat Top 10.</sub></p>
+    </td>
+    <td width="50%" valign="top" align="center">
+      <h4 align="center">4. Pengalaman Mobile Responsif</h4>
+      <img src="docs/images/preview-catalog-mobile.png" alt="Preview Mobile LokaTalenta" width="240" />
+      <p align="center"><sub>Nyaman diakses dari smartphone dengan navigasi ringkas dan 0px horizontal overflow.</sub></p>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## 🎯 Untuk Siapa LokaTalenta?
 
 - **Pencari Kerja & Fresh Graduate** — Berlatih menghadapi pola tes seleksi perusahaan ritel nasional maupun korporasi besar dengan simulasi waktu nyata dan pembahasan lengkap.
