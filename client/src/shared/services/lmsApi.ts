@@ -407,6 +407,25 @@ export const lmsApi = {
     return null;
   },
 
+  async getQuizWithQuestions(quizId: string): Promise<Quiz | null> {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('quizzes')
+        .select('*, questions(*)')
+        .eq('id', quizId)
+        .single();
+      if (error) throw error;
+      if (!data) return null;
+      return {
+        ...data,
+        questions: ((data as any).questions ?? []).sort(
+          (a: Question, b: Question) => a.order_index - b.order_index
+        ),
+      };
+    }
+    return this.getQuizMeta(quizId);
+  },
+
   async getInProgressAttempt(userId: string, quizId: string): Promise<QuizAttempt | null> {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
@@ -2341,6 +2360,23 @@ export const lmsApi = {
   },
 
   async listLeaderboard(): Promise<LeaderboardEntry[]> {
+    if (isSupabaseConfigured && supabase) {
+      const { data: students } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('role', 'student')
+        .eq('is_active', true)
+        .limit(20);
+      return (students ?? []).map((s) => ({
+        user_id: s.id,
+        full_name: s.full_name,
+        xp: 0,
+        level: 1,
+        completed_lessons: 0,
+        passed_quizzes: 0,
+      }));
+    }
+
     const profiles = await getDemoProfiles();
     const students = profiles.filter((p) => p.role === 'student');
     const progressMap = readLocal<Record<string, string[]>>(STORAGE_KEYS.progress, {});

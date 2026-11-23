@@ -42,7 +42,9 @@ export function GamificationAnalyticsSection({
       completed_lessons: completedLessonsCount,
       passed_quizzes: passedQuizzesCount,
     };
-    const filtered = rawLeaderboard.filter((e) => e.user_id !== user.id);
+    const filtered = rawLeaderboard.filter(
+      (e) => e.user_id !== user.id && e.full_name !== user.full_name
+    );
     return [...filtered, currentEntry].sort((a, b) => b.xp - a.xp);
   })();
   const weeklyDone = completedLessonsCount + attempts.length;

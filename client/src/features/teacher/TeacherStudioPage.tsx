@@ -57,7 +57,7 @@ export function TeacherStudioPage() {
   const [lessonDuration, setLessonDuration] = useState(10);
 
   // Quiz Settings & Question Builder State
-  const [selectedQuizId, setSelectedQuizId] = useState('quiz-evaluasi-retail');
+  const [selectedQuizId, setSelectedQuizId] = useState('');
   const [quizDuration, setQuizDuration] = useState(120);
   const [quizPassingScore, setQuizPassingScore] = useState(70);
   const [quizUseSubtests, setQuizUseSubtests] = useState(true);
@@ -162,7 +162,7 @@ export function TeacherStudioPage() {
 
   const { data: selectedQuizMeta } = useQuery({
     queryKey: ['teacher-quiz-meta', selectedQuizId],
-    queryFn: () => lmsApi.getQuizMeta(selectedQuizId),
+    queryFn: () => lmsApi.getQuizWithQuestions(selectedQuizId),
     enabled: Boolean(selectedQuizId),
   });
   const activeQuestions = selectedQuizMeta?.questions ?? activeQuizObj?.questions ?? [];
