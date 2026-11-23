@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.1.0] - 2026-11-23
+
+### Minor
+- Menghapus OTP saat registrasi, mempertahankan validasi format email & cek duplikasi email, serta memperbarui test case AUTH-01 dan AUTH-03
+
+---
+
 ## [1.0.0] - 2026-11-23 — Initial Production Release
 
 ### Major / Core Platform
