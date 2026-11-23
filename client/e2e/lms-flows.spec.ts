@@ -21,6 +21,9 @@ test.describe('LokaTalenta LMS E2E Regression Suite (BL-10)', () => {
     await page.getByPlaceholder('nama@email.com').fill('pelajar@lokatalenta.id');
     await page.getByRole('button', { name: /Kirim Tautan Reset Password/i }).click();
     await expect(page.getByText(/tautan reset password telah dikirim/i)).toBeVisible();
+
+    await page.goto('/auth?type=recovery');
+    await expect(page.getByRole('heading', { name: /Buat Password Baru/i })).toBeVisible();
   });
 
   test('tryout akbar page displays scheduled events, registration toggle, and leaderboard (BL-09)', async ({ page }) => {
