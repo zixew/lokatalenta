@@ -1,0 +1,17 @@
+{
+  "name": "LokaTalenta — Akademi Bahasa & Karier",
+  "short_name": "LokaTalenta",
+  "description": "Platform belajar bahasa, psikotes kerja, dan persiapan karier terstruktur.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6F5F1",
+  "theme_color": "#0F766E",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
