@@ -83,7 +83,7 @@
 | COM-03 | Student | Happy | Deep-link **Tanyakan Soal Ini ke Komunitas** | Klik tombol di `QuizResultPage` | Composer `/community` otomatis terbuka & terisi kutipan soal + opsi | **PASS** |
 | MNT-01 | Student/Teacher | Happy | Q&A berulir, konsultasi 1-on-1 & Sesi Live | Kirim pertanyaan/balasan & daftar sesi | Tersimpan & notifikasi terkirim | **PASS** |
 | MNT-02 | Student | Sad | Booking Sesi Live saat kuota penuh | Coba daftar sesi yang penuh | Ditolak dengan pesan `Kuota sesi sudah penuh.` | **PASS** |
-| PRF-01 | Student | Happy | Konsistensi XP, Streak, Global Leaderboard & Riwayat Kuis | Buka `/profile` setelah belajar & mengerjakan kuis | XP, materi, tes dikerjakan, dan Global Leaderboard (`get_public_leaderboard`) sinkron lintas siswa | **PENDING SIT/UAT** |
+| PRF-01 | Student | Happy | Konsistensi XP, Streak, Global Leaderboard & Riwayat Kuis | Buka `/profile` setelah belajar & mengerjakan kuis | XP, materi, tes dikerjakan, dan Global Leaderboard (`get_public_leaderboard`) sinkron lintas siswa | **PASS** |
 | PRF-02 | Student/Guest | Happy/Sad | Edit Bio/Nama & akses `/profile` tanpa login | Edit bio + reload; buka `/profile` saat logout | Perubahan bio tersimpan; guest diarahkan ke `/auth` | **PARTIAL FAIL** *(Edit bio PASS; guest `/profile` blank)* |
 
 ---
