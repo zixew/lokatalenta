@@ -1,20 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, ChevronLeft, ChevronRight, Search, Shield, Users } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, ClipboardList, Search, Shield, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { lmsApi } from '../../shared/services/lmsApi';
 import type { UserRole } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
-
-type AdminTab = 'users' | 'courses';
-const COURSE_PAGE_SIZE = 10;
-
 import { useAuthStore } from '../auth/useAuthStore';
+import { AdminAuditLogPanel } from './AdminAuditLogPanel';
+import { getAdminAuditLogs, recordAdminAuditLog } from './adminAuditLog';
+
+type AdminTab = 'users' | 'courses' | 'audit';
+const COURSE_PAGE_SIZE = 10;
 
 export function AdminPanelPage() {
   const { user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
+  const [auditLogs, setAuditLogs] = useState(() => getAdminAuditLogs());
 
   // User filters
   const [userSearch, setUserSearch] = useState('');
@@ -40,25 +42,52 @@ export function AdminPanelPage() {
   const updateRoleMut = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: UserRole }) =>
       lmsApi.updateUserRole(userId, role),
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
+      const targetUser = profiles.find((p) => p.id === vars.userId);
+      setAuditLogs(
+        recordAdminAuditLog({
+          actorName: currentUser?.full_name || 'Admin',
+          action: 'ROLE_UPDATED',
+          targetLabel: targetUser?.email || vars.userId,
+          detail: `Mengubah role menjadi ${vars.role}`,
+        })
+      );
     },
   });
 
   const togglePublishMut = useMutation({
     mutationFn: ({ courseId, isPublished }: { courseId: string; isPublished: boolean }) =>
       lmsApi.toggleCoursePublish(courseId, isPublished),
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
+      const targetCourse = courses.find((c) => c.id === vars.courseId);
+      setAuditLogs(
+        recordAdminAuditLog({
+          actorName: currentUser?.full_name || 'Admin',
+          action: 'COURSE_PUBLISH_TOGGLED',
+          targetLabel: targetCourse?.title || vars.courseId,
+          detail: vars.isPublished ? 'Menerbitkan kursus ke katalog' : 'Menarik kursus ke draft',
+        })
+      );
     },
   });
 
   const toggleActiveMut = useMutation({
     mutationFn: ({ userId, isActive }: { userId: string; isActive: boolean }) =>
       lmsApi.toggleUserActive(userId, isActive),
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
+      const targetUser = profiles.find((p) => p.id === vars.userId);
+      setAuditLogs(
+        recordAdminAuditLog({
+          actorName: currentUser?.full_name || 'Admin',
+          action: 'USER_STATUS_CHANGED',
+          targetLabel: targetUser?.email || vars.userId,
+          detail: vars.isActive ? 'Mengaktifkan kembali akun' : 'Menonaktifkan akun',
+        })
+      );
     },
   });
 
@@ -172,6 +201,18 @@ export function AdminPanelPage() {
         >
           <BookOpen className="w-4 h-4" />
           Moderasi Kursus ({courses.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('audit')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+            activeTab === 'audit'
+              ? 'bg-[#0F766E] text-white'
+              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+          }`}
+        >
+          <ClipboardList className="w-4 h-4" />
+          Audit Log ({auditLogs.length})
         </button>
       </div>
 
@@ -474,6 +515,9 @@ export function AdminPanelPage() {
           )}
         </section>
       )}
+
+      {/* TAB 3: ADMIN AUDIT LOG */}
+      {activeTab === 'audit' && <AdminAuditLogPanel logs={auditLogs} />}
     </div>
   );
 }
