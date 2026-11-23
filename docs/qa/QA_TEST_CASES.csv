@@ -29,7 +29,9 @@ QUZ-04,Student,Quiz Runner,Sad Flow,Mengulang kuis setelah lulus,Sudah lulus >= 
 QUZ-05,Student,Quiz Runner,Happy Flow,Filter Navigasi Soal (Semua/Kosong/Ragu),Berada di QuizRunnerPage,Klik pill Kosong Ragu dan Semua,Grid nomor soal terfilter akurat,PASS
 QUZ-06,Student,Quiz Runner,Happy Flow,Keyboard shortcuts (A-E panah F),Berada di QuizRunnerPage,Tekan A/B ArrowRight dan F,Opsi terpilih pindah soal dan soal ditandai Ragu-ragu,FAIL (F tidak berfungsi)
 QUZ-07,Student,Quiz Result,Happy Flow,Rekomendasi Fokus Subtes & Filter Subtes,Ada jawaban salah di QuizResultPage,Klik Fokus Soal [Subtes],List pembahasan terfilter ke soal salah subtes terlemah,PASS
-QUZ-08,Student,Quiz Result,Happy Flow,Ulangi Latihan setelah cooldown selesai,Cooldown 60 detik selesai,Klik tombol Ulangi Latihan,Layar berpindah ke Quiz Runner dan memuat soal baru,FAIL (UI tetap di hasil)
+QUZ-08,Student,Quiz Result,Happy Flow,Ulangi Latihan setelah cooldown selesai,Cooldown 60 detik selesai,Klik tombol Ulangi Latihan,Layar berpindah ke Quiz Runner dan memuat soal baru,PASS
+KRP-01,Public/Student,Kraepelin Simulator,Happy Flow,Simulasi Kraepelin & Kurva Kecepatan (/kraepelin),Berada di /kraepelin,Pilih preset -> Mulai Simulasi -> jawab beberapa pasangan via keypad/keyboard -> Selesai,Tampil Total Terjawab Akurasi Kecepatan Konsistensi dan Kurva per Kolom,PASS
+KRP-02,Public/Student,Kraepelin Simulator,Sad Flow,Kraepelin Mobile 390x844 & selesai 0 jawaban,Berada di /kraepelin,Buka di 390x844 -> Mulai -> Selesai tanpa menjawab,0px horizontal overflow dan semua metrik 0% tanpa NaN,PASS
 COM-01,Student,Komunitas,Happy Flow,Buat topik dan hapus topik,Login di /community,Buat topik baru lalu hapus,Post tersimpan (201) dan terhapus (204),PASS
 COM-02,Student,Komunitas,Sad Flow,Guard Dukung 1x & double-click cepat,Ada topik di /community,Klik cepat tombol Dukung 2x berturut-turut,Hanya 1 request terkirim 0 HTTP 409 toggle +1/-1 akurat,PASS
 COM-03,Student,Komunitas,Happy Flow,Deep-link Tanyakan Soal Ini ke Komunitas,Berada di QuizResultPage,Klik Tanyakan Soal Ini ke Komunitas,Composer /community otomatis terbuka terisi kutipan soal,PASS
