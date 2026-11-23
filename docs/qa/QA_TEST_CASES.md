@@ -17,9 +17,9 @@
 ## 2. Autentikasi, Validasi Email & Keamanan Sesi (`AUTH`)
 | ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
 |---|---|---|---|---|---|---|
-| AUTH-01 | Guest | Happy | Registrasi akun pelajar baru tanpa OTP | Buka `/auth` → **Gabung Sekarang** → isi Nama, Email valid baru, Password ≥ 6 → klik **Daftar Sekarang** | Akun terbuat, langsung masuk sebagai Pelajar, redirect ke `/` | **PENDING RE-TEST** |
+| AUTH-01 | Guest | Happy | Registrasi akun pelajar baru tanpa OTP | Buka `/auth` → **Gabung Sekarang** → isi Nama, Email valid baru, Password ≥ 6 → klik **Daftar Sekarang** | Akun terbuat, langsung masuk sebagai Pelajar, redirect ke `/` | **PASS** |
 | AUTH-02 | Guest | Sad | Login dengan password salah | Buka `/auth` → isi email valid + password salah → klik **Masuk** | Muncul error `"Invalid login credentials"`, tetap di `/auth` | **PASS** |
-| AUTH-03 | Guest | Sad | Registrasi dengan email duplikat | Daftar ulang memakai email yang sudah terdaftar (`nadia@pelajar.id`) | Registrasi ditolak dengan pesan `"Email sudah terdaftar. Silakan masuk."` | **PENDING RE-TEST** |
+| AUTH-03 | Guest | Sad | Registrasi dengan email duplikat | Daftar ulang memakai email yang sudah terdaftar (`nadia@pelajar.id`) | Registrasi ditolak dengan pesan `"Email sudah terdaftar. Silakan masuk."` | **PASS** |
 | AUTH-04 | All | Sad | Login akun yang dinonaktifkan Admin | Admin menonaktifkan akun → user mencoba login | Login ditolak dengan pesan `"Akun Anda sedang dinonaktifkan oleh Admin."` | **PASS** |
 | AUTH-05 | Guest | Happy | Pembersihan input password saat ganti mode | Isi password di mode Masuk → klik **Gabung Sekarang** | Input password otomatis dikosongkan | **PASS** |
 | AUTH-06 | Guest | Sad | Validasi format email & panjang password < 6 | Isi `"bukanemail"` / password `"123"` saat daftar | Form menolak submit dengan pesan validasi yang jelas | **PASS** |
