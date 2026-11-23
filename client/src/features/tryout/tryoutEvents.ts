@@ -1,3 +1,5 @@
+import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
+
 export type TryoutEventStatus = 'live' | 'upcoming' | 'ended';
 
 export interface TryoutEvent {
@@ -87,5 +89,56 @@ export function toggleTryoutRegistration(userId: string, eventId: string): strin
   } catch {
     // ignore storage errors
   }
+  return next;
+}
+
+export async function syncTryoutRegistrationsFromServer(userId: string): Promise<string[]> {
+  const localIds = getRegisteredTryoutIds(userId);
+  if (!isSupabaseConfigured || !supabase || !userId || userId === 'guest') {
+    return localIds;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('tryout_registrations')
+      .select('event_id')
+      .eq('user_id', userId);
+    if (error || !data) return localIds;
+
+    const merged = Array.from(
+      new Set([...localIds, ...data.map((r: { event_id: string }) => r.event_id)])
+    );
+    localStorage.setItem(`${REG_STORAGE_KEY}_${userId}`, JSON.stringify(merged));
+    return merged;
+  } catch {
+    return localIds;
+  }
+}
+
+export async function toggleTryoutRegistrationAsync(
+  userId: string,
+  eventId: string
+): Promise<string[]> {
+  const wasRegistered = getRegisteredTryoutIds(userId).includes(eventId);
+  const next = toggleTryoutRegistration(userId, eventId);
+
+  if (isSupabaseConfigured && supabase && userId && userId !== 'guest') {
+    try {
+      if (wasRegistered) {
+        await supabase
+          .from('tryout_registrations')
+          .delete()
+          .eq('user_id', userId)
+          .eq('event_id', eventId);
+      } else {
+        await supabase
+          .from('tryout_registrations')
+          .upsert({ user_id: userId, event_id: eventId }, { onConflict: 'user_id,event_id' });
+      }
+    } catch {
+      // keep optimistic local state
+    }
+  }
+
   return next;
 }

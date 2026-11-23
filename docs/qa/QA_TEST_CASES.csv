@@ -54,3 +54,7 @@ QUZ-05,Student,Kuis & Sertifikat,Happy Flow,Tantangan 1v1 & Share Skor/Sertifika
 AUTH-04,Public,Autentikasi,Happy Flow,Lupa Password / Reset Password (BL-08),Di halaman /auth,Klik Lupa Password masukkan email valid dan submit,Tampil konfirmasi tautan reset password terkirim,READY FOR SIT
 TRY-01,Public/Student,Tryout Akbar,Happy Flow,Tryout Akbar Terjadwal & Leaderboard (BL-09),Buka /tryout,Lihat jadwal event klik Daftar Event dan cek Leaderboard,Event Live/Upcoming/Ended tampil status Terdaftar tersimpan & Top 10 tampil,READY FOR SIT
 E2E-01,All,Automated E2E,Happy Flow,Playwright E2E Regression Suite (BL-10),CI / Local,Jalankan suite E2E lms-flows.spec.ts,Seluruh alur regresi inti lulus,READY FOR SIT
+PRF-03,System,Performance,Happy Flow,Code-Splitting Vendor Bundle < 250 kB (BL-11),Build produksi,Jalankan npm run build,Seluruh chunk di bawah 250 kB dengan 0 chunk warning,PASS
+AUTH-05,Public,Autentikasi,Happy Flow,Callback Form Buat Password Baru (?type=recovery) (BL-12),Buka /auth?type=recovery,Isi Password Baru dan Konfirmasi Password Baru,Form Buat Password Baru tampil dan validasi cocok bekerja,READY FOR SIT
+TRY-02,Student,Tryout Akbar,Happy Flow,Filter Kategori & Sync Pendaftaran Tryout (BL-13),Buka /tryout,Klik filter kategori dan Daftar Event,Event terfilter akurat dan pendaftaran tersimpan,READY FOR SIT
+E2E-02,System,Automated E2E,Happy Flow,Suite E2E Recovery & Topbar (BL-14),CI / Local,Jalankan unit test & E2E,Seluruh test lulus 100%,READY FOR SIT
