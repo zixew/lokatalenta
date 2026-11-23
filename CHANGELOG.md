@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.6.0] - 2026-11-23
+
+### Minor
+- Sprint 3: Challenge 1v1 & Share Skor/Sertifikat (BL-07), Forgot Password (BL-08), Tryout Akbar (BL-09), dan Playwright E2E Suite (BL-10)
+
+---
+
 ## [1.5.0] - 2026-11-23
 
 ### Minor
