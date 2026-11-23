@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:dev": "bash ../scripts/deploy.sh dev",
+    "deploy:prod": "bash ../scripts/deploy.sh prod"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",
