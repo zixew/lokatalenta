@@ -31,7 +31,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 transition-colors">
+    <div className="min-h-screen overflow-x-hidden flex flex-col bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 transition-colors">
       <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#161B22]/95 backdrop-blur border-b border-[#E5E3DC] dark:border-slate-800 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           {/* Brand + Desktop Nav */}
@@ -42,7 +42,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <span className="font-bold text-base tracking-tight text-[#18181B] dark:text-white block">
                   LokaTalenta
                 </span>
-                <span className="text-[11px] text-[#71717A] dark:text-slate-400 font-medium block">
+                <span className="text-[11px] text-[#71717A] dark:text-slate-400 font-medium hidden sm:block">
                   Akademi Bahasa &amp; Karier
                 </span>
               </div>

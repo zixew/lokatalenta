@@ -161,8 +161,7 @@ export function CoursePlayerPage() {
     );
   }
 
-  const canAccessCourse =
-    isEnrolled || user?.role === 'teacher' || user?.role === 'admin';
+  const canAccessCourse = isEnrolled;
 
   if (!canAccessCourse) {
     return (

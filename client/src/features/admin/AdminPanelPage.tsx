@@ -9,7 +9,10 @@ import { Button } from '../../shared/ui/Button';
 type AdminTab = 'users' | 'courses';
 const COURSE_PAGE_SIZE = 10;
 
+import { useAuthStore } from '../auth/useAuthStore';
+
 export function AdminPanelPage() {
+  const { user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
 
@@ -266,39 +269,67 @@ export function AdminPanelPage() {
                       </td>
                       <td className="px-6 py-3.5">
                         <div className="inline-flex rounded-lg border border-[#E5E3DC] dark:border-slate-700 overflow-hidden">
-                          {(['student', 'teacher', 'admin'] as UserRole[]).map((roleOpt) => (
-                            <button
-                              key={roleOpt}
-                              type="button"
-                              onClick={() => updateRoleMut.mutate({ userId: p.id, role: roleOpt })}
-                              className={`px-2.5 py-1 text-xs font-semibold cursor-pointer transition-colors ${
-                                p.role === roleOpt
-                                  ? 'bg-[#0F766E] text-white'
-                                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                              }`}
-                            >
-                              {roleOpt === 'student'
-                                ? 'Pelajar'
-                                : roleOpt === 'teacher'
-                                ? 'Pengajar'
-                                : 'Admin'}
-                            </button>
-                          ))}
+                          {(['student', 'teacher', 'admin'] as UserRole[]).map((roleOpt) => {
+                            const isSelf = p.id === currentUser?.id;
+                            return (
+                              <button
+                                key={roleOpt}
+                                type="button"
+                                disabled={isSelf || updateRoleMut.isPending}
+                                title={
+                                  isSelf
+                                    ? 'Tidak dapat mengubah role akun Anda sendiri'
+                                    : undefined
+                                }
+                                onClick={() =>
+                                  updateRoleMut.mutate({ userId: p.id, role: roleOpt })
+                                }
+                                className={`px-2.5 py-1 text-xs font-semibold transition-colors ${
+                                  isSelf ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                                } ${
+                                  p.role === roleOpt
+                                    ? 'bg-[#0F766E] text-white'
+                                    : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                              >
+                                {roleOpt === 'student'
+                                  ? 'Pelajar'
+                                  : roleOpt === 'teacher'
+                                  ? 'Pengajar'
+                                  : 'Admin'}
+                              </button>
+                            );
+                          })}
                         </div>
                       </td>
                       <td className="px-6 py-3.5 text-right">
-                        <Button
-                          variant={p.is_active === false ? 'secondary' : 'ghost'}
-                          size="sm"
-                          onClick={() =>
-                            toggleActiveMut.mutate({
-                              userId: p.id,
-                              isActive: p.is_active === false,
-                            })
-                          }
-                        >
-                          {p.is_active === false ? 'Aktifkan Akun' : 'Nonaktifkan'}
-                        </Button>
+                        {(() => {
+                          const isSelf = p.id === currentUser?.id;
+                          return (
+                            <Button
+                              variant={p.is_active === false ? 'secondary' : 'ghost'}
+                              size="sm"
+                              disabled={isSelf || toggleActiveMut.isPending}
+                              title={
+                                isSelf
+                                  ? 'Tidak dapat menonaktifkan akun Anda sendiri'
+                                  : undefined
+                              }
+                              onClick={() =>
+                                toggleActiveMut.mutate({
+                                  userId: p.id,
+                                  isActive: p.is_active === false,
+                                })
+                              }
+                            >
+                              {isSelf
+                                ? 'Akun Aktif (Anda)'
+                                : p.is_active === false
+                                ? 'Aktifkan Akun'
+                                : 'Nonaktifkan'}
+                            </Button>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))

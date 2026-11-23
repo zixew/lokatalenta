@@ -60,7 +60,7 @@ export function CatalogPage() {
     navigate(targetUrl);
   };
 
-  const { data: courses = [], isLoading } = useQueryPlaceholder();
+  const { data: courses = [], isLoading, isError, refetch } = useQueryPlaceholder();
   const { data: enrolledIds = [] } = useEnrollmentsQuery(user?.id);
   const { data: completedLessonIds = [] } = useCompletedLessonsQuery(user?.id);
   const { data: userAttempts = [] } = useUserAttemptsQuery(user?.id);
@@ -184,7 +184,7 @@ export function CatalogPage() {
             )}
             <a href="#katalog">
               <Button variant="secondary" size="lg">
-                Jelajahi {courses.length}+ Program
+                {isLoading ? 'Jelajahi Program' : `Jelajahi ${courses.length}+ Program`}
               </Button>
             </a>
           </div>
@@ -299,10 +299,16 @@ export function CatalogPage() {
 
               <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                 <span className="text-xs text-[#71717A] dark:text-slate-400 font-medium">
-                  <strong className="text-[#18181B] dark:text-white font-mono-tabular">
-                    {filteredCourses.length}
-                  </strong>{' '}
-                  program
+                  {isLoading ? (
+                    'Memuat program...'
+                  ) : (
+                    <>
+                      <strong className="text-[#18181B] dark:text-white font-mono-tabular">
+                        {filteredCourses.length}
+                      </strong>{' '}
+                      program
+                    </>
+                  )}
                 </span>
 
                 <div className="relative">
@@ -384,6 +390,15 @@ export function CatalogPage() {
                     className="h-64 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl animate-pulse"
                   />
                 ))}
+              </div>
+            ) : isError ? (
+              <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl p-10 text-center space-y-3">
+                <p className="text-sm font-semibold text-rose-800 dark:text-rose-200">
+                  Gagal memuat daftar program dari server.
+                </p>
+                <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+                  Coba Lagi
+                </Button>
               </div>
             ) : filteredCourses.length === 0 ? (
               <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-12 text-center space-y-3">

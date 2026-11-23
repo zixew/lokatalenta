@@ -64,7 +64,7 @@ function PageLoader() {
 
 function RequireRole({ roles, children }: { roles: UserRole[]; children: ReactNode }) {
   const { user, initialized } = useAuthStore();
-  if (!initialized) return null;
+  if (!initialized) return <PageLoader />;
   if (!user) return <Navigate to="/auth" replace />;
   if (!roles.includes(user.role)) return <Navigate to="/" replace />;
   return <>{children}</>;

@@ -25,12 +25,26 @@ export function GamificationAnalyticsSection({
     user ? lmsApi.getWeeklyGoal(user.id) : 5
   );
 
-  const { data: leaderboard = [] } = useQuery({
+  const { data: rawLeaderboard = [] } = useQuery({
     queryKey: ['leaderboard'],
     queryFn: () => lmsApi.listLeaderboard(),
   });
 
   const stats = computeGamificationStats(attempts, completedLessonsCount, enrolledCount);
+  const passedQuizzesCount = attempts.filter((a) => (a.score ?? 0) >= 70).length;
+  const leaderboard = (() => {
+    if (!user || user.role !== 'student') return rawLeaderboard;
+    const currentEntry = {
+      user_id: user.id,
+      full_name: user.full_name,
+      xp: stats.xp,
+      level: stats.level,
+      completed_lessons: completedLessonsCount,
+      passed_quizzes: passedQuizzesCount,
+    };
+    const filtered = rawLeaderboard.filter((e) => e.user_id !== user.id);
+    return [...filtered, currentEntry].sort((a, b) => b.xp - a.xp);
+  })();
   const weeklyDone = completedLessonsCount + attempts.length;
   const weeklyPct = Math.min(100, Math.round((weeklyDone / Math.max(1, weeklyGoal)) * 100));
 

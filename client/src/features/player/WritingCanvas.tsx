@@ -150,9 +150,17 @@ export function WritingCanvas({ lines }: { lines: VoiceLine[] }) {
             </div>
             {/* Faint character guide */}
             {showGuide && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center select-none">
-                <span className="text-7xl font-bold text-slate-300/70 dark:text-slate-700/70">
-                  {targetChar.slice(0, 3)}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-3 select-none">
+                <span
+                  className={`font-bold text-center break-words text-slate-300/70 dark:text-slate-700/70 ${
+                    targetChar.length <= 2
+                      ? 'text-7xl'
+                      : targetChar.length <= 5
+                      ? 'text-4xl'
+                      : 'text-2xl leading-snug'
+                  }`}
+                >
+                  {targetChar}
                 </span>
               </div>
             )}

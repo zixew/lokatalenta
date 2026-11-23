@@ -104,10 +104,14 @@ export function AuthPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <div>
-                <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5">
+                <label
+                  htmlFor="auth-fullname"
+                  className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5"
+                >
                   Nama Lengkap
                 </label>
                 <input
+                  id="auth-fullname"
                   type="text"
                   required
                   disabled={otpSent}
@@ -120,10 +124,14 @@ export function AuthPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5">
+              <label
+                htmlFor="auth-email"
+                className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5"
+              >
                 Email
               </label>
               <input
+                id="auth-email"
                 type="email"
                 required
                 disabled={isRegister && otpSent}
@@ -135,10 +143,14 @@ export function AuthPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5">
+              <label
+                htmlFor="auth-password"
+                className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1.5"
+              >
                 Password
               </label>
               <input
+                id="auth-password"
                 type="password"
                 required
                 minLength={6}
@@ -153,8 +165,11 @@ export function AuthPage() {
             {isRegister && otpSent && (
               <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
-                  <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200">
-                    Kode OTP (6 Digit)
+                  <label
+                    htmlFor="auth-otp"
+                    className="block text-xs font-semibold text-[#18181B] dark:text-slate-200"
+                  >
+                    Kode OTP Email
                   </label>
                   <button
                     type="button"
@@ -166,6 +181,7 @@ export function AuthPage() {
                   </button>
                 </div>
                 <input
+                  id="auth-otp"
                   type="text"
                   required
                   maxLength={8}

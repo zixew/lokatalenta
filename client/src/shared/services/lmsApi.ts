@@ -222,7 +222,7 @@ export const lmsApi = {
       const { data, error } = await supabase
         .from('courses')
         .select(
-          `*, profiles:teacher_id(full_name), modules(*, lessons(*, quizzes(*)))`
+          `id, slug, teacher_id, title, description, category, level, estimated_hours, thumbnail_url, is_published, created_at, profiles:teacher_id(full_name), modules(id, course_id, title, order_index, lessons(id, module_id, title, type, duration_minutes, order_index, quizzes(id, lesson_id, title, description, duration_minutes, passing_score, use_subtests, question_limit)))`
         )
         .eq('is_published', true)
         .order('created_at', { ascending: false });
@@ -238,6 +238,7 @@ export const lmsApi = {
               .sort((a: Lesson, b: Lesson) => a.order_index - b.order_index)
               .map((l: any) => ({
                 ...l,
+                content: l.content ?? '',
                 quiz: Array.isArray(l.quizzes) ? l.quizzes[0] ?? null : l.quizzes ?? null,
               })),
           })),
@@ -250,7 +251,9 @@ export const lmsApi = {
     if (isSupabaseConfigured && supabase) {
       let query = supabase
         .from('courses')
-        .select(`*, profiles:teacher_id(full_name), modules(*, lessons(*, quizzes(*, questions(*))))`)
+        .select(
+          `id, slug, teacher_id, title, description, category, level, estimated_hours, thumbnail_url, is_published, created_at, profiles:teacher_id(full_name), modules(id, course_id, title, order_index, lessons(id, module_id, title, type, duration_minutes, order_index, quizzes(id, lesson_id, title, description, duration_minutes, passing_score, use_subtests, question_limit)))`
+        )
         .order('created_at', { ascending: false });
       if (teacherId) query = query.eq('teacher_id', teacherId);
       const { data, error } = await query;
@@ -258,13 +261,18 @@ export const lmsApi = {
       return (data ?? []).map((c: any) => ({
         ...c,
         teacher_name: c.profiles?.full_name ?? 'Pengajar',
-        modules: (c.modules ?? []).map((m: any) => ({
-          ...m,
-          lessons: (m.lessons ?? []).map((l: any) => ({
-            ...l,
-            quiz: Array.isArray(l.quizzes) ? l.quizzes[0] ?? null : l.quizzes ?? null,
+        modules: (c.modules ?? [])
+          .sort((a: Module, b: Module) => a.order_index - b.order_index)
+          .map((m: any) => ({
+            ...m,
+            lessons: (m.lessons ?? [])
+              .sort((a: Lesson, b: Lesson) => a.order_index - b.order_index)
+              .map((l: any) => ({
+                ...l,
+                content: l.content ?? '',
+                quiz: Array.isArray(l.quizzes) ? l.quizzes[0] ?? null : l.quizzes ?? null,
+              })),
           })),
-        })),
       }));
     }
     const all = await getDemoCourses();

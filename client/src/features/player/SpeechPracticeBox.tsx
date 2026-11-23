@@ -79,7 +79,12 @@ export function SpeechPracticeBox({ lines }: { lines: VoiceLine[] }) {
     recognition.onend = () => {
       setListening(false);
     };
-    recognition.start();
+    try {
+      recognition.start();
+    } catch {
+      setListening(false);
+      setStatusMsg('unsupported');
+    }
   };
 
   return (
@@ -158,6 +163,12 @@ export function SpeechPracticeBox({ lines }: { lines: VoiceLine[] }) {
             </p>
           )}
         </div>
+      )}
+
+      {!transcript && statusMsg === 'retry' && (
+        <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+          Mikrofon tidak terdeteksi atau suara tidak tertangkap. Periksa izin mikrofon lalu coba lagi.
+        </p>
       )}
 
       {statusMsg === 'unsupported' && (

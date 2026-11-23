@@ -145,7 +145,7 @@ export function QuizRunnerPage() {
     [attempt]
   );
 
-  // Keyboard shortcuts (A-E or 1-5, Left/Right arrows)
+  // Keyboard shortcuts (A-E or 1-5, Left/Right arrows, F to flag)
   useEffect(() => {
     if (!currentQuestion || showConfirm) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -153,6 +153,8 @@ export function QuizRunnerPage() {
         setCurrentIndex((i) => Math.min(questions.length - 1, i + 1));
       } else if (e.key === 'ArrowLeft') {
         setCurrentIndex((i) => Math.max(0, i - 1));
+      } else if (e.key.toLowerCase() === 'f') {
+        setFlagged((prev) => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }));
       } else {
         const keyMap: Record<string, string> = {
           '1': 'A',

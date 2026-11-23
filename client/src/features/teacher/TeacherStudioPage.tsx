@@ -160,6 +160,13 @@ export function TeacherStudioPage() {
     },
   });
 
+  const { data: selectedQuizMeta } = useQuery({
+    queryKey: ['teacher-quiz-meta', selectedQuizId],
+    queryFn: () => lmsApi.getQuizMeta(selectedQuizId),
+    enabled: Boolean(selectedQuizId),
+  });
+  const activeQuestions = selectedQuizMeta?.questions ?? activeQuizObj?.questions ?? [];
+
   const addModuleMut = useMutation({
     mutationFn: () => lmsApi.addModule(selectedCourseId, moduleTitle),
     onSuccess: (mod) => {
@@ -480,10 +487,10 @@ export function TeacherStudioPage() {
             <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-[#18181B] dark:text-white">Daftar Soal Saat Ini</h3>
-                <Badge tone="blue">{activeQuizObj?.questions?.length ?? 0} Soal</Badge>
+                <Badge tone="blue">{activeQuestions.length} Soal</Badge>
               </div>
               <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                {(activeQuizObj?.questions ?? []).map((q, idx) => (
+                {activeQuestions.map((q, idx) => (
                   <div
                     key={q.id}
                     className="p-3 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex items-start justify-between gap-2"
