@@ -23,6 +23,8 @@ import {
   buildChallengeUrl,
   buildLinkedInShareUrl,
   buildWhatsAppShareUrl,
+  evaluateChallengeOutcome,
+  getActiveChallengeForQuiz,
 } from './shareAndChallenge';
 
 export function QuizResultPage() {
@@ -271,8 +273,42 @@ export function QuizResultPage() {
       </div>
 
       {/* Tantang Teman 1v1 & Bagikan Skor */}
-      {quizId && (
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {quizId && (() => {
+        const duelChallenge = getActiveChallengeForQuiz(quizId);
+        const duelResult = duelChallenge
+          ? evaluateChallengeOutcome(score, duelChallenge)
+          : null;
+        return (
+          <div className="space-y-4">
+            {duelChallenge && duelResult && (
+              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      tone={
+                        duelResult.outcome === 'win'
+                          ? 'emerald'
+                          : duelResult.outcome === 'draw'
+                            ? 'blue'
+                            : 'amber'
+                      }
+                    >
+                      Hasil Duel 1v1
+                    </Badge>
+                    <span className="text-xs font-bold text-[#18181B] dark:text-white">
+                      {duelResult.headline}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#71717A] dark:text-slate-400">
+                    Skor Anda: <strong className="font-mono-tabular">{score}/100</strong> vs{' '}
+                    <strong>{duelChallenge.challenger}</strong>:{' '}
+                    <strong className="font-mono-tabular">{duelChallenge.targetScore}/100</strong>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <Share2 className="w-4 h-4 text-[#0F766E]" />
@@ -334,7 +370,9 @@ export function QuizResultPage() {
             </a>
           </div>
         </div>
-      )}
+          </div>
+        );
+      })()}
 
       {/* Ringkasan Jawaban: Jawaban Salah & Jawaban yang Seharusnya Benar */}
       <section id="quiz-review-section" className="space-y-4">
