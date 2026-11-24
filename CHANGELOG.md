@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.1.0] - 2026-11-24
+
+### Minor
+- Sprint 11: Cohort Kelas Privat (BL-33), Agenda Belajar & Tenggat (BL-34), dan Lab Query SQL Interaktif (BL-35)
+
+---
+
 ## [2.0.1] - 2026-11-24
 
 ### Hotfix

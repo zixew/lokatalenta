@@ -1,0 +1,97 @@
+import { ChevronDown, ChevronUp, Database, Table2 } from 'lucide-react';
+import { useState } from 'react';
+import { Badge } from '../../shared/ui/Badge';
+import { InteractiveSpreadsheetLab } from './InteractiveSpreadsheetLab';
+import { InteractiveSqlLab } from './InteractiveSqlLab';
+
+interface HandsOnLabContainerProps {
+  defaultLab: 'excel' | 'sql';
+  defaultExpanded?: boolean;
+}
+
+export function HandsOnLabContainer({
+  defaultLab,
+  defaultExpanded = false,
+}: HandsOnLabContainerProps) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [activeLab, setActiveLab] = useState<'excel' | 'sql'>(defaultLab);
+
+  return (
+    <section className="rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] overflow-hidden">
+      <div className="px-5 py-3.5 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          {activeLab === 'sql' ? (
+            <Database className="w-4 h-4 text-[#0F766E]" />
+          ) : (
+            <Table2 className="w-4 h-4 text-[#0F766E]" />
+          )}
+          <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
+            Hands-On Practice Lab
+          </h3>
+          <Badge tone="emerald">Interaktif</Badge>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-lg bg-[#F6F5F1] dark:bg-slate-800 p-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLab('excel');
+                setExpanded(true);
+              }}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                activeLab === 'excel'
+                  ? 'bg-[#0F766E] text-white'
+                  : 'text-[#52525B] dark:text-slate-300'
+              }`}
+            >
+              <Table2 className="w-3.5 h-3.5" />
+              Lab Excel (fx)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLab('sql');
+                setExpanded(true);
+              }}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                activeLab === 'sql'
+                  ? 'bg-[#0F766E] text-white'
+                  : 'text-[#52525B] dark:text-slate-300'
+              }`}
+            >
+              <Database className="w-3.5 h-3.5" />
+              Lab SQL (SELECT)
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="px-2.5 py-1 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#52525B] dark:text-slate-300 inline-flex items-center gap-1 cursor-pointer"
+          >
+            {expanded ? (
+              <>
+                Tutup Lab <ChevronUp className="w-3.5 h-3.5" />
+              </>
+            ) : (
+              <>
+                Buka Lab <ChevronDown className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="p-5">
+          {activeLab === 'excel' ? (
+            <InteractiveSpreadsheetLab defaultExpanded />
+          ) : (
+            <InteractiveSqlLab />
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
