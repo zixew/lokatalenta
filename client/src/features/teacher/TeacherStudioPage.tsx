@@ -280,9 +280,30 @@ export function TeacherStudioPage() {
         explanation,
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
+    onSuccess: async (updatedQuestion) => {
+      queryClient.setQueryData<Course[]>(['teacher-courses', user?.id], (prev) =>
+        (prev ?? []).map((course) => ({
+          ...course,
+          modules: (course.modules ?? []).map((mod) => ({
+            ...mod,
+            lessons: mod.lessons.map((les) =>
+              les.quiz?.questions
+                ? {
+                    ...les,
+                    quiz: {
+                      ...les.quiz,
+                      questions: les.quiz.questions.map((q) =>
+                        q.id === updatedQuestion.id ? updatedQuestion : q
+                      ),
+                    },
+                  }
+                : les
+            ),
+          })),
+        }))
+      );
+      await queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
+      await queryClient.invalidateQueries({ queryKey: ['courses'] });
       resetQuestionForm();
       showSuccess('Soal berhasil diperbarui secara in-place.');
     },
