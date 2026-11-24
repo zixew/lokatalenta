@@ -49,6 +49,13 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** mentee memilih sel (mis. `B6`, `D2`, `E2`), mengetik rumus pada Formula Bar `fx` (contoh: `=SUM(B2:B5)`, `=AVERAGE(B2:B5)`, `=IF(B2>=10000000,"Bonus 10%","Bonus 5%")`, `=VLOOKUP("A02",A2:C5,3,FALSE)`, atau `=B2*C2`),
   - **Then** spreadsheet menghitung hasil rumus secara *real-time*, menampilkan evaluasi **Misi Praktik Rumus** (Benar / Petunjuk Perbaikan), dan menyediakan pilihan skenario latihan (*Rekap Penjualan `SUM/AVERAGE`*, *Komisi Bertingkat `IF`*, *Lookup Barang `VLOOKUP`*).
 
+#### `US-23C` (BL-23C): Security Hardening, HTTP Security Headers & Automated Performance Benchmark Gate
+- **User Story:** *Sebagai **Tim Engineering & Pengelola Platform**, saya ingin seluruh input pengguna, ekspor/impor CSV, evaluator rumus spreadsheet, serta header HTTP diamankan dari celah XSS/CSV-Injection/Clickjacking dan diuji dengan **Performance Benchmark Test** otomatis di setiap sprint, sehingga aplikasi tetap cepat (< 50ms komputasi berat, < 250 kB per chunk) dan aman di produksi.*
+- **Acceptance Criteria:**
+  - **Given** kode aplikasi dijalankan pada pipeline test & deployment Vercel,
+  - **When** suite keamanan & performa (`securityAndPerf.test.ts`) dijalankan,
+  - **Then** seluruh pengujian sanitasi XSS, proteksi CSV Formula Injection, rate-limit guard, HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` di `vercel.json`), serta benchmark kecepatan komputasi (1.000 evaluasi rumus spreadsheet < 50ms, filter 1.000 kursus < 15ms, ukuran chunk JS < 250 kB) dinyatakan **PASS**.
+
 ---
 
 ### B. Epik 2 — Multi-User 1v1 Duel Arena & Adaptive Subtest Drill (`Sprint 8` • `v1.11.0` Minor)

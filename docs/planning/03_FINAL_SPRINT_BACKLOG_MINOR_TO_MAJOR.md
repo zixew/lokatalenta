@@ -27,6 +27,7 @@
 | **BL-22** | `task/bl-22-cloud-study-prefs` | `US-22` | Migrasi SQL `user_study_preferences` + sinkronisasi jalur karier, target XP harian, dan `last_lesson_id` lintas perangkat. | `CAT-05` |
 | **BL-23** | `task/bl-23-export-course-notes` | `US-23` | Fungsi `buildCourseNotesMarkdown(course, userId)` + tombol **Unduh Catatan Kursus (.md)** di `CoursePlayerPage.tsx` + unit test `sprint7Features.test.ts`. | `CRS-08` |
 | **BL-23B** | `task/bl-23b-interactive-spreadsheet-lab` | `US-23B` | `spreadsheetEngine.ts` (`=SUM`, `=AVERAGE`, `=MIN`, `=MAX`, `=COUNT`, `=IF`, `=VLOOKUP`, aritmetika sel) + komponen `InteractiveSpreadsheetLab.tsx` di `CoursePlayerPage.tsx` dengan Formula Bar `fx`, 3 skenario latihan teknis, & auto-grader rumus. | `CRS-09` |
+| **BL-23C** | `task/bl-23c-security-and-perf-test` | `US-23C` | `securityGuards.ts` (XSS sanitizer, CSV Formula Injection guard, action rate-limiter), HTTP Security Headers di `client/vercel.json`, serta automated **Security & Performance Benchmark Test Suite** (`securityAndPerf.test.ts`: 1.000 evaluasi rumus < 50ms, 1.000 filter kursus < 15ms, bundle chunk budget < 250 kB). | `SEC-01`, `PERF-01` |
 
 ---
 

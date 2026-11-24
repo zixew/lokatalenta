@@ -171,6 +171,7 @@ RPC publik `get_talent_passport(p_user_id uuid)` (`SECURITY DEFINER`) untuk mena
 | :--- | :--- | :--- |
 | **Player Notes Sync** | `src/features/player/lessonNotesStorage.ts` | `syncLessonNoteFromServer(userId, lessonId)`, `saveLessonNoteAsync(userId, lessonId, text)`, `exportCourseNotesMarkdown(course, userId)` |
 | **Interactive Spreadsheet Lab** | `src/features/player/spreadsheetEngine.ts` & `InteractiveSpreadsheetLab.tsx` | Safe parser tanpa `eval()`: referensi sel (`A1..E8`), range (`B2:B5`), fungsi `=SUM`, `=AVERAGE`, `=MIN`, `=MAX`, `=COUNT`, `=IF`, `=VLOOKUP`, operator aritmetika (`+`, `-`, `*`, `/`), serta auto-grader misi praktik rumus. |
+| **Security & Performance Suite** | `src/shared/lib/securityGuards.ts`, `client/vercel.json`, & `src/__tests__/securityAndPerf.test.ts` | Sanitasi XSS (`sanitizeUserText`), proteksi CSV Injection (`sanitizeCsvCell`), guard anti-prototype-pollution, HTTP Security Headers di `vercel.json`, serta automated benchmark latency (< 50ms untuk 1.000 kalkulasi spreadsheet & < 15ms untuk 1.000 filter katalog). |
 | **Study Preferences** | `src/features/courses/learningGoalStorage.ts` | `syncStudyPreferences(userId)`, `saveStudyPreferencesAsync(userId, prefs)` |
 | **Duel & Kraepelin** | `src/features/kraepelin/kraepelinHistory.ts` | `getKraepelinHistory(userId)`, `recordKraepelinAttempt(userId, summary)` |
 | **Teacher Question Edit** | `src/shared/services/lmsApi.ts` & `TeacherStudioPage.tsx` | `lmsApi.updateQuestionInQuiz(questionId, payload)` + mode `editingQuestionId` di form Question Builder |
