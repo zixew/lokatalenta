@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
+import { emitEcosystemTelemetry } from '../../shared/services/ecosystemTelemetry';
 
 export interface TypingAttemptRecord {
   id: string;
@@ -93,11 +94,46 @@ export async function saveTypingAttempt(
     }
     const existing = readLocal(userId);
     writeLocal(userId, [data as TypingAttemptRecord, ...existing]);
-    return data as TypingAttemptRecord;
+    const saved = data as TypingAttemptRecord;
+    emitEcosystemTelemetry({
+      divisionId: 'lounge',
+      agentId: 13,
+      entityId: saved.id,
+      title: 'Tes mengetik selesai',
+      summary: `Latihan mengetik selesai (${payload.wpm} WPM, akurasi ${payload.accuracy_pct}%)`,
+      targetZone: 'lounge',
+      targetFloor: 2,
+      severity: 'success',
+      metadata: {
+        event: 'typing_completed',
+        presetId: payload.preset_id,
+        wpm: payload.wpm,
+        accuracyPct: payload.accuracy_pct,
+        durationSeconds: payload.duration_seconds,
+      },
+    });
+    return saved;
   }
 
   const key = userId || 'guest';
   const existing = readLocal(key);
   writeLocal(key, [localRecord, ...existing]);
+  emitEcosystemTelemetry({
+    divisionId: 'lounge',
+    agentId: 13,
+    entityId: localRecord.id,
+    title: 'Tes mengetik selesai',
+    summary: `Latihan mengetik selesai (${payload.wpm} WPM, akurasi ${payload.accuracy_pct}%)`,
+    targetZone: 'lounge',
+    targetFloor: 2,
+    severity: 'success',
+    metadata: {
+      event: 'typing_completed',
+      presetId: payload.preset_id,
+      wpm: payload.wpm,
+      accuracyPct: payload.accuracy_pct,
+      durationSeconds: payload.duration_seconds,
+    },
+  });
   return localRecord;
 }

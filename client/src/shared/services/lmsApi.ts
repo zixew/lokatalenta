@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { emitEcosystemTelemetry } from './ecosystemTelemetry';
 import type {
   AppNotification,
   AssignmentRubricItem,
@@ -327,6 +328,17 @@ export const lmsApi = {
         .from('enrollments')
         .upsert({ user_id: userId, course_id: courseId }, { onConflict: 'user_id,course_id' });
       if (error) throw error;
+      emitEcosystemTelemetry({
+        divisionId: 'lounge',
+        agentId: 13,
+        entityId: courseId,
+        title: 'Kursus LMS diikuti',
+        summary: `Peserta mendaftar pada kursus ${courseId}`,
+        targetZone: 'lounge',
+        targetFloor: 2,
+        severity: 'info',
+        metadata: { event: 'course_enrolled', courseId },
+      });
       return;
     }
     const map = readLocal<Record<string, string[]>>(STORAGE_KEYS.enrollments, {
@@ -336,6 +348,17 @@ export const lmsApi = {
     if (!list.includes(courseId)) {
       map[userId] = [...list, courseId];
       writeLocal(STORAGE_KEYS.enrollments, map);
+      emitEcosystemTelemetry({
+        divisionId: 'lounge',
+        agentId: 13,
+        entityId: courseId,
+        title: 'Kursus LMS diikuti',
+        summary: `Peserta mendaftar pada kursus ${courseId}`,
+        targetZone: 'lounge',
+        targetFloor: 2,
+        severity: 'info',
+        metadata: { event: 'course_enrolled', courseId },
+      });
     }
   },
 
@@ -381,6 +404,17 @@ export const lmsApi = {
           { onConflict: 'user_id,lesson_id' }
         );
       if (error) throw error;
+      emitEcosystemTelemetry({
+        divisionId: 'lounge',
+        agentId: 13,
+        entityId: lessonId,
+        title: 'Materi pelajaran selesai',
+        summary: `Peserta menyelesaikan materi ${lessonId}`,
+        targetZone: 'lounge',
+        targetFloor: 2,
+        severity: 'success',
+        metadata: { event: 'lesson_completed', lessonId },
+      });
       return;
     }
     const map = readLocal<Record<string, string[]>>(STORAGE_KEYS.progress, {});
@@ -388,6 +422,17 @@ export const lmsApi = {
     if (!list.includes(lessonId)) {
       map[userId] = [...list, lessonId];
       writeLocal(STORAGE_KEYS.progress, map);
+      emitEcosystemTelemetry({
+        divisionId: 'lounge',
+        agentId: 13,
+        entityId: lessonId,
+        title: 'Materi pelajaran selesai',
+        summary: `Peserta menyelesaikan materi ${lessonId}`,
+        targetZone: 'lounge',
+        targetFloor: 2,
+        severity: 'success',
+        metadata: { event: 'lesson_completed', lessonId },
+      });
     }
   },
 
@@ -648,6 +693,24 @@ export const lmsApi = {
         p_answers: answers,
       });
       if (error) throw error;
+      emitEcosystemTelemetry({
+        divisionId: 'lounge',
+        agentId: 13,
+        entityId: data?.quiz_id ?? attemptId,
+        title: 'Submit percobaan kuis',
+        summary: `Kuis ${data?.quiz_id ?? attemptId} diselesaikan dengan skor ${data?.score ?? 0}`,
+        targetZone: 'lounge',
+        targetFloor: 2,
+        severity: 'success',
+        metadata: {
+          event: 'quiz_submitted',
+          quizId: data?.quiz_id ?? null,
+          score: data?.score ?? null,
+          categoryCount: data?.category_breakdown
+            ? Object.keys(data.category_breakdown).length
+            : 0,
+        },
+      });
       return data;
     }
 
@@ -687,6 +750,22 @@ export const lmsApi = {
     };
     attempts[idx] = updated;
     writeLocal(STORAGE_KEYS.attempts, attempts);
+    emitEcosystemTelemetry({
+      divisionId: 'lounge',
+      agentId: 13,
+      entityId: updated.quiz_id,
+      title: 'Submit percobaan kuis',
+      summary: `Kuis ${updated.quiz_id} diselesaikan dengan skor ${updated.score ?? 0}`,
+      targetZone: 'lounge',
+      targetFloor: 2,
+      severity: 'success',
+      metadata: {
+        event: 'quiz_submitted',
+        quizId: updated.quiz_id,
+        score: updated.score ?? 0,
+        categoryCount: Object.keys(breakdown).length,
+      },
+    });
     return updated;
   },
 
@@ -2503,6 +2582,22 @@ export const lmsApi = {
         .select()
         .single();
       if (error) throw error;
+      emitEcosystemTelemetry({
+        id: `lms-cert-${input.cert_code}`,
+        divisionId: 'lounge',
+        agentId: 14,
+        entityId: input.cert_code,
+        title: 'Sertifikat LMS diterbitkan',
+        summary: `Sertifikat ${input.cert_code} terdaftar untuk kursus ${input.course_id}`,
+        targetZone: 'lobby',
+        targetFloor: 1,
+        severity: 'success',
+        metadata: {
+          event: 'certificate_registered',
+          courseId: input.course_id,
+          certCode: input.cert_code,
+        },
+      });
       return data;
     }
     const all = readLocal<CertificateRecord[]>(STORAGE_KEYS.certificates, []);
@@ -2516,6 +2611,22 @@ export const lmsApi = {
       issued_at: new Date().toISOString(),
     };
     writeLocal(STORAGE_KEYS.certificates, [rec, ...all]);
+    emitEcosystemTelemetry({
+      id: `lms-cert-${input.cert_code}`,
+      divisionId: 'lounge',
+      agentId: 14,
+      entityId: input.cert_code,
+      title: 'Sertifikat LMS diterbitkan',
+      summary: `Sertifikat ${input.cert_code} terdaftar untuk kursus ${input.course_id}`,
+      targetZone: 'lobby',
+      targetFloor: 1,
+      severity: 'success',
+      metadata: {
+        event: 'certificate_registered',
+        courseId: input.course_id,
+        certCode: input.cert_code,
+      },
+    });
     return rec;
   },
 
@@ -2596,6 +2707,21 @@ export const lmsApi = {
         .select()
         .single();
       if (error) throw error;
+      emitEcosystemTelemetry({
+        divisionId: 'lounge',
+        agentId: 13,
+        entityId: data?.id ?? null,
+        title: 'Diskusi komunitas baru',
+        summary: `Postingan komunitas baru pada kategori ${input.category}`,
+        targetZone: 'lounge',
+        targetFloor: 2,
+        severity: 'info',
+        metadata: {
+          event: 'community_post_created',
+          category: input.category,
+          authorRole: input.author_role,
+        },
+      });
       return data;
     }
     const all = await this.listCommunityPosts();
@@ -2606,6 +2732,21 @@ export const lmsApi = {
       created_at: new Date().toISOString(),
     };
     writeLocal(STORAGE_KEYS.communityPosts, [item, ...all]);
+    emitEcosystemTelemetry({
+      divisionId: 'lounge',
+      agentId: 13,
+      entityId: item.id,
+      title: 'Diskusi komunitas baru',
+      summary: `Postingan komunitas baru pada kategori ${input.category}`,
+      targetZone: 'lounge',
+      targetFloor: 2,
+      severity: 'info',
+      metadata: {
+        event: 'community_post_created',
+        category: input.category,
+        authorRole: input.author_role,
+      },
+    });
     return item;
   },
 

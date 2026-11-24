@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
+import { emitEcosystemTelemetry } from '../../shared/services/ecosystemTelemetry';
 
 export type TryoutEventStatus = 'live' | 'upcoming' | 'ended';
 
@@ -89,6 +90,20 @@ export function toggleTryoutRegistration(userId: string, eventId: string): strin
   } catch {
     // ignore storage errors
   }
+  emitEcosystemTelemetry({
+    divisionId: 'lounge',
+    agentId: 13,
+    entityId: eventId,
+    title: exists ? 'Pendaftaran tryout dibatalkan' : 'Pendaftaran tryout dikonfirmasi',
+    summary: `Status registrasi tryout ${eventId}: ${exists ? 'dibatalkan' : 'terdaftar'}`,
+    targetZone: 'lounge',
+    targetFloor: 2,
+    severity: 'info',
+    metadata: {
+      event: exists ? 'tryout_unregistered' : 'tryout_registered',
+      eventId,
+    },
+  });
   return next;
 }
 

@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
+import { emitEcosystemTelemetry } from '../../shared/services/ecosystemTelemetry';
 
 export type AdminAuditAction =
   | 'ROLE_UPDATED'
@@ -52,6 +53,25 @@ export function recordAdminAuditLog(input: {
   };
   const next = [entry, ...current].slice(0, 100);
   saveAdminAuditLogsLocal(next);
+  emitEcosystemTelemetry({
+    divisionId: 'lounge',
+    agentId: 15,
+    entityId: entry.id,
+    title: 'Aktivitas audit admin tercatat',
+    summary: `Aksi tata kelola admin: ${input.action}`,
+    targetZone: 'lounge',
+    targetFloor: 2,
+    severity:
+      input.action === 'CERTIFICATE_REVOKED' ||
+      input.action === 'COMMUNITY_POST_DELETED' ||
+      input.action === 'USER_STATUS_CHANGED'
+        ? 'warning'
+        : 'info',
+    metadata: {
+      event: 'admin_audit_logged',
+      action: input.action,
+    },
+  });
   return next;
 }
 

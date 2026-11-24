@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
+import { emitEcosystemTelemetry } from '../../shared/services/ecosystemTelemetry';
 
 export interface KraepelinAttemptRecord {
   id: string;
@@ -112,6 +113,24 @@ export async function recordKraepelinAttemptAsync(params: {
       // keep local history if cloud sync fails
     }
   }
+
+  emitEcosystemTelemetry({
+    divisionId: 'lounge',
+    agentId: 13,
+    entityId: entry.id,
+    title: 'Tes Kraepelin selesai',
+    summary: `Simulasi Kraepelin selesai (${entry.speed_kpm} KPM, akurasi ${entry.accuracy_pct}%)`,
+    targetZone: 'lounge',
+    targetFloor: 2,
+    severity: 'success',
+    metadata: {
+      event: 'kraepelin_completed',
+      presetId: entry.preset_id,
+      speedKpm: entry.speed_kpm,
+      accuracyPct: entry.accuracy_pct,
+      stabilityScore: entry.stability_score,
+    },
+  });
 
   return next;
 }

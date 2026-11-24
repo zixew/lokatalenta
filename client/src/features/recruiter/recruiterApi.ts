@@ -1,5 +1,6 @@
 import type { RecruiterCandidate, AssessmentInvitation } from '../../shared/types/lms';
 import { sanitizeUserText } from '../../shared/lib/securityGuards';
+import { emitEcosystemTelemetry } from '../../shared/services/ecosystemTelemetry';
 
 const SHORTLIST_STORAGE_KEY = 'lokatalenta_recruiter_shortlist';
 const INVITATION_STORAGE_KEY = 'lokatalenta_assessment_invitations';
@@ -134,7 +135,22 @@ export function toggleCandidateShortlist(candidateId: string): boolean {
   const exists = current.includes(candidateId);
   const next = exists ? current.filter((id) => id !== candidateId) : [...current, candidateId];
   saveShortlistedIds(next);
-  return !exists;
+  const nextAdded = !exists;
+  emitEcosystemTelemetry({
+    divisionId: 'lounge',
+    agentId: 23,
+    entityId: candidateId,
+    title: nextAdded ? 'Kandidat ditambahkan ke shortlist' : 'Kandidat dihapus dari shortlist',
+    summary: `Perubahan shortlist rekruter untuk kandidat ${candidateId}`,
+    targetZone: 'lounge',
+    targetFloor: 2,
+    severity: 'info',
+    metadata: {
+      event: nextAdded ? 'candidate_shortlisted' : 'candidate_unshortlisted',
+      candidateId,
+    },
+  });
+  return nextAdded;
 }
 
 export function getStoredInvitations(): AssessmentInvitation[] {
@@ -202,6 +218,22 @@ export function createAssessmentInvitation(payload: {
     // Ignore storage quota
   }
 
+  emitEcosystemTelemetry({
+    divisionId: 'lounge',
+    agentId: 23,
+    entityId: newInvite.id,
+    title: 'Undangan asesmen rekruter dibuat',
+    summary: `Undangan asesmen untuk kuis ${payload.quizId} (${sanitizedPos}) diterbitkan`,
+    targetZone: 'lounge',
+    targetFloor: 2,
+    severity: 'success',
+    metadata: {
+      event: 'assessment_invite_created',
+      quizId: payload.quizId,
+      targetPosition: sanitizedPos,
+    },
+  });
+
   return newInvite;
 }
 
@@ -219,12 +251,42 @@ export function addToShortlist(candidateId: string): void {
   const current = getShortlistedIds();
   if (!current.includes(candidateId)) {
     saveShortlistedIds([...current, candidateId]);
+    emitEcosystemTelemetry({
+      divisionId: 'lounge',
+      agentId: 23,
+      entityId: candidateId,
+      title: 'Kandidat ditambahkan ke shortlist',
+      summary: `Kandidat ${candidateId} ditambahkan ke shortlist rekruter`,
+      targetZone: 'lounge',
+      targetFloor: 2,
+      severity: 'info',
+      metadata: {
+        event: 'candidate_shortlisted',
+        candidateId,
+      },
+    });
   }
 }
 
 export function removeFromShortlist(candidateId: string): void {
   const current = getShortlistedIds();
-  saveShortlistedIds(current.filter((id) => id !== candidateId));
+  if (current.includes(candidateId)) {
+    saveShortlistedIds(current.filter((id) => id !== candidateId));
+    emitEcosystemTelemetry({
+      divisionId: 'lounge',
+      agentId: 23,
+      entityId: candidateId,
+      title: 'Kandidat dihapus dari shortlist',
+      summary: `Kandidat ${candidateId} dihapus dari shortlist rekruter`,
+      targetZone: 'lounge',
+      targetFloor: 2,
+      severity: 'info',
+      metadata: {
+        event: 'candidate_unshortlisted',
+        candidateId,
+      },
+    });
+  }
 }
 
 export async function listCandidatesAsync(): Promise<RecruiterCandidate[]> {
