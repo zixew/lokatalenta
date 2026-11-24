@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.11.0] - 2026-11-24
+
+### Minor
+- Sprint 8: Riwayat Duel 1v1 (BL-24), Smart Subtest Drill (BL-25), dan Riwayat & Tren Kraepelin (BL-26)
+
+---
+
 ## [1.10.1] - 2026-11-24
 
 ### Hotfix
