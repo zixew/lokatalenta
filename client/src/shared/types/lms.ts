@@ -1,4 +1,41 @@
-export type UserRole = 'student' | 'teacher' | 'admin';
+export type UserRole = 'student' | 'teacher' | 'admin' | 'recruiter';
+
+export interface RecruiterCandidate {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  category: string;
+  readiness_status: 'ready' | 'developing' | 'exploring';
+  radar_scores: {
+    kognitif: number;
+    logika: number;
+    ketahanan: number;
+    komunikasi: number;
+    spasial: number;
+  };
+  kraepelin_summary?: {
+    speed_wpm: number;
+    accuracy_pct: number;
+    stability_grade: string;
+  };
+  top_certificates: string[];
+  is_shortlisted?: boolean;
+}
+
+export interface AssessmentInvitation {
+  id: string;
+  org_id: string;
+  org_name: string;
+  quiz_id: string;
+  quiz_title: string;
+  target_position: string;
+  invite_token: string;
+  created_at: string;
+  expires_at?: string;
+  candidates_count: number;
+  avg_score?: number;
+}
 
 export interface Profile {
   id: string;

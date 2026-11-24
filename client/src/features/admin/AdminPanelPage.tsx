@@ -1041,7 +1041,7 @@ export function AdminPanelPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
-                {(['all', 'student', 'teacher', 'admin'] as const).map((r) => (
+                {(['all', 'student', 'teacher', 'recruiter', 'admin'] as const).map((r) => (
                   <button
                     key={r}
                     type="button"
@@ -1061,6 +1061,8 @@ export function AdminPanelPage() {
                       ? 'Pelajar'
                       : r === 'teacher'
                       ? 'Pengajar'
+                      : r === 'recruiter'
+                      ? 'Rekruter'
                       : 'Admin'}
                   </button>
                 ))}
@@ -1124,11 +1126,11 @@ export function AdminPanelPage() {
                           p.role === 'admin' ? 'amber' : p.role === 'teacher' ? 'blue' : 'emerald'
                         }
                       >
-                        {p.role === 'student' ? 'Pelajar' : p.role === 'teacher' ? 'Pengajar' : 'Admin'}
+                        {p.role === 'student' ? 'Pelajar' : p.role === 'teacher' ? 'Pengajar' : p.role === 'recruiter' ? 'Rekruter' : 'Admin'}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {(['student', 'teacher', 'admin'] as UserRole[]).map((role) => (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {(['student', 'teacher', 'recruiter', 'admin'] as UserRole[]).map((role) => (
                         <button
                           key={role}
                           type="button"
@@ -1140,7 +1142,7 @@ export function AdminPanelPage() {
                               : 'border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
                           }`}
                         >
-                          {role === 'student' ? 'Pelajar' : role === 'teacher' ? 'Pengajar' : 'Admin'}
+                          {role === 'student' ? 'Pelajar' : role === 'teacher' ? 'Pengajar' : role === 'recruiter' ? 'Rekruter' : 'Admin'}
                         </button>
                       ))}
                     </div>
@@ -1202,19 +1204,21 @@ export function AdminPanelPage() {
                       <td className="px-6 py-3.5">
                         <Badge
                           tone={
-                            p.role === 'admin' ? 'amber' : p.role === 'teacher' ? 'blue' : 'emerald'
+                            p.role === 'admin' ? 'amber' : p.role === 'teacher' ? 'blue' : p.role === 'recruiter' ? 'rose' : 'emerald'
                           }
                         >
                           {p.role === 'student'
                             ? 'Pelajar'
                             : p.role === 'teacher'
                             ? 'Pengajar'
+                            : p.role === 'recruiter'
+                            ? 'Rekruter'
                             : 'Admin'}
                         </Badge>
                       </td>
                       <td className="px-6 py-3.5">
                         <div className="inline-flex rounded-lg border border-[#E5E3DC] dark:border-slate-700 overflow-hidden">
-                          {(['student', 'teacher', 'admin'] as UserRole[]).map((roleOpt) => {
+                          {(['student', 'teacher', 'recruiter', 'admin'] as UserRole[]).map((roleOpt) => {
                             const isSelf = p.id === currentUser?.id;
                             return (
                               <button
@@ -1241,6 +1245,8 @@ export function AdminPanelPage() {
                                   ? 'Pelajar'
                                   : roleOpt === 'teacher'
                                   ? 'Pengajar'
+                                  : roleOpt === 'recruiter'
+                                  ? 'Rekruter'
                                   : 'Admin'}
                               </button>
                             );
@@ -2563,8 +2569,8 @@ export function AdminPanelPage() {
                       <span className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400 block">
                         Aksi Cepat
                       </span>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {(['student', 'teacher', 'admin'] as UserRole[]).map((roleOpt) => (
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {(['student', 'teacher', 'recruiter', 'admin'] as UserRole[]).map((roleOpt) => (
                           <button
                             key={roleOpt}
                             type="button"
@@ -2583,6 +2589,8 @@ export function AdminPanelPage() {
                               ? 'Pelajar'
                               : roleOpt === 'teacher'
                                 ? 'Pengajar'
+                                : roleOpt === 'recruiter'
+                                ? 'Rekruter'
                                 : 'Admin'}
                           </button>
                         ))}
