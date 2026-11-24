@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.12.0] - 2026-11-24
+
+### Minor
+- Sprint 9: Edit Soal In-Place di Teacher Studio (BL-27), Cloud Admin Audit Log (BL-28), dan Ekspor CSV Governance (BL-29)
+
+---
+
 ## [1.11.1] - 2026-11-24
 
 ### Hotfix

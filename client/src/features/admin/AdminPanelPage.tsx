@@ -1,5 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, ChevronLeft, ChevronRight, ClipboardList, Search, Shield, Users } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Download,
+  Search,
+  Shield,
+  Users,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { lmsApi } from '../../shared/services/lmsApi';
 import type { UserRole } from '../../shared/types/lms';
@@ -7,7 +16,15 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
 import { AdminAuditLogPanel } from './AdminAuditLogPanel';
-import { getAdminAuditLogs, recordAdminAuditLog } from './adminAuditLog';
+import {
+  recordAdminAuditLogAsync,
+  syncAdminAuditLogsFromServer,
+} from './adminAuditLog';
+import {
+  buildAuditLogsCsv,
+  buildUsersCsv,
+  downloadCsvFile,
+} from './adminCsvExport';
 
 type AdminTab = 'users' | 'courses' | 'audit';
 const COURSE_PAGE_SIZE = 10;
@@ -16,7 +33,11 @@ export function AdminPanelPage() {
   const { user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
-  const [auditLogs, setAuditLogs] = useState(() => getAdminAuditLogs());
+
+  const { data: auditLogs = [] } = useQuery({
+    queryKey: ['admin-audit-logs'],
+    queryFn: syncAdminAuditLogsFromServer,
+  });
 
   // User filters
   const [userSearch, setUserSearch] = useState('');
@@ -42,52 +63,52 @@ export function AdminPanelPage() {
   const updateRoleMut = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: UserRole }) =>
       lmsApi.updateUserRole(userId, role),
-    onSuccess: (_data, vars) => {
+    onSuccess: async (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
       const targetUser = profiles.find((p) => p.id === vars.userId);
-      setAuditLogs(
-        recordAdminAuditLog({
-          actorName: currentUser?.full_name || 'Admin',
-          action: 'ROLE_UPDATED',
-          targetLabel: targetUser?.email || vars.userId,
-          detail: `Mengubah role menjadi ${vars.role}`,
-        })
-      );
+      const updated = await recordAdminAuditLogAsync({
+        actorId: currentUser?.id,
+        actorName: currentUser?.full_name || 'Admin',
+        action: 'ROLE_UPDATED',
+        targetLabel: targetUser?.email || vars.userId,
+        detail: `Mengubah role menjadi ${vars.role}`,
+      });
+      queryClient.setQueryData(['admin-audit-logs'], updated);
     },
   });
 
   const togglePublishMut = useMutation({
     mutationFn: ({ courseId, isPublished }: { courseId: string; isPublished: boolean }) =>
       lmsApi.toggleCoursePublish(courseId, isPublished),
-    onSuccess: (_data, vars) => {
+    onSuccess: async (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       const targetCourse = courses.find((c) => c.id === vars.courseId);
-      setAuditLogs(
-        recordAdminAuditLog({
-          actorName: currentUser?.full_name || 'Admin',
-          action: 'COURSE_PUBLISH_TOGGLED',
-          targetLabel: targetCourse?.title || vars.courseId,
-          detail: vars.isPublished ? 'Menerbitkan kursus ke katalog' : 'Menarik kursus ke draft',
-        })
-      );
+      const updated = await recordAdminAuditLogAsync({
+        actorId: currentUser?.id,
+        actorName: currentUser?.full_name || 'Admin',
+        action: 'COURSE_PUBLISH_TOGGLED',
+        targetLabel: targetCourse?.title || vars.courseId,
+        detail: vars.isPublished ? 'Menerbitkan kursus ke katalog' : 'Menarik kursus ke draft',
+      });
+      queryClient.setQueryData(['admin-audit-logs'], updated);
     },
   });
 
   const toggleActiveMut = useMutation({
     mutationFn: ({ userId, isActive }: { userId: string; isActive: boolean }) =>
       lmsApi.toggleUserActive(userId, isActive),
-    onSuccess: (_data, vars) => {
+    onSuccess: async (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
       const targetUser = profiles.find((p) => p.id === vars.userId);
-      setAuditLogs(
-        recordAdminAuditLog({
-          actorName: currentUser?.full_name || 'Admin',
-          action: 'USER_STATUS_CHANGED',
-          targetLabel: targetUser?.email || vars.userId,
-          detail: vars.isActive ? 'Mengaktifkan kembali akun' : 'Menonaktifkan akun',
-        })
-      );
+      const updated = await recordAdminAuditLogAsync({
+        actorId: currentUser?.id,
+        actorName: currentUser?.full_name || 'Admin',
+        action: 'USER_STATUS_CHANGED',
+        targetLabel: targetUser?.email || vars.userId,
+        detail: vars.isActive ? 'Mengaktifkan kembali akun' : 'Menonaktifkan akun',
+      });
+      queryClient.setQueryData(['admin-audit-logs'], updated);
     },
   });
 
@@ -267,6 +288,20 @@ export function AdminPanelPage() {
                     {st === 'all' ? 'Semua Status' : st === 'active' ? 'Aktif' : 'Nonaktif'}
                   </button>
                 ))}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={filteredProfiles.length === 0}
+                  onClick={() =>
+                    downloadCsvFile(
+                      `lokatalenta-users-${new Date().toISOString().slice(0, 10)}.csv`,
+                      buildUsersCsv(filteredProfiles)
+                    )
+                  }
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Unduh CSV Pengguna
+                </Button>
               </div>
             </div>
           </div>
@@ -517,7 +552,17 @@ export function AdminPanelPage() {
       )}
 
       {/* TAB 3: ADMIN AUDIT LOG */}
-      {activeTab === 'audit' && <AdminAuditLogPanel logs={auditLogs} />}
+      {activeTab === 'audit' && (
+        <AdminAuditLogPanel
+          logs={auditLogs}
+          onExportCsv={(filteredLogs) =>
+            downloadCsvFile(
+              `lokatalenta-audit-logs-${new Date().toISOString().slice(0, 10)}.csv`,
+              buildAuditLogsCsv(filteredLogs)
+            )
+          }
+        />
+      )}
     </div>
   );
 }

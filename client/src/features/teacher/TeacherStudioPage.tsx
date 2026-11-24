@@ -91,6 +91,20 @@ export function TeacherStudioPage() {
   const [explanation, setExplanation] = useState('');
   const [questionSearch, setQuestionSearch] = useState('');
   const [questionCategoryFilter, setQuestionCategoryFilter] = useState('ALL');
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+
+  const resetQuestionForm = () => {
+    setEditingQuestionId(null);
+    setQText('');
+    setQImageUrl('');
+    setQAudioText('');
+    setOptA('');
+    setOptB('');
+    setOptC('');
+    setOptD('');
+    setOptE('');
+    setExplanation('');
+  };
 
   const showSuccess = (msg: string) => {
     setErrorBanner('');
@@ -241,16 +255,57 @@ export function TeacherStudioPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      setQText('');
-      setQImageUrl('');
-      setQAudioText('');
-      setOptA('');
-      setOptB('');
-      setOptC('');
-      setOptD('');
-      setOptE('');
-      setExplanation('');
+      resetQuestionForm();
       showSuccess('Soal baru berhasil ditambahkan.');
+    },
+  });
+
+  const updateQuestionMut = useMutation({
+    mutationFn: () => {
+      if (!editingQuestionId) throw new Error('Tidak ada soal yang sedang diedit.');
+      return lmsApi.updateQuestionInQuiz(editingQuestionId, {
+        category_tag: qCategory,
+        question_text: qText,
+        image_url: qImageUrl || null,
+        audio_text: qAudioText.trim() || null,
+        audio_lang: qAudioText.trim() ? qAudioLang : null,
+        options: [
+          { key: 'A', text: optA },
+          { key: 'B', text: optB },
+          { key: 'C', text: optC },
+          { key: 'D', text: optD },
+          { key: 'E', text: optE },
+        ],
+        correct_option: correctOpt,
+        explanation,
+      });
+    },
+    onSuccess: async (updatedQuestion) => {
+      queryClient.setQueryData<Course[]>(['teacher-courses', user?.id], (prev) =>
+        (prev ?? []).map((course) => ({
+          ...course,
+          modules: (course.modules ?? []).map((mod) => ({
+            ...mod,
+            lessons: mod.lessons.map((les) =>
+              les.quiz?.questions
+                ? {
+                    ...les,
+                    quiz: {
+                      ...les.quiz,
+                      questions: les.quiz.questions.map((q) =>
+                        q.id === updatedQuestion.id ? updatedQuestion : q
+                      ),
+                    },
+                  }
+                : les
+            ),
+          })),
+        }))
+      );
+      await queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
+      await queryClient.invalidateQueries({ queryKey: ['courses'] });
+      resetQuestionForm();
+      showSuccess('Soal berhasil diperbarui secara in-place.');
     },
   });
 
@@ -543,6 +598,7 @@ export function TeacherStudioPage() {
                       <button
                         type="button"
                         onClick={() => {
+                          setEditingQuestionId(q.id);
                           setQCategory(q.category_tag);
                           setQText(q.question_text);
                           setQImageUrl(q.image_url ?? '');
@@ -554,7 +610,7 @@ export function TeacherStudioPage() {
                           setOptE(q.options.find((o) => o.key === 'E')?.text ?? '');
                           setCorrectOpt(q.correct_option);
                           setExplanation(q.explanation);
-                          showSuccess('Soal dimuat ke form editor untuk diedit atau diduplikasi.');
+                          showSuccess('Soal dimuat ke form editor untuk diperbarui.');
                         }}
                         className="p-1.5 text-slate-400 hover:text-[#0F766E] cursor-pointer"
                         title="Muat ke form editor"
@@ -579,18 +635,27 @@ export function TeacherStudioPage() {
           {/* Right: Question Builder with Image Upload */}
           <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
             <div>
-              <h2 className="text-base font-bold text-[#18181B] dark:text-white">
-                Tambah Soal Baru (Teks &amp; Gambar)
-              </h2>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                  {editingQuestionId ? 'Edit Soal In-Place' : 'Tambah Soal Baru (Teks & Gambar)'}
+                </h2>
+                {editingQuestionId && <Badge tone="blue">Mode Edit</Badge>}
+              </div>
               <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
-                Anda bebas membuat soal teks maupun melampirkan gambar (cocok untuk tes spasial atau grafik).
+                {editingQuestionId
+                  ? 'Perubahan akan langsung memperbarui soal terpilih tanpa membuat duplikat.'
+                  : 'Anda bebas membuat soal teks maupun melampirkan gambar (cocok untuk tes spasial atau grafik).'}
               </p>
             </div>
 
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                addQuestionMut.mutate();
+                if (editingQuestionId) {
+                  updateQuestionMut.mutate();
+                } else {
+                  addQuestionMut.mutate();
+                }
               }}
               className="space-y-4"
             >
@@ -748,9 +813,25 @@ export function TeacherStudioPage() {
                 </div>
               </div>
 
-              <Button type="submit" disabled={addQuestionMut.isPending}>
-                {addQuestionMut.isPending ? 'Menambahkan...' : 'Simpan Soal ke Bank Soal'}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={addQuestionMut.isPending || updateQuestionMut.isPending}
+                >
+                  {editingQuestionId
+                    ? updateQuestionMut.isPending
+                      ? 'Memperbarui...'
+                      : 'Perbarui Soal Ini'
+                    : addQuestionMut.isPending
+                      ? 'Menambahkan...'
+                      : 'Simpan Soal Baru'}
+                </Button>
+                {editingQuestionId && (
+                  <Button type="button" variant="secondary" onClick={resetQuestionForm}>
+                    Batal Edit
+                  </Button>
+                )}
+              </div>
             </form>
           </div>
 
