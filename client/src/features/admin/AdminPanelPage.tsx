@@ -27,6 +27,7 @@ import {
 } from './adminCsvExport';
 
 type AdminTab = 'users' | 'courses' | 'audit';
+const USER_PAGE_SIZE = 10;
 const COURSE_PAGE_SIZE = 10;
 
 export function AdminPanelPage() {
@@ -39,10 +40,11 @@ export function AdminPanelPage() {
     queryFn: syncAdminAuditLogsFromServer,
   });
 
-  // User filters
+  // User filters & pagination
   const [userSearch, setUserSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [userPage, setUserPage] = useState(1);
 
   // Course filters & pagination
   const [courseSearch, setCourseSearch] = useState('');
@@ -141,6 +143,13 @@ export function AdminPanelPage() {
       return true;
     });
   }, [courses, courseSearch, categoryFilter, publishFilter]);
+
+  const totalUserPages = Math.max(1, Math.ceil(filteredProfiles.length / USER_PAGE_SIZE));
+  const safeUserPage = Math.min(userPage, totalUserPages);
+  const pagedProfiles = filteredProfiles.slice(
+    (safeUserPage - 1) * USER_PAGE_SIZE,
+    safeUserPage * USER_PAGE_SIZE
+  );
 
   const totalCoursePages = Math.max(1, Math.ceil(filteredCourses.length / COURSE_PAGE_SIZE));
   const safeCoursePage = Math.min(coursePage, totalCoursePages);
@@ -317,14 +326,14 @@ export function AdminPanelPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
-                {filteredProfiles.length === 0 ? (
+                {pagedProfiles.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-8 text-center text-xs text-[#71717A]">
                       Tidak ada pengguna yang sesuai dengan filter.
                     </td>
                   </tr>
                 ) : (
-                  filteredProfiles.map((p) => (
+                  pagedProfiles.map((p) => (
                     <tr key={p.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
                       <td className="px-6 py-3.5">
                         <p className="font-semibold text-[#18181B] dark:text-white">{p.full_name}</p>
@@ -413,6 +422,34 @@ export function AdminPanelPage() {
               </tbody>
             </table>
           </div>
+
+          {totalUserPages > 1 && (
+            <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+              <span>
+                Halaman {safeUserPage} dari {totalUserPages} ({filteredProfiles.length} pengguna)
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={safeUserPage <= 1}
+                  onClick={() => setUserPage((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  Prev
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={safeUserPage >= totalUserPages}
+                  onClick={() => setUserPage((p) => Math.min(totalUserPages, p + 1))}
+                >
+                  Next
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
       )}
 

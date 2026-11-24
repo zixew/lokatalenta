@@ -29,6 +29,17 @@ function buildTopbarNavItems(
   isLoggedIn: boolean,
   role?: UserRole
 ): TopbarNavItem[] {
+  if (role === 'admin') {
+    return [
+      {
+        to: '/admin',
+        label: 'Admin Dashboard',
+        icon: <ShieldCheck className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+    ];
+  }
+
   const items: TopbarNavItem[] = [
     {
       to: '/',
@@ -65,20 +76,11 @@ function buildTopbarNavItems(
     });
   }
 
-  if (role === 'teacher' || role === 'admin') {
+  if (role === 'teacher') {
     items.push({
       to: '/teacher',
       label: 'Teacher Studio',
       icon: <GraduationCap className="w-4 h-4 shrink-0" />,
-      priority: 'overflow',
-    });
-  }
-
-  if (role === 'admin') {
-    items.push({
-      to: '/admin',
-      label: 'Admin Panel',
-      icon: <ShieldCheck className="w-4 h-4 shrink-0" />,
       priority: 'overflow',
     });
   }
