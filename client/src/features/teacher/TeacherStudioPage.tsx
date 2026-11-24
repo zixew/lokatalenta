@@ -15,6 +15,7 @@ import {
   PlusCircle,
   Search,
   Trash2,
+  Users,
   Volume2,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -33,8 +34,9 @@ import {
 import { TeacherAnalyticsPanel } from './TeacherAnalyticsPanel';
 import { TeacherAssignmentsTab } from './TeacherAssignmentsTab';
 import { TeacherInteractionTab } from './TeacherInteractionTab';
+import { TeacherCohortPanel } from '../cohort/TeacherCohortPanel';
 
-type StudioTab = 'courses' | 'questions' | 'assignments' | 'interaction' | 'students';
+type StudioTab = 'courses' | 'questions' | 'assignments' | 'interaction' | 'students' | 'cohorts';
 
 export function TeacherStudioPage() {
   const { user } = useAuthStore();
@@ -459,6 +461,7 @@ export function TeacherStudioPage() {
           { id: 'assignments' as StudioTab, label: 'Tugas & Penilaian', icon: ClipboardCheck },
           { id: 'interaction' as StudioTab, label: 'Interaksi Mentor', icon: MessageSquare },
           { id: 'students' as StudioTab, label: 'Progres Siswa', icon: GraduationCap },
+          { id: 'cohorts' as StudioTab, label: 'Cohort & Kelas', icon: Users },
         ].map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -1458,6 +1461,15 @@ export function TeacherStudioPage() {
 
       {activeTab === 'interaction' && (
         <TeacherInteractionTab
+          courses={courses}
+          onSuccess={showSuccess}
+          onError={setErrorBanner}
+        />
+      )}
+
+      {activeTab === 'cohorts' && user && (
+        <TeacherCohortPanel
+          teacherId={user.id}
           courses={courses}
           onSuccess={showSuccess}
           onError={setErrorBanner}

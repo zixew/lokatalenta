@@ -16,6 +16,7 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
+import { StudentCohortCard } from '../cohort/StudentCohortCard';
 import { syncKraepelinHistoryFromServer } from '../kraepelin/kraepelinHistory';
 import { CompetencyRadarCard } from '../talent/CompetencyRadarCard';
 import {
@@ -294,6 +295,9 @@ export function ProfilePage() {
                   </Button>
                 </Link>
               </section>
+
+              {/* BL-33: Cohort & Kelas Privat */}
+              <StudentCohortCard userId={user.id} courses={courses} />
 
               {/* Enrolled Courses Progress */}
               <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
