@@ -131,6 +131,13 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** perekrut memasukkan Kode Sertifikat (`LT-...`) atau ID Talent Passport,
   - **Then** sistem menampilkan hasil verifikasi keaslian beserta tautan menuju **Talent Readiness Passport** kandidat tersebut.
 
+#### `US-32B` (BL-32B): Isolasi UI & Role Guard Khusus Admin Dashboard (`ADM-06`)
+- **User Story:** *Sebagai **Admin Platform**, saya ingin akun Admin hanya memiliki akses dan navigasi yang berhubungan dengan **Admin Dashboard** (`/admin`), sehingga akun Admin tidak dapat mengakses halaman Pelajar maupun halaman Pengajar.*
+- **Acceptance Criteria:**
+  - **Given** pengguna login sebagai `admin`,
+  - **When** melihat `TopbarNav` atau mencoba mengakses rute Pelajar (`/`, `/courses/:slug`, `/quiz/:quizId`, `/kraepelin`, `/tryout`, `/community`, `/profile`, `/certificate`) maupun rute Pengajar (`/teacher`),
+  - **Then** menu navigasi hanya menampilkan **Admin Dashboard** (`/admin`) dan tombol tema/keluar, serta seluruh rute non-admin otomatis di-redirect ke `/admin`.
+
 ---
 
 ### E. Epik 5 — Cohort Kelas Privat, Timeline Tugas & SQL Sandbox (`Sprint 11` • `v2.1.0` Minor)
