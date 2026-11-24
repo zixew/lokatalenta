@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.9.1] - 2026-11-24
+
+### Patch
+- Perbaikan Filter Kursus & Latihan: item radio ter-select dengan highlight, tap di luar menutup drawer & membatalkan draft, dan filter baru diterapkan saat klik Terapkan
+
+---
+
 ## [1.9.0] - 2026-11-23
 
 ### Minor
