@@ -536,21 +536,24 @@ export const lmsApi = {
 
   async startQuizAttempt(
     userId: string,
-    quizId: string
+    quizId: string,
+    options?: { isSmartDrill?: boolean }
   ): Promise<{ attempt: QuizAttempt; questions: SafeQuestion[] }> {
     await this.syncExpiredAttempts(userId);
     const quizMeta = await this.getQuizMeta(quizId);
     const passingScore = quizMeta?.passing_score ?? 70;
 
-    const latestSubmitted = await this.getUserAttemptForQuiz(userId, quizId);
-    if (latestSubmitted) {
-      if ((latestSubmitted.score ?? 0) >= passingScore) {
-        throw new Error('Anda sudah lulus tes ini.');
-      }
-      const elapsedMs = Date.now() - new Date(latestSubmitted.submitted_at!).getTime();
-      if (elapsedMs < 60 * 1000) {
-        const waitSec = Math.ceil((60 * 1000 - elapsedMs) / 1000);
-        throw new Error(`Harap tunggu ${waitSec} detik sebelum mengulang tes.`);
+    if (!options?.isSmartDrill) {
+      const latestSubmitted = await this.getUserAttemptForQuiz(userId, quizId);
+      if (latestSubmitted) {
+        if ((latestSubmitted.score ?? 0) >= passingScore) {
+          throw new Error('Anda sudah lulus tes ini.');
+        }
+        const elapsedMs = Date.now() - new Date(latestSubmitted.submitted_at!).getTime();
+        if (elapsedMs < 60 * 1000) {
+          const waitSec = Math.ceil((60 * 1000 - elapsedMs) / 1000);
+          throw new Error(`Harap tunggu ${waitSec} detik sebelum mengulang tes.`);
+        }
       }
     }
 
