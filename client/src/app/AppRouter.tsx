@@ -80,15 +80,26 @@ function RequireRole({ roles, children }: { roles: UserRole[]; children: ReactNo
   if (!initialized) return <PageLoader />;
   if (!user) return <Navigate to="/auth" replace />;
   if (!roles.includes(user.role)) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/'} replace />;
+    const home =
+      user.role === 'admin' ? '/admin' : user.role === 'teacher' ? '/teacher' : '/';
+    return <Navigate to={home} replace />;
   }
   return <>{children}</>;
 }
 
-function RedirectAdminToDashboard({ children }: { children: ReactNode }) {
+function RedirectNonStudentHome({ children }: { children: ReactNode }) {
   const { user, initialized } = useAuthStore();
   if (!initialized) return <PageLoader />;
   if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+  if (user?.role === 'teacher') return <Navigate to="/teacher" replace />;
+  return <>{children}</>;
+}
+
+function RedirectAuthenticatedFromAuth({ children }: { children: ReactNode }) {
+  const { user, initialized } = useAuthStore();
+  if (!initialized) return <PageLoader />;
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+  if (user?.role === 'teacher') return <Navigate to="/teacher" replace />;
   return <>{children}</>;
 }
 
@@ -100,7 +111,7 @@ export function AppRouter() {
         <Route
           path="/quiz/:quizId"
           element={
-            <RequireRole roles={['student', 'teacher']}>
+            <RequireRole roles={['student']}>
               <QuizRunnerPage />
             </RequireRole>
           }
@@ -116,41 +127,41 @@ export function AppRouter() {
                   <Route
                     path="/"
                     element={
-                      <RedirectAdminToDashboard>
+                      <RedirectNonStudentHome>
                         <CatalogPage />
-                      </RedirectAdminToDashboard>
+                      </RedirectNonStudentHome>
                     }
                   />
                   <Route
                     path="/kraepelin"
                     element={
-                      <RedirectAdminToDashboard>
+                      <RedirectNonStudentHome>
                         <KraepelinPage />
-                      </RedirectAdminToDashboard>
+                      </RedirectNonStudentHome>
                     }
                   />
                   <Route
                     path="/tryout"
                     element={
-                      <RedirectAdminToDashboard>
+                      <RedirectNonStudentHome>
                         <TryoutPage />
-                      </RedirectAdminToDashboard>
+                      </RedirectNonStudentHome>
                     }
                   />
                   <Route
                     path="/auth"
                     element={
-                      <RedirectAdminToDashboard>
+                      <RedirectAuthenticatedFromAuth>
                         <AuthPage />
-                      </RedirectAdminToDashboard>
+                      </RedirectAuthenticatedFromAuth>
                     }
                   />
                   <Route
                     path="/community"
                     element={
-                      <RedirectAdminToDashboard>
+                      <RequireRole roles={['student', 'teacher']}>
                         <CommunityPage />
-                      </RedirectAdminToDashboard>
+                      </RequireRole>
                     }
                   />
                   <Route path="/verify" element={<VerifyCertificatePage />} />
@@ -159,7 +170,7 @@ export function AppRouter() {
                   <Route
                     path="/courses/:slug"
                     element={
-                      <RequireRole roles={['student', 'teacher']}>
+                      <RequireRole roles={['student']}>
                         <CoursePlayerPage />
                       </RequireRole>
                     }
@@ -167,7 +178,7 @@ export function AppRouter() {
                   <Route
                     path="/quiz/:quizId/result/:attemptId"
                     element={
-                      <RequireRole roles={['student', 'teacher']}>
+                      <RequireRole roles={['student']}>
                         <QuizResultPage />
                       </RequireRole>
                     }
@@ -175,7 +186,7 @@ export function AppRouter() {
                   <Route
                     path="/certificate/:courseId"
                     element={
-                      <RequireRole roles={['student', 'teacher']}>
+                      <RequireRole roles={['student']}>
                         <CertificatePage />
                       </RequireRole>
                     }
@@ -207,9 +218,9 @@ export function AppRouter() {
                   <Route
                     path="*"
                     element={
-                      <RedirectAdminToDashboard>
+                      <RedirectNonStudentHome>
                         <Navigate to="/" replace />
-                      </RedirectAdminToDashboard>
+                      </RedirectNonStudentHome>
                     }
                   />
                 </Routes>
