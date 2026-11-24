@@ -1,13 +1,16 @@
 import {
   AlertTriangle,
   ArrowLeft,
+  BookOpen,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Clock,
   Flag,
+  Lock,
   Moon,
   Send,
+  ShieldCheck,
   Sun,
   Volume2,
 } from 'lucide-react';
@@ -19,6 +22,7 @@ import type { QuizAttempt, SafeQuestion } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
+import { getLockedQuizMode, lockQuizMode, type QuizSessionMode } from './quizModeStorage';
 import { parseChallengeParams, saveActiveChallengeForQuiz } from './shareAndChallenge';
 
 export function QuizRunnerPage() {
@@ -52,6 +56,8 @@ export function QuizRunnerPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [navFilter, setNavFilter] = useState<'all' | 'unanswered' | 'flagged'>('all');
   const [practiceMode, setPracticeMode] = useState(false);
+  const [modeSelected, setModeSelected] = useState(false);
+  const [pendingMode, setPendingMode] = useState<QuizSessionMode>('exam');
   const [practiceFeedback, setPracticeFeedback] = useState<
     Record<string, { is_correct: boolean; correct_option: string; explanation: string }>
   >({});
@@ -124,6 +130,14 @@ export function QuizRunnerPage() {
           setAnswers(activeAttempt.answers ?? {});
           setSecondsLeft(remaining);
           setQuestions(effectiveQs);
+          const lockedMode = getLockedQuizMode(activeAttempt.id);
+          if (lockedMode) {
+            setPracticeMode(lockedMode === 'practice');
+            setPendingMode(lockedMode);
+            setModeSelected(true);
+          } else {
+            setModeSelected(false);
+          }
           setLoading(false);
         }
       } catch (err: any) {
@@ -154,7 +168,7 @@ export function QuizRunnerPage() {
 
   // Countdown timer with auto-submit
   useEffect(() => {
-    if (loading || !attempt) return;
+    if (loading || !attempt || !modeSelected) return;
     if (secondsLeft <= 0) {
       const t = setTimeout(() => {
         void handleSubmit();
@@ -165,7 +179,7 @@ export function QuizRunnerPage() {
       setSecondsLeft((s) => Math.max(0, s - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [loading, attempt, secondsLeft, handleSubmit]);
+  }, [loading, attempt, modeSelected, secondsLeft, handleSubmit]);
 
   const currentQuestion = questions[currentIndex];
 
@@ -253,6 +267,86 @@ export function QuizRunnerPage() {
     );
   }
 
+  if (!modeSelected && attempt) {
+    const handleConfirmStartMode = () => {
+      lockQuizMode(attempt.id, pendingMode);
+      setPracticeMode(pendingMode === 'practice');
+      setModeSelected(true);
+    };
+
+    return (
+      <div className="min-h-screen bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-2xl rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0F766E] dark:text-teal-400">
+              <Lock className="w-3.5 h-3.5" />
+              <span>Pilihan Mode 1x Sebelum Memulai</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#18181B] dark:text-white">
+              {quizTitle}
+            </h1>
+            <p className="text-sm text-[#52525B] dark:text-slate-400">
+              Total {questions.length} soal{subtestFilter ? ` • Smart Drill (${subtestFilter})` : ''}. Pilih mode pengerjaan di bawah ini — mode akan <strong>terkunci</strong> selama sesi berlangsung.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-3.5">
+            <button
+              type="button"
+              onClick={() => setPendingMode('exam')}
+              className={`text-left rounded-xl border p-4 transition-all cursor-pointer ${
+                pendingMode === 'exam'
+                  ? 'border-[#18181B] dark:border-teal-400 bg-slate-50 dark:bg-slate-800/80 ring-2 ring-[#18181B]/10 dark:ring-teal-400/20'
+                  : 'border-[#E5E3DC] dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="inline-flex items-center gap-1.5 font-bold text-sm text-[#18181B] dark:text-white">
+                  <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  Mode Ujian
+                </span>
+                {pendingMode === 'exam' && <Badge tone="blue">Dipilih</Badge>}
+              </div>
+              <p className="text-xs text-[#52525B] dark:text-slate-400 leading-relaxed">
+                Simulasi ketat dengan timer penuh tanpa cek kunci jawaban atau pembahasan di tengah sesi.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setPendingMode('practice')}
+              className={`text-left rounded-xl border p-4 transition-all cursor-pointer ${
+                pendingMode === 'practice'
+                  ? 'border-[#0F766E] dark:border-teal-400 bg-teal-50/60 dark:bg-teal-950/30 ring-2 ring-[#0F766E]/20'
+                  : 'border-[#E5E3DC] dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="inline-flex items-center gap-1.5 font-bold text-sm text-[#18181B] dark:text-white">
+                  <BookOpen className="w-4 h-4 text-[#0F766E] dark:text-teal-400" />
+                  Mode Latihan
+                </span>
+                {pendingMode === 'practice' && <Badge tone="emerald">Dipilih</Badge>}
+              </div>
+              <p className="text-xs text-[#52525B] dark:text-slate-400 leading-relaxed">
+                Belajar aktif dengan fitur <strong>Cek Jawaban &amp; Pembahasan</strong> langsung per soal.
+              </p>
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#E5E3DC] dark:border-slate-800">
+            <Button variant="secondary" onClick={() => navigate(-1)}>
+              Kembali
+            </Button>
+            <Button variant="primary" onClick={handleConfirmStartMode}>
+              Mulai {pendingMode === 'practice' ? 'Mode Latihan' : 'Mode Ujian'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const answeredCount = questions.filter((q) => Boolean(answers[q.id])).length;
   const flaggedCount = questions.filter((q) => Boolean(flagged[q.id])).length;
   const unansweredCount = questions.length - answeredCount;
@@ -283,18 +377,17 @@ export function QuizRunnerPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => setPracticeMode((m) => !m)}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-semibold ${
                 practiceMode
                   ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                  : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  : 'bg-slate-100 dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-200'
               }`}
-              title="Beralih antara Mode Ujian ketat dan Mode Latihan (cek pembahasan langsung)"
+              title="Mode terkunci (hanya dapat dipilih 1x sebelum memulai)"
             >
+              <Lock className="w-3.5 h-3.5" />
               {practiceMode ? 'Mode Latihan' : 'Mode Ujian'}
-            </button>
+            </span>
 
             <button
               type="button"
