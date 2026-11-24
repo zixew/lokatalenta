@@ -1,8 +1,8 @@
-# Dokumen QA Test Cases — LokaTalenta (`v2.0.0`)
+# Dokumen QA Test Cases — LokaTalenta (`v2.1.2`)
 
 > [!NOTE]
 > Sumber utama matriks QA tersedia dalam format Excel terstruktur: [QA_TEST_CASES_LOKATALENTA.xlsx](file:///Users/a2299/Documents/Projects/lms-psikotes/docs/qa/QA_TEST_CASES_LOKATALENTA.xlsx).
-> Total skenario terverifikasi: **81** (0 duplikasi ID).
+> Total skenario terverifikasi: **87** (0 duplikasi ID).
 
 | ID | Role | Modul | Tipe Flow | Judul Skenario | Prasyarat | Langkah Uji | Ekspektasi Hasil | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
