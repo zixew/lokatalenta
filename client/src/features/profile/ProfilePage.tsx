@@ -1,12 +1,14 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Award,
+  Bookmark,
   BookOpen,
   CheckCircle2,
   ClipboardCheck,
   FileCheck2,
   GraduationCap,
   ShieldCheck,
+  Trash2,
   User,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -22,6 +24,11 @@ import { syncKraepelinHistoryFromServer } from '../kraepelin/kraepelinHistory';
 import { syncTryoutRegistrationsFromServer } from '../tryout/tryoutEvents';
 import { buildStudyAgendaItems } from './studyAgenda';
 import { StudyAgendaCard } from './StudyAgendaCard';
+import { DiagnosticStudyPlanCard } from './DiagnosticStudyPlanCard';
+import {
+  listQuestionBookmarks,
+  removeQuestionBookmark,
+} from '../quiz-runner/questionBookmarksApi';
 import { CompetencyRadarCard } from '../talent/CompetencyRadarCard';
 import {
   getPassportVisibilityLocal,
@@ -36,6 +43,7 @@ import { GamificationAnalyticsSection } from './GamificationAnalyticsSection';
 
 export function ProfilePage() {
   const { user, setProfile } = useAuthStore();
+  const queryClient = useQueryClient();
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [savedMsg, setSavedMsg] = useState('');
@@ -76,6 +84,20 @@ export function ProfilePage() {
     queryKey: ['user-certificates', user?.id],
     queryFn: () => (user ? listUserCertificatesAsync(user.id) : Promise.resolve([])),
     enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const { data: bookmarkedQuestions = [] } = useQuery({
+    queryKey: ['question-bookmarks', user?.id ?? 'guest'],
+    queryFn: () => listQuestionBookmarks(user?.id ?? 'guest'),
+    enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const removeBookmarkMut = useMutation({
+    mutationFn: (questionId: string) =>
+      removeQuestionBookmark(user?.id ?? 'guest', questionId),
+    onSuccess: (next) => {
+      queryClient.setQueryData(['question-bookmarks', user?.id ?? 'guest'], next);
+    },
   });
 
   const { data: registeredTryoutIds = [] } = useQuery({
@@ -329,6 +351,63 @@ export function ProfilePage() {
                   completedLessonIds,
                 })}
               />
+
+              {/* BL-36: Diagnostic Study Plan Otomatis */}
+              <DiagnosticStudyPlanCard attempts={attempts} courses={courses} />
+
+              {/* BL-37: Soal Tersimpan (Bookmark) */}
+              <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                    <Bookmark className="w-4 h-4 text-[#0F766E]" />
+                    Soal Tersimpan ({bookmarkedQuestions.length})
+                  </h2>
+                </div>
+                {bookmarkedQuestions.length === 0 ? (
+                  <p className="text-sm text-[#71717A] dark:text-slate-400">
+                    Belum ada soal sulit yang ditandai. Tandai soal pada halaman pembahasan kuis untuk mengulasnya kembali di sini.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {bookmarkedQuestions.map((bm) => (
+                      <div
+                        key={bm.id}
+                        className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-2"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Badge tone="slate">{bm.category_tag || 'Umum'}</Badge>
+                              <span className="text-xs text-[#71717A] dark:text-slate-400">
+                                {bm.quiz_title}
+                              </span>
+                            </div>
+                            <p className="text-sm font-medium text-[#18181B] dark:text-white">
+                              {bm.question_text}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeBookmarkMut.mutate(bm.question_id)}
+                            className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer shrink-0"
+                            title="Hapus dari bookmark"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {bm.explanation && (
+                          <p className="text-xs text-[#52525B] dark:text-slate-300 border-t border-[#E5E3DC] dark:border-slate-800 pt-2">
+                            <span className="font-semibold text-[#0F766E] dark:text-teal-400">
+                              Pembahasan:{' '}
+                            </span>
+                            {bm.explanation}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
 
               {/* Enrolled Courses Progress */}
               <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">

@@ -1,8 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   ArrowRight,
   Award,
+  Bookmark,
+  BookmarkCheck,
   CheckCircle2,
   Copy,
   MessageSquare,
@@ -28,10 +30,15 @@ import {
   listQuizChallengesAsync,
   recordQuizChallengeAsync,
 } from './shareAndChallenge';
+import {
+  listQuestionBookmarks,
+  toggleQuestionBookmark,
+} from './questionBookmarksApi';
 
 export function QuizResultPage() {
   const { quizId, attemptId } = useParams<{ quizId: string; attemptId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const [filterMode, setFilterMode] = useState<'all' | 'wrong'>('all');
   const [selectedSubtest, setSelectedSubtest] = useState<string>('ALL');
@@ -54,6 +61,30 @@ export function QuizResultPage() {
     queryFn: () => lmsApi.getCourseContextByQuizId(quizId!),
     enabled: Boolean(quizId),
   });
+
+  const { data: bookmarks = [] } = useQuery({
+    queryKey: ['question-bookmarks', user?.id ?? 'guest'],
+    queryFn: () => listQuestionBookmarks(user?.id ?? 'guest'),
+  });
+
+  const toggleBookmarkMut = useMutation({
+    mutationFn: (qItem: {
+      question_id: string;
+      category_tag: string;
+      question_text: string;
+      explanation: string;
+    }) =>
+      toggleQuestionBookmark(user?.id ?? 'guest', {
+        ...qItem,
+        quiz_id: quizId ?? '',
+        quiz_title: quizMeta?.title ?? 'Evaluasi Kuis',
+      }),
+    onSuccess: (res) => {
+      queryClient.setQueryData(['question-bookmarks', user?.id ?? 'guest'], res.items);
+    },
+  });
+
+  const bookmarkedIds = new Set(bookmarks.map((b) => b.question_id));
 
   const { data, isLoading } = useQuery({
     queryKey: ['attempt-result', attemptId],
@@ -628,7 +659,32 @@ export function QuizResultPage() {
                       </span>
                       {q.explanation}
                     </div>
-                    <div className="pt-2 border-t border-teal-200/70 dark:border-teal-800/70 flex justify-end">
+                    <div className="pt-2 border-t border-teal-200/70 dark:border-teal-800/70 flex flex-wrap items-center justify-between gap-2">
+                      <Button
+                        size="sm"
+                        variant={bookmarkedIds.has(q.id) ? 'primary' : 'secondary'}
+                        disabled={toggleBookmarkMut.isPending}
+                        onClick={() =>
+                          toggleBookmarkMut.mutate({
+                            question_id: q.id,
+                            category_tag: q.category_tag,
+                            question_text: q.question_text,
+                            explanation: q.explanation,
+                          })
+                        }
+                      >
+                        {bookmarkedIds.has(q.id) ? (
+                          <>
+                            <BookmarkCheck className="w-3.5 h-3.5" />
+                            Tersimpan di Bookmark
+                          </>
+                        ) : (
+                          <>
+                            <Bookmark className="w-3.5 h-3.5" />
+                            Simpan ke Bookmark Soal Sulit
+                          </>
+                        )}
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
