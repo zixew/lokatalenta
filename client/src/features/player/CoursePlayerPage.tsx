@@ -24,7 +24,8 @@ import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
 import { CourseOverviewGate } from './CourseOverviewGate';
 import { FlashcardDeck } from './FlashcardDeck';
-import { InteractiveSpreadsheetLab } from './InteractiveSpreadsheetLab';
+import { HandsOnLabContainer } from './HandsOnLabContainer';
+import { isTechnicalSqlCourse } from './sqlSandboxEngine';
 import { isTechnicalSpreadsheetCourse } from './spreadsheetEngine';
 import { LessonNotesAndCheckPanel } from './LessonNotesAndCheckPanel';
 import { LessonExtrasPanel } from './LessonExtrasPanel';
@@ -660,16 +661,24 @@ export function CoursePlayerPage() {
                 </div>
               )}
 
-              {/* BL-23B: Interactive Spreadsheet & Excel Formula Lab */}
-              {activeLesson.type !== 'quiz' && (
-                <InteractiveSpreadsheetLab
-                  key={`lab-${course.id}-${activeLesson.id}`}
-                  defaultExpanded={isTechnicalSpreadsheetCourse(
-                    `${course.title} ${activeLesson.title}`,
-                    course.category
-                  )}
-                />
-              )}
+              {/* BL-23B & BL-35: Interactive Hands-On Lab (Excel & SQL) */}
+              {activeLesson.type !== 'quiz' && (() => {
+                const isSql = isTechnicalSqlCourse(
+                  `${course.title} ${activeLesson.title}`,
+                  course.category
+                );
+                const isExcel = isTechnicalSpreadsheetCourse(
+                  `${course.title} ${activeLesson.title}`,
+                  course.category
+                );
+                return (
+                  <HandsOnLabContainer
+                    key={`lab-${course.id}-${activeLesson.id}`}
+                    defaultLab={isSql ? 'sql' : 'excel'}
+                    defaultExpanded={isSql || isExcel}
+                  />
+                );
+              })()}
 
               {/* BL-04: Interactive Quick Check & Personal Notes */}
               {activeLesson.type !== 'quiz' && (
