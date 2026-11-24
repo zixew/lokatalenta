@@ -188,6 +188,13 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** halaman dimuat,
   - **Then** tampil ringkasan versi aktif, status storage/SW, serta log error runtime yang tertangkap oleh ErrorBoundary.
 
+#### `US-38B` (BL-38B): Tes Kecepatan & Ketepatan Mengetik (`Typing Speed & Accuracy Test`)
+- **User Story:** *Sebagai **Pelajar**, saya ingin berlatih kecepatan dan ketepatan mengetik (WPM, CPM, akurasi karakter %, dan tingkat salah ketik) dengan highlight huruf real-time dan riwayat progres, sehingga siap menghadapi tes administrasi/data entry maupun seleksi kerja.*
+- **Acceptance Criteria:**
+  - **Given** pelajar membuka `/typing` (atau menu **Tes Mengetik**),
+  - **When** pelajar memilih durasi (30s / 60s) atau paket teks (Indonesia / Inggris / Angka & Simbol) lalu mulai mengetik,
+  - **Then** sistem menampilkan **WPM**, **CPM**, **Akurasi (%)**, highlight karakter benar/salah secara real-time, serta menyimpan riwayat hasil latihan ke lokal/cloud (`typing_attempts`).
+
 ---
 
 ### G. Epik 7 — Multi-Format Assessment, Proctoring Lite & Stress Gate (`Sprint 13` • `v2.3.0` Minor)
