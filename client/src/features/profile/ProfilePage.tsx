@@ -1,12 +1,14 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Award,
+  Bookmark,
   BookOpen,
   CheckCircle2,
   ClipboardCheck,
   FileCheck2,
   GraduationCap,
   ShieldCheck,
+  Trash2,
   User,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -16,12 +18,17 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
-import { listStudentCohortsAsync } from '../cohort/cohortApi';
+import { listStudentCohortsAsync, listTeacherCohortsAsync } from '../cohort/cohortApi';
 import { StudentCohortCard } from '../cohort/StudentCohortCard';
 import { syncKraepelinHistoryFromServer } from '../kraepelin/kraepelinHistory';
 import { syncTryoutRegistrationsFromServer } from '../tryout/tryoutEvents';
 import { buildStudyAgendaItems } from './studyAgenda';
 import { StudyAgendaCard } from './StudyAgendaCard';
+import { DiagnosticStudyPlanCard } from './DiagnosticStudyPlanCard';
+import {
+  listQuestionBookmarks,
+  removeQuestionBookmark,
+} from '../quiz-runner/questionBookmarksApi';
 import { CompetencyRadarCard } from '../talent/CompetencyRadarCard';
 import {
   getPassportVisibilityLocal,
@@ -36,6 +43,7 @@ import { GamificationAnalyticsSection } from './GamificationAnalyticsSection';
 
 export function ProfilePage() {
   const { user, setProfile } = useAuthStore();
+  const queryClient = useQueryClient();
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [savedMsg, setSavedMsg] = useState('');
@@ -78,6 +86,20 @@ export function ProfilePage() {
     enabled: Boolean(user && user.role === 'student'),
   });
 
+  const { data: bookmarkedQuestions = [] } = useQuery({
+    queryKey: ['question-bookmarks', user?.id ?? 'guest'],
+    queryFn: () => listQuestionBookmarks(user?.id ?? 'guest'),
+    enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const removeBookmarkMut = useMutation({
+    mutationFn: (questionId: string) =>
+      removeQuestionBookmark(user?.id ?? 'guest', questionId),
+    onSuccess: (next) => {
+      queryClient.setQueryData(['question-bookmarks', user?.id ?? 'guest'], next);
+    },
+  });
+
   const { data: registeredTryoutIds = [] } = useQuery({
     queryKey: ['tryout-registrations', user?.id],
     queryFn: () => (user ? syncTryoutRegistrationsFromServer(user.id) : Promise.resolve([])),
@@ -95,11 +117,10 @@ export function ProfilePage() {
     enabled: Boolean(user && user.role === 'student'),
   });
 
-  const { data: studentProgress = [] } = useQuery({
-    queryKey: ['teacher-student-progress', user?.id],
-    queryFn: () =>
-      user ? lmsApi.listTeacherStudentProgress(user.id) : Promise.resolve([]),
-    enabled: Boolean(user && (user.role === 'teacher' || user.role === 'admin')),
+  const { data: teacherCohorts = [] } = useQuery({
+    queryKey: ['teacher-cohorts', user?.id],
+    queryFn: () => (user ? listTeacherCohortsAsync(user.id) : Promise.resolve([])),
+    enabled: Boolean(user && user.role === 'teacher'),
   });
 
   const updateProfileMut = useMutation({
@@ -330,6 +351,63 @@ export function ProfilePage() {
                 })}
               />
 
+              {/* BL-36: Diagnostic Study Plan Otomatis */}
+              <DiagnosticStudyPlanCard attempts={attempts} courses={courses} />
+
+              {/* BL-37: Soal Tersimpan (Bookmark) */}
+              <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                    <Bookmark className="w-4 h-4 text-[#0F766E]" />
+                    Soal Tersimpan ({bookmarkedQuestions.length})
+                  </h2>
+                </div>
+                {bookmarkedQuestions.length === 0 ? (
+                  <p className="text-sm text-[#71717A] dark:text-slate-400">
+                    Belum ada soal sulit yang ditandai. Tandai soal pada halaman pembahasan kuis untuk mengulasnya kembali di sini.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {bookmarkedQuestions.map((bm) => (
+                      <div
+                        key={bm.id}
+                        className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-2"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Badge tone="slate">{bm.category_tag || 'Umum'}</Badge>
+                              <span className="text-xs text-[#71717A] dark:text-slate-400">
+                                {bm.quiz_title}
+                              </span>
+                            </div>
+                            <p className="text-sm font-medium text-[#18181B] dark:text-white">
+                              {bm.question_text}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeBookmarkMut.mutate(bm.question_id)}
+                            className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer shrink-0"
+                            title="Hapus dari bookmark"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {bm.explanation && (
+                          <p className="text-xs text-[#52525B] dark:text-slate-300 border-t border-[#E5E3DC] dark:border-slate-800 pt-2">
+                            <span className="font-semibold text-[#0F766E] dark:text-teal-400">
+                              Pembahasan:{' '}
+                            </span>
+                            {bm.explanation}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
               {/* Enrolled Courses Progress */}
               <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
                 <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -455,82 +533,62 @@ export function ProfilePage() {
             </>
           )}
 
-          {/* TEACHER STUDENT PROGRESS VIEW */}
-          {user.role === 'teacher' && (
-            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between">
-                <div>
-                  <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
-                    <GraduationCap className="w-4 h-4 text-[#0F766E]" />
-                    Progres Belajar Siswa
-                  </h2>
-                  <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
-                    Pantau penyelesaian materi dan hasil tes siswa yang terdaftar di kursus Anda.
-                  </p>
-                </div>
-                <Link to="/teacher">
-                  <Button variant="secondary" size="sm">
-                    Buka Teacher Studio
-                  </Button>
-                </Link>
-              </div>
+          {/* TEACHER MENTOR SUMMARY CARD */}
+          {user.role === 'teacher' && (() => {
+            const mentorCoursesCount = courses.filter((c) => c.teacher_id === user.id).length;
+            const activeCohortsCount = teacherCohorts.filter((c) => c.is_active).length;
+            const totalCohortMembers = teacherCohorts.reduce((sum, c) => sum + c.member_count, 0);
 
-              {studentProgress.length === 0 ? (
-                <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
-                  Belum ada siswa yang terdaftar pada kursus Anda.
+            return (
+              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400 flex items-center justify-center">
+                      <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                        Ringkasan Mengajar Mentor
+                      </h2>
+                      <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
+                        Kelola kurikulum kursus, cohort peserta, dan progres belajar di Teacher Studio.
+                      </p>
+                    </div>
+                  </div>
+                  <Link to="/teacher">
+                    <Button size="sm">Buka Teacher Studio</Button>
+                  </Link>
                 </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
-                      <tr>
-                        <th className="px-6 py-3">Siswa</th>
-                        <th className="px-6 py-3">Kursus</th>
-                        <th className="px-6 py-3">Progres Materi</th>
-                        <th className="px-6 py-3">Nilai Tes</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
-                      {studentProgress.map((row) => {
-                        const pct =
-                          row.total_lessons > 0
-                            ? Math.round((row.completed_lessons / row.total_lessons) * 100)
-                            : 0;
-                        return (
-                          <tr key={`${row.student_id}-${row.course_id}`}>
-                            <td className="px-6 py-3.5">
-                              <p className="font-semibold text-[#18181B] dark:text-white">{row.student_name}</p>
-                              <p className="text-xs text-[#71717A] dark:text-slate-400">{row.student_email}</p>
-                            </td>
-                            <td className="px-6 py-3.5 text-[#52525B] dark:text-slate-300">{row.course_title}</td>
-                            <td className="px-6 py-3.5 w-48">
-                              <div className="space-y-1">
-                                <span className="text-xs font-mono-tabular text-[#18181B] dark:text-white">
-                                  {row.completed_lessons}/{row.total_lessons} materi ({pct}%)
-                                </span>
-                                <ProgressBar value={pct} tone="emerald" />
-                              </div>
-                            </td>
-                            <td className="px-6 py-3.5">
-                              {row.latest_quiz_score !== null ? (
-                                <Badge
-                                  tone={row.latest_quiz_score >= 70 ? 'emerald' : 'amber'}
-                                >
-                                  {row.latest_quiz_score}%
-                                </Badge>
-                              ) : (
-                                <span className="text-xs text-[#71717A] dark:text-slate-400">Belum tes</span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                    <span className="text-xs text-[#71717A] dark:text-slate-400 block">
+                      Kursus Diampu
+                    </span>
+                    <strong className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
+                      {mentorCoursesCount}
+                    </strong>
+                  </div>
+                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                    <span className="text-xs text-[#71717A] dark:text-slate-400 block">
+                      Cohort Aktif
+                    </span>
+                    <strong className="text-2xl font-extrabold font-mono-tabular text-[#0F766E] dark:text-teal-400 mt-1 block">
+                      {activeCohortsCount}
+                    </strong>
+                  </div>
+                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                    <span className="text-xs text-[#71717A] dark:text-slate-400 block">
+                      Peserta Terdaftar di Cohort
+                    </span>
+                    <strong className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
+                      {totalCohortMembers}
+                    </strong>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            );
+          })()}
 
           {/* ADMIN OVERVIEW */}
           {user.role === 'admin' && (

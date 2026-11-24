@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MessageSquare, PlusCircle, Send, ThumbsUp, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
+import { MessageSquare, PlusCircle, Search, Send, ThumbsUp, Trash2, Users } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
 import type { CommunityPost } from '../../shared/types/lms';
@@ -28,6 +28,8 @@ export function CommunityPage() {
   const draft = (location.state as DraftCommunityState) ?? null;
   const queryClient = useQueryClient();
   const [selectedCat, setSelectedCat] = useState('Semua');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'terbaru' | 'terpopuler'>('terbaru');
   const [showComposer, setShowComposer] = useState(() => Boolean(draft?.draftTitle || draft?.draftContent));
   const [title, setTitle] = useState(() => draft?.draftTitle ?? '');
   const [category, setCategory] = useState(() => draft?.draftCategory ?? 'Tips Psikotes');
@@ -78,8 +80,25 @@ export function CommunityPage() {
     },
   });
 
-  const filteredPosts =
-    selectedCat === 'Semua' ? posts : posts.filter((p) => p.category === selectedCat);
+  const filteredPosts = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const list = posts.filter((p) => {
+      const matchCat = selectedCat === 'Semua' || p.category === selectedCat;
+      const matchSearch =
+        !q ||
+        p.title.toLowerCase().includes(q) ||
+        p.content.toLowerCase().includes(q) ||
+        p.author_name.toLowerCase().includes(q);
+      return matchCat && matchSearch;
+    });
+
+    return [...list].sort((a, b) => {
+      if (sortBy === 'terpopuler') {
+        if (b.likes_count !== a.likes_count) return b.likes_count - a.likes_count;
+      }
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [posts, selectedCat, searchQuery, sortBy]);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
@@ -162,22 +181,47 @@ export function CommunityPage() {
         </form>
       )}
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setSelectedCat(cat)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
-              selectedCat === cat
-                ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                : 'bg-white dark:bg-[#161B22] border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
-            }`}
+      {/* Search, Sort & Category Filter */}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-[#71717A] dark:text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari topik, isi diskusi, atau nama penulis..."
+              aria-label="Cari topik diskusi"
+              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] text-[#18181B] dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            />
+          </div>
+          <select
+            aria-label="Urutkan topik diskusi"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'terbaru' | 'terpopuler')}
+            className="px-3.5 py-2 text-xs font-semibold rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E] cursor-pointer"
           >
-            {cat}
-          </button>
-        ))}
+            <option value="terbaru">Urutkan: Terbaru</option>
+            <option value="terpopuler">Urutkan: Terpopuler</option>
+          </select>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCat(cat)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                selectedCat === cat
+                  ? 'bg-[#0F766E] border-[#0F766E] text-white'
+                  : 'bg-white dark:bg-[#161B22] border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Posts Feed */}

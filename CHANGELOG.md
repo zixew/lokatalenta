@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.2.0] - 2026-11-24
+
+### Minor
+- Sprint 12 (v2.2.0): Diagnostic Study Plan, Question Bookmarks, Health Telemetry, Typing Speed Test, POV Polish & Interactive UI Revamp
+
+---
+
 ## [2.1.2] - 2026-11-24
 
 ### Hotfix

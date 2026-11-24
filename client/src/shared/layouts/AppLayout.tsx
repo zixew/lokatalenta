@@ -1,6 +1,7 @@
 import {
   BookOpen,
   GraduationCap,
+  Keyboard,
   LogOut,
   Menu,
   Moon,
@@ -221,6 +222,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   >
                     <Timer className="w-4 h-4" />
                     Tes Kraepelin
+                  </Link>
+
+                  <Link
+                    to="/typing"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/typing')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    <Keyboard className="w-4 h-4" />
+                    Tes Mengetik
                   </Link>
 
                   <Link

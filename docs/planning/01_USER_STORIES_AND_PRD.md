@@ -216,6 +216,20 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** admin memilih **Preview Kursus**, tab **Moderasi Komunitas**, atau tab **Sertifikat**,
   - **Then** modal read-only menampilkan daftar modul & lesson tanpa membuka rute `/courses/:slug`, admin dapat menghapus postingan bermasalah atau mencabut sertifikat dengan pencatatan otomatis ke `admin_audit_logs`.
 
+#### `US-38F` (BL-38F — UI Revamp): Katalog Interaktif, Hero Bento Hub & Micro-Interactions (Student POV)
+- **User Story:** *Sebagai **Pelajar**, saya ingin tampilan beranda dan katalog terasa modern, responsif, dan interaktif (bukan sekadar daftar statis), sehingga pengalaman belajar lebih memotivasi.*
+- **Acceptance Criteria:**
+  - **Given** pelajar membuka `/` (`CatalogPage`),
+  - **When** halaman dimuat atau pelajar mengarahkan kursor/memfilter kursus,
+  - **Then** tampil **Hero Bento Hub** dengan ring progres XP harian interaktif & quick-launch latihan, kartu kursus dengan *hover elevation*, *quick preview syllabus drawer*, badge fitur (*Lab Interaktif*, *Audio TTS*, *Sertifikat*), serta *skeleton shimmer* saat loading.
+
+#### `US-38G` (BL-38G — UI Revamp): Course Player Zen Mode, Quiz Feedback Ekspresif & Grafik Interaktif
+- **User Story:** *Sebagai **Pelajar**, saya ingin tampilan Course Player, QuizRunner, Kraepelin, dan Radar 5D lebih dinamis dan memuaskan secara visual saat berlatih.*
+- **Acceptance Criteria:**
+  - **Given** pelajar belajar di `CoursePlayerPage`, mengerjakan `QuizRunnerPage`, atau memantau `/kraepelin` & `/profile`,
+  - **When** pelajar menyelesaikan modul/kuis atau memeriksa grafik ketahanan/Radar 5D,
+  - **Then** tersedia toggle **Zen / Focus Mode** pada Player, progress ring per modul di sidebar kurikulum, animasi perayaan (*milestone toast*) saat lulus modul/kuis, serta *interactive hover tooltip* pada grafik Kraepelin dan Radar Kompetensi 5D.
+
 ---
 
 ### G. Epik 7 — Multi-Format Assessment, Proctoring Lite & Stress Gate (`Sprint 13` • `v2.3.0` Minor)
@@ -247,6 +261,13 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **Given** mentor di `/teacher` atau admin di `/admin`,
   - **When** mentor menekan **Duplikasi Kursus/Quiz** atau admin mengirim **Broadcast Pengumuman**,
   - **Then** salinan kursus/quiz berstatus Draft terbuat instan dan banner pengumuman global tampil di header aplikasi seluruh pengguna.
+
+#### `US-40D` (BL-40D — UI Revamp): Mentor Studio Drag-and-Drop & Admin Interactive Drawer/Charts
+- **User Story:** *Sebagai **Mentor** dan **Admin**, saya ingin antarmuka `/teacher` dan `/admin` lebih interaktif dengan drag-and-drop, split preview, grafik distribusi, serta modal/toast modern pengganti dialog browser bawaan.*
+- **Acceptance Criteria:**
+  - **Given** mentor membuka `/teacher` atau admin membuka `/admin`,
+  - **When** mentor menyusun modul/materi/soal atau admin menginspeksi pengguna/kursus & melakukan aksi sensitif,
+  - **Then** mentor dapat melakukan *drag-and-drop* urutan modul/lesson & *live split preview* soal, sementara admin memiliki *slide-over detail drawer*, grafik distribusi role/pertumbuhan interaktif, dan modal konfirmasi + toast modern (menggantikan `window.confirm`).
 
 #### `US-41` (BL-41): Security & Stress Benchmark Suite v2 (5.000 Operasi)
 - **User Story:** *Sebagai **Tim Engineering**, saya ingin menguji performa parser rumus, filter katalog, dan sanitasi payload pada skala 5.000 operasi sebelum masuk ke rilis Major `v3.0.0`.*

@@ -1,4 +1,5 @@
 import { ArrowRight, Compass } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '../../shared/ui/Badge';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
@@ -26,7 +27,10 @@ export function CompetencyRadarCard({
   metrics,
   interactive = true,
 }: CompetencyRadarCardProps) {
+  const [activeDimKey, setActiveDimKey] = useState<string | null>(null);
   const total = metrics.dimensions.length;
+  const activeDimension =
+    metrics.dimensions.find((d) => d.key === activeDimKey) ?? null;
   const dataPoints = metrics.dimensions
     .map((d, idx) => {
       const p = polarPoint(idx, total, (d.score / 100) * MAX_RADIUS);
@@ -64,7 +68,7 @@ export function CompetencyRadarCard({
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
         {/* Pure SVG 5D Radar */}
-        <div className="md:col-span-5 flex justify-center">
+        <div className="md:col-span-5 flex flex-col items-center gap-3">
           <svg
             viewBox="-75 -24 370 248"
             className="w-full max-w-[300px] h-auto select-none"
@@ -101,22 +105,38 @@ export function CompetencyRadarCard({
                   : labelPos.x > CENTER_X + 10
                     ? 'start'
                     : 'middle';
+              const isSelected = activeDimKey === dim.key;
               return (
-                <g key={dim.key}>
+                <g
+                  key={dim.key}
+                  className="cursor-pointer"
+                  onMouseEnter={() => setActiveDimKey(dim.key)}
+                  onClick={() =>
+                    setActiveDimKey((prev) => (prev === dim.key ? null : dim.key))
+                  }
+                >
                   <line
                     x1={CENTER_X}
                     y1={CENTER_Y}
                     x2={edge.x}
                     y2={edge.y}
                     stroke="currentColor"
-                    className="text-slate-200 dark:text-slate-700"
-                    strokeWidth={0.9}
+                    className={
+                      isSelected
+                        ? 'text-[#0F766E] dark:text-teal-400'
+                        : 'text-slate-200 dark:text-slate-700'
+                    }
+                    strokeWidth={isSelected ? 1.5 : 0.9}
                   />
                   <text
                     x={labelPos.x}
                     y={labelPos.y + 3}
                     textAnchor={anchor}
-                    className="fill-[#52525B] dark:fill-slate-300 text-[10px] font-semibold"
+                    className={`text-[10px] font-semibold transition-colors ${
+                      isSelected
+                        ? 'fill-[#0F766E] dark:fill-teal-400'
+                        : 'fill-[#52525B] dark:fill-slate-300'
+                    }`}
                   >
                     {dim.label}
                   </text>
@@ -133,18 +153,57 @@ export function CompetencyRadarCard({
             />
             {metrics.dimensions.map((d, idx) => {
               const p = polarPoint(idx, total, (d.score / 100) * MAX_RADIUS);
+              const isSelected = activeDimKey === d.key;
               return (
-                <circle
+                <g
                   key={d.key}
-                  cx={p.x}
-                  cy={p.y}
-                  r={3.5}
-                  className="fill-[#0F766E] dark:fill-teal-400 stroke-white dark:stroke-slate-900"
-                  strokeWidth={1.2}
-                />
+                  className="cursor-pointer"
+                  onMouseEnter={() => setActiveDimKey(d.key)}
+                  onClick={() =>
+                    setActiveDimKey((prev) => (prev === d.key ? null : d.key))
+                  }
+                >
+                  <circle cx={p.x} cy={p.y} r={12} fill="transparent" />
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={isSelected ? 5.5 : 3.5}
+                    className="fill-[#0F766E] dark:fill-teal-400 stroke-white dark:stroke-slate-900 transition-all"
+                    strokeWidth={isSelected ? 2 : 1.2}
+                  />
+                </g>
               );
             })}
           </svg>
+
+          {/* Interactive Dimension Tooltip */}
+          <div className="w-full max-w-[300px] min-h-[52px] rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900/70 px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs">
+            {activeDimension ? (
+              <>
+                <div className="min-w-0">
+                  <p className="font-bold text-[#18181B] dark:text-white truncate">
+                    {activeDimension.label}
+                  </p>
+                  <p className="text-[11px] font-mono-tabular text-[#52525B] dark:text-slate-400">
+                    Skor saat ini: <strong>{activeDimension.score}%</strong>
+                  </p>
+                </div>
+                {interactive && (
+                  <Link
+                    to={activeDimension.drillPath}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0F766E] text-white font-semibold text-[11px] hover:bg-[#115E59] shrink-0"
+                  >
+                    Latih
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                )}
+              </>
+            ) : (
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400 mx-auto text-center">
+                Arahkan kursor atau klik titik dimensi pada radar untuk detail &amp; latihan.
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Dimension Breakdown */}

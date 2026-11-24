@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   BookOpen,
   CheckCircle2,
   ChevronDown,
@@ -7,6 +6,7 @@ import {
   ChevronRight,
   ClipboardCheck,
   Clock,
+  Eye,
   FileCheck2,
   Filter,
   Layers,
@@ -24,7 +24,10 @@ import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
 import { CatalogFilterPanel, type ProgramTypeFilter } from './CatalogFilterPanel';
+import { CatalogHeroBento } from './CatalogHeroBento';
 import { CatalogPersonalizationSection } from './CatalogPersonalizationSection';
+import { CourseSyllabusDrawer } from './CourseSyllabusDrawer';
+import { getSavedDailyXpTarget, syncStudyPreferencesFromServer } from './learningGoalStorage';
 
 const PAGE_SIZE = 6;
 type SortOption = 'default' | 'title_asc' | 'duration_asc' | 'duration_desc';
@@ -83,6 +86,9 @@ export function CatalogPage() {
     return () => document.removeEventListener('keydown', onKey);
   }, [mobileFilterOpen, selectedCategory, selectedType, selectedLevel]);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [previewCourse, setPreviewCourse] = useState<{ course: Course; targetUrl: string } | null>(
+    null
+  );
 
   const handleOpenTarget = (e: React.MouseEvent, targetUrl: string) => {
     if (!user) {
@@ -102,6 +108,20 @@ export function CatalogPage() {
     queryKey: ['course-rating-summaries'],
     queryFn: () => lmsApi.listAllCourseRatingSummaries(),
   });
+  const { data: studyPrefs } = useQuery({
+    queryKey: ['study-preferences', user?.id],
+    queryFn: () => syncStudyPreferencesFromServer(user?.id),
+  });
+
+  const [todayStr] = useState(() => new Date().toISOString().slice(0, 10));
+  const earnedToday = useMemo(() => {
+    return userAttempts.reduce((sum, att) => {
+      if (!att.submitted_at || !att.submitted_at.startsWith(todayStr)) return sum;
+      const passedBonus = (att.score ?? 0) >= 70 ? 35 : 0;
+      return sum + 40 + passedBonus;
+    }, 0);
+  }, [userAttempts, todayStr]);
+  const xpTarget = studyPrefs?.xpTarget ?? getSavedDailyXpTarget();
 
   const getDirectQuiz = (course: Course) => {
     const lessons = (course.modules ?? []).flatMap((m) => m.lessons);
@@ -217,75 +237,16 @@ export function CatalogPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-10">
-      {/* Editorial Hero */}
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <div className="lg:col-span-7 space-y-5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F6F5F1] dark:bg-slate-800 border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#0F766E] dark:text-teal-400">
-            LokaTalenta • Akademi Bahasa, Karier &amp; Komunitas
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#18181B] dark:text-white leading-tight tracking-tight">
-            Bangun Kompetensi Bahasa Asing &amp; Kesiapan Seleksi Kerja secara Terstruktur.
-          </h1>
-          <p className="text-base text-[#52525B] dark:text-slate-300 leading-relaxed max-w-2xl">
-            Pelajari kurikulum bertahap dari nol hingga mahir dengan{' '}
-            <strong className="text-[#18181B] dark:text-white">20+ modul bahasa</strong>, latihan
-            aksara &amp; pelafalan,{' '}
-            <strong className="text-[#18181B] dark:text-white">simulasi psikotes</strong>, serta
-            bimbingan langsung bersama mentor.
-          </p>
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            {structuredCourse && (
-              <Link
-                to={`/courses/${structuredCourse.slug}`}
-                onClick={(e) => handleOpenTarget(e, `/courses/${structuredCourse.slug}`)}
-              >
-                <Button size="lg">
-                  Gabung &amp; Mulai Belajar
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            )}
-            <a href="#katalog">
-              <Button variant="secondary" size="lg">
-                {isLoading ? 'Jelajahi Program' : `Jelajahi ${courses.length}+ Program`}
-              </Button>
-            </a>
-            <Link to="/kraepelin">
-              <Button variant="secondary" size="lg">
-                Simulator Kraepelin / Pauli
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Clean Structured Summary Card */}
-        <div className="lg:col-span-5 bg-[#F6F5F1] dark:bg-slate-900/80 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
-              Pilar Pembelajaran LokaTalenta
-            </span>
-            <span className="text-xs font-mono-tabular font-semibold text-[#0F766E] dark:text-teal-400">
-              4 Jalur Utama
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { label: 'Bahasa Jepang & Korea', desc: 'Aksara, Kosakata & Percakapan' },
-              { label: 'Bahasa Inggris Karier', desc: 'Grammar, Speaking & Bisnis' },
-              { label: 'Simulasi Psikotes', desc: 'Numerik, Deret, Logika & Ketelitian' },
-              { label: 'Mentoring & Tugas', desc: 'Tanya Jawab, Sesi Live & Rubrik' },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-lg p-3.5 space-y-1"
-              >
-                <p className="text-sm font-bold text-[#18181B] dark:text-white">{item.label}</p>
-                <p className="text-xs text-[#71717A] dark:text-slate-400">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CatalogHeroBento
+        userName={user?.full_name}
+        isLoggedIn={Boolean(user)}
+        earnedToday={earnedToday}
+        xpTarget={xpTarget}
+        totalCourses={courses.length}
+        isLoading={isLoading}
+        primaryCourseSlug={structuredCourse?.slug}
+        onOpenTarget={handleOpenTarget}
+      />
 
       <CatalogPersonalizationSection
         courses={courses}
@@ -476,8 +437,25 @@ export function CatalogPage() {
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="h-64 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl animate-pulse"
-                  />
+                    className="h-64 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between overflow-hidden"
+                  >
+                    <div className="space-y-3 animate-pulse">
+                      <div className="flex items-center justify-between">
+                        <div className="h-5 w-24 rounded-full bg-slate-200 dark:bg-slate-800" />
+                        <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                      </div>
+                      <div className="h-5 w-4/5 rounded bg-slate-200 dark:bg-slate-800" />
+                      <div className="space-y-2 pt-1">
+                        <div className="h-3 w-full rounded bg-slate-100 dark:bg-slate-800/70" />
+                        <div className="h-3 w-5/6 rounded bg-slate-100 dark:bg-slate-800/70" />
+                        <div className="h-3 w-2/3 rounded bg-slate-100 dark:bg-slate-800/70" />
+                      </div>
+                    </div>
+                    <div className="pt-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between animate-pulse">
+                      <div className="h-3.5 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                      <div className="h-3.5 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : isError ? (
@@ -533,7 +511,7 @@ export function CatalogPage() {
                         key={course.id}
                         to={targetUrl}
                         onClick={(e) => handleOpenTarget(e, targetUrl)}
-                        className="group bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-[#0F766E]/60 dark:hover:border-teal-500/60 hover:shadow-sm transition-all"
+                        className="group bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:-translate-y-1 hover:border-[#0F766E]/60 dark:hover:border-teal-500/60 hover:shadow-md transition-all duration-200"
                       >
                         <div className="space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -627,10 +605,25 @@ export function CatalogPage() {
                                     {course.estimated_hours} Jam
                                   </span>
                                 </div>
-                                <span className="inline-flex items-center gap-1 font-semibold text-[#0F766E] dark:text-teal-400">
-                                  <BookOpen className="w-3.5 h-3.5" />
-                                  Buka
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setPreviewCourse({ course, targetUrl });
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:text-[#0F766E] dark:hover:text-teal-400 font-semibold transition-colors cursor-pointer"
+                                    title="Pratinjau silabus kursus"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    Silabus
+                                  </button>
+                                  <span className="inline-flex items-center gap-1 font-semibold text-[#0F766E] dark:text-teal-400">
+                                    <BookOpen className="w-3.5 h-3.5" />
+                                    Buka
+                                  </span>
+                                </div>
                               </>
                             )}
                           </div>
@@ -791,6 +784,13 @@ export function CatalogPage() {
           </div>
         </div>
       )}
+      {/* Syllabus Preview Slide-Over Drawer */}
+      <CourseSyllabusDrawer
+        course={previewCourse?.course ?? null}
+        targetUrl={previewCourse?.targetUrl ?? ''}
+        onClose={() => setPreviewCourse(null)}
+        onStartCourse={handleOpenTarget}
+      />
     </div>
   );
 }

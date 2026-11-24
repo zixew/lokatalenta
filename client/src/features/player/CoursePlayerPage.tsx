@@ -7,9 +7,12 @@ import {
   ClipboardCheck,
   Clock,
   Download,
+  Eye,
   FileText,
   Lock,
+  Maximize2,
   Megaphone,
+  Minimize2,
   PlayCircle,
   Trophy,
   Volume2,
@@ -20,6 +23,7 @@ import { lmsApi } from '../../shared/services/lmsApi';
 import type { Lesson } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
+import { MilestoneToast } from '../../shared/ui/MilestoneToast';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
 import { CourseOverviewGate } from './CourseOverviewGate';
@@ -41,6 +45,8 @@ export function CoursePlayerPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
+  const isMentorPreview =
+    user?.role === 'teacher' && searchParams.get('preview') === 'true';
 
   const { data: course, isLoading } = useQuery({
     queryKey: ['course', slug],
@@ -90,6 +96,13 @@ export function CoursePlayerPage() {
   const [flashcardMode, setFlashcardMode] = useState(false);
   const [writingMode, setWritingMode] = useState(false);
   const [speechMode, setSpeechMode] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [milestoneToast, setMilestoneToast] = useState<{
+    visible: boolean;
+    title: string;
+    subtitle?: string;
+    variant: 'lesson' | 'module';
+  }>({ visible: false, title: '', variant: 'lesson' });
 
   const speakLine = (text: string, lang: 'ja-JP' | 'en-US' | 'ko-KR', idx: number) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -121,6 +134,7 @@ export function CoursePlayerPage() {
   };
 
   const isLessonLocked = (lessonId: string) => {
+    if (isMentorPreview) return false;
     const idx = allLessons.findIndex((l) => l.id === lessonId);
     if (idx <= 0) return false;
     return !isLessonDone(allLessons[idx - 1]);
@@ -137,10 +151,10 @@ export function CoursePlayerPage() {
     allLessons[0];
 
   useEffect(() => {
-    if (user?.id && course?.id && activeLesson?.id) {
+    if (!isMentorPreview && user?.id && course?.id && activeLesson?.id) {
       saveLastOpenedLessonId(user.id, course.id, activeLesson.id);
     }
-  }, [user?.id, course?.id, activeLesson?.id]);
+  }, [isMentorPreview, user?.id, course?.id, activeLesson?.id]);
 
   const isEnrolled = course ? enrolledIds.includes(course.id) : false;
 
@@ -178,7 +192,7 @@ export function CoursePlayerPage() {
     );
   }
 
-  const canAccessCourse = isEnrolled;
+  const canAccessCourse = isEnrolled || isMentorPreview;
 
   if (!canAccessCourse) {
     return (
@@ -203,8 +217,36 @@ export function CoursePlayerPage() {
 
   const handleCompleteAndNext = async () => {
     if (!user || !activeLesson) return;
+    if (isMentorPreview) {
+      if (nextLesson) setActiveLessonId(nextLesson.id);
+      return;
+    }
     if (!completedIds.includes(activeLesson.id)) {
       await completeMutation.mutateAsync(activeLesson.id);
+      const mod = (course.modules ?? []).find((m) => m.id === activeLesson.module_id);
+      const nextCompletedSet = new Set([...completedIds, activeLesson.id]);
+      const isModuleNowDone = Boolean(
+        mod &&
+          mod.lessons.length > 0 &&
+          mod.lessons.every((l) =>
+            l.type === 'quiz' && l.quiz
+              ? attempts.some(
+                  (a) =>
+                    a.quiz_id === l.quiz!.id &&
+                    a.submitted_at !== null &&
+                    (a.score ?? 0) >= l.quiz!.passing_score
+                )
+              : nextCompletedSet.has(l.id)
+          )
+      );
+      setMilestoneToast({
+        visible: true,
+        variant: isModuleNowDone ? 'module' : 'lesson',
+        title: isModuleNowDone && mod ? mod.title : activeLesson.title,
+        subtitle: isModuleNowDone
+          ? 'Seluruh materi pada modul ini telah Anda selesaikan!'
+          : 'Progres belajar Anda telah tersimpan.',
+      });
     }
     if (nextLesson) setActiveLessonId(nextLesson.id);
   };
@@ -215,11 +257,11 @@ export function CoursePlayerPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <Link
-            to="/"
+            to={isMentorPreview ? '/teacher' : '/'}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-[#71717A] dark:text-slate-400 hover:text-[#18181B] dark:hover:text-white"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Kembali ke Katalog
+            {isMentorPreview ? 'Kembali ke Studio Mentor' : 'Kembali ke Katalog'}
           </Link>
           <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">{course.title}</h1>
           <p className="text-xs text-[#71717A] dark:text-slate-400">
@@ -229,7 +271,20 @@ export function CoursePlayerPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {user && (
+          <Button
+            type="button"
+            size="sm"
+            variant={isFocusMode ? 'primary' : 'secondary'}
+            onClick={() => setIsFocusMode((prev) => !prev)}
+          >
+            {isFocusMode ? (
+              <Minimize2 className="w-3.5 h-3.5" />
+            ) : (
+              <Maximize2 className="w-3.5 h-3.5" />
+            )}
+            {isFocusMode ? 'Keluar Mode Fokus' : 'Mode Fokus'}
+          </Button>
+          {user && !isFocusMode && (
             <Button
               type="button"
               size="sm"
@@ -249,7 +304,7 @@ export function CoursePlayerPage() {
               Unduh Catatan (.md)
             </Button>
           )}
-          {!isEnrolled && user ? (
+          {!isMentorPreview && !isEnrolled && user ? (
             <Button
               size="lg"
               onClick={() => enrollMutation.mutate()}
@@ -257,7 +312,7 @@ export function CoursePlayerPage() {
             >
               {enrollMutation.isPending ? 'Memproses...' : 'Gabung Course'}
             </Button>
-          ) : user && allLessons.length > 0 && completedCount === allLessons.length ? (
+          ) : !isMentorPreview && user && allLessons.length > 0 && completedCount === allLessons.length ? (
             <Link to={`/certificate/${course.id}`}>
               <Button size="lg">
                 <Award className="w-4 h-4" />
@@ -268,8 +323,30 @@ export function CoursePlayerPage() {
         </div>
       </div>
 
+      {/* Mentor Preview Banner */}
+      {isMentorPreview && (
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Eye className="w-4 h-4 text-amber-700 dark:text-amber-300 shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
+                Mode Pratinjau Mentor (Read-Only)
+              </p>
+              <p className="text-xs text-amber-800 dark:text-amber-300">
+                Anda sedang meninjau materi sebagai pengajar. Perubahan progres, kuis, dan XP dinonaktifkan.
+              </p>
+            </div>
+          </div>
+          <Link to="/teacher">
+            <Button variant="secondary" size="sm">
+              Kembali ke Studio
+            </Button>
+          </Link>
+        </div>
+      )}
+
       {/* Course Announcements Banner */}
-      {announcements.length > 0 && (
+      {!isFocusMode && announcements.length > 0 && (
         <div className="p-4 rounded-2xl bg-teal-50/70 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 space-y-1.5">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-bold text-[#0F766E] dark:text-teal-300 inline-flex items-center gap-1.5">
@@ -289,7 +366,11 @@ export function CoursePlayerPage() {
       {/* 2-Column Learning Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Main Content Area */}
-        <div className="lg:col-span-8 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+        <div
+          className={`${
+            isFocusMode ? 'lg:col-span-12 max-w-4xl mx-auto w-full' : 'lg:col-span-8'
+          } bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6`}
+        >
           {!activeLesson ? (
             <p className="text-sm text-[#71717A] dark:text-slate-400">Belum ada materi di kursus ini.</p>
           ) : activeLesson.type === 'quiz' && activeLesson.quiz ? (
@@ -329,7 +410,12 @@ export function CoursePlayerPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
-                {!user ? (
+                {isMentorPreview ? (
+                  <Badge tone="amber" className="py-1.5 px-3 text-xs">
+                    <Eye className="w-3.5 h-3.5" />
+                    Mode Pratinjau Mentor: Pengerjaan kuis dinonaktifkan (Read-Only).
+                  </Badge>
+                ) : !user ? (
                   <Link to="/auth">
                     <Button size="lg">Masuk untuk Mulai Tes</Button>
                   </Link>
@@ -694,7 +780,7 @@ export function CoursePlayerPage() {
               <div className="pt-6 border-t border-[#E5E3DC] dark:border-slate-800 space-y-4">
                 <div className="flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
                   <span>Estimasi baca: {activeLesson.duration_minutes} menit</span>
-                  {!nextLesson && user && (
+                  {!nextLesson && user && !isMentorPreview && (
                     <Button
                       onClick={handleCompleteAndNext}
                       disabled={completeMutation.isPending}
@@ -740,7 +826,7 @@ export function CoursePlayerPage() {
                         >
                           <div className="min-w-0">
                             <span className="text-[11px] font-semibold uppercase tracking-wider text-teal-100 block truncate">
-                              {isLessonDone(activeLesson) ? 'Lanjut' : 'Selesai & Lanjut'} •{' '}
+                              {isMentorPreview || isLessonDone(activeLesson) ? 'Lanjut' : 'Selesai & Lanjut'} •{' '}
                               {findModuleTitle(nextLesson.module_id)}
                             </span>
                             <span className="text-sm font-bold truncate block">
@@ -757,7 +843,7 @@ export function CoursePlayerPage() {
             </div>
           )}
 
-          {activeLesson && (
+          {activeLesson && !isFocusMode && (
             <LessonExtrasPanel
               key={activeLesson.id}
               courseId={course.id}
@@ -770,6 +856,7 @@ export function CoursePlayerPage() {
         </div>
 
         {/* Right Sidebar: Syllabus & Progress */}
+        {!isFocusMode && (
         <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-5 lg:sticky lg:top-24">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
@@ -837,7 +924,16 @@ export function CoursePlayerPage() {
             ))}
           </div>
         </aside>
+        )}
       </div>
+
+      <MilestoneToast
+        visible={milestoneToast.visible}
+        title={milestoneToast.title}
+        subtitle={milestoneToast.subtitle}
+        variant={milestoneToast.variant}
+        onClose={() => setMilestoneToast((prev) => ({ ...prev, visible: false }))}
+      />
     </div>
   );
 }

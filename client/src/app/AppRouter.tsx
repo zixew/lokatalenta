@@ -31,6 +31,7 @@ const CatalogPage = lazy(() =>
 const KraepelinPage = lazy(() =>
   import('../features/kraepelin/KraepelinPage').then((m) => ({ default: m.KraepelinPage }))
 );
+const TypingTestPage = lazy(() => import('../features/typing/TypingTestPage'));
 const CoursePlayerPage = lazy(() =>
   import('../features/player/CoursePlayerPage').then((m) => ({
     default: m.CoursePlayerPage,
@@ -141,6 +142,14 @@ export function AppRouter() {
                     }
                   />
                   <Route
+                    path="/typing"
+                    element={
+                      <RedirectNonStudentHome>
+                        <TypingTestPage />
+                      </RedirectNonStudentHome>
+                    }
+                  />
+                  <Route
                     path="/tryout"
                     element={
                       <RedirectNonStudentHome>
@@ -170,7 +179,7 @@ export function AppRouter() {
                   <Route
                     path="/courses/:slug"
                     element={
-                      <RequireRole roles={['student']}>
+                      <RequireRole roles={['student', 'teacher']}>
                         <CoursePlayerPage />
                       </RequireRole>
                     }

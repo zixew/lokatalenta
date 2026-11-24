@@ -2,6 +2,7 @@ import {
   BookOpen,
   ChevronDown,
   GraduationCap,
+  Keyboard,
   ShieldCheck,
   Timer,
   Trophy,
@@ -74,6 +75,12 @@ function buildTopbarNavItems(
       to: '/kraepelin',
       label: 'Tes Kraepelin',
       icon: <Timer className="w-4 h-4 shrink-0" />,
+      priority: 'primary',
+    },
+    {
+      to: '/typing',
+      label: 'Tes Mengetik',
+      icon: <Keyboard className="w-4 h-4 shrink-0" />,
       priority: 'primary',
     },
     {

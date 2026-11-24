@@ -1,7 +1,14 @@
 # Final Product & Sprint Backlog (`BL-21` s.d. `BL-32`) — Minor ke Major (`v1.10.0` → `v2.0.0`)
 
-**Baseline Saat Ini:** `v1.9.1`  
+**Baseline Saat Ini:** `v2.1.2`  
 **Alur GitFlow Wajib:** `task/<bl-id>` → `feature/<sprint>` → **SIT** → `dev` (**UAT**) → `release/<versi>` (**Staging & Release Notes**) → `main` (**Production Deploy**) → sync `main` → `dev`
+
+### Aturan Agile SDLC Ceremonies Wajib (Setiap Awal & Akhir Sprint)
+Setiap memulai dan mengakhiri sprint, tim multi-agent (`product-owner`, `solution-architect`, `frontend-engineer`, `qa-devops`, serta `student-pov`, `teacher-pov`, `admin-pov`) **wajib** menjalankan seremoni Agile SDLC berikut:
+1. **Sprint Planning (Awal Sprint):** Penentuan prioritas bisnis, arsitektur DB/API & migrasi Supabase, desain komponen & budget bundle `< 250 kB`, serta test plan 3 POV.
+2. **Sprint Execution & SIT Gate:** Implementasi per `task/<bl-id>`, `oxlint`, `vitest`, `vite build`, dan SIT lintas 3 POV (`student`, `teacher`, `admin`).
+3. **Sprint Review & Release (Akhir Sprint):** Demo/verifikasi fitur live di Staging & Production (`main`), sinkronisasi 1:1 `QA_TEST_CASES.md` & `QA_TEST_CASES_LOKATALENTA.xlsx`.
+4. **Sprint Retrospective (Akhir Sprint):** Evaluasi hal yang berjalan baik (*Keep*), masalah/utang teknis (*Problem*), dan action item perbaikan untuk sprint berikutnya.
 
 ---
 
@@ -79,18 +86,23 @@
 
 ---
 
-### Sprint 12 — Diagnostic Study Plan, Bookmark Soal & Telemetry (`v2.2.0` • Minor)
+### Sprint 12 — Diagnostic Study Plan, Bookmark Soal, Telemetry, POV Polish & UI Revamp (`v2.2.0` • Minor)
 - **Branch Feature:** `feature/sprint12-diagnostic-bookmark-telemetry`
+- **Strategi Eksekusi (2 Batch Terukur):**
+  - **Batch 12A (Core Features & Observability):** `BL-36`, `BL-37`, `BL-38`, `BL-38B`
+  - **Batch 12B (Penguatan POV 3 Role & UI Revamp):** `BL-38C`, `BL-38D`, `BL-38E`, `BL-38F`, `BL-38G`
 
 | ID | Branch Task | User Story | Scope Implementasi | Test Case QA |
 | :--- | :--- | :--- | :--- | :--- |
 | **BL-36** | `task/bl-36-diagnostic-study-plan` | `US-36` | Generator rencana belajar adaptif otomatis dari skor subtest terlemah di `ProfilePage`. | `PRF-06` |
-| **BL-37** | `task/bl-37-question-bookmarks` | `US-37` | Tombol **Bookmark Soal Sulit** di `QuizResultPage` + tab **Soal Tersimpan** di `ProfilePage`. | `QUZ-09` |
+| **BL-37** | `task/bl-37-question-bookmarks` | `US-37` | Tombol **Bookmark Soal Sulit** di `QuizResultPage` + tab **Soal Tersimpan** di `ProfilePage`. | `QUZ-14` |
 | **BL-38** | `task/bl-38-admin-health-telemetry` | `US-38` | Telemetry collector & tab **Kesehatan Sistem** di `AdminPanelPage`. | `ADM-07` |
 | **BL-38B** | `task/bl-38b-typing-speed-accuracy` | `US-38B` | `typingEngine.ts` (kalkulator WPM, CPM, Akurasi %, Error Rate) + `TypingTestPage.tsx` (`/typing`) dengan highlight karakter real-time, pilihan durasi/teks, & riwayat hasil `typing_attempts`. | `TYP-01` |
 | **BL-38C** | `task/bl-38c-student-pov-xp-tryout` | `US-38C` | Pelacak XP Harian real-time (`earnedToday / xpTarget`), tautan aksi Radar 5D, Leaderboard per event Tryout, & search/sort forum Komunitas. | `CAT-08`, `TRY-03` |
 | **BL-38D** | `task/bl-38d-mentor-preview-cohort-mgmt` | `US-38D` | Mode Pratinjau Mentor (`/courses/:slug?preview=true`), manajemen anggota cohort (lihat/keluarkan/arsip), edit metadata kursus/modul, & Ringkasan Mengajar di `/profile`. | `TCH-09` |
 | **BL-38E** | `task/bl-38e-admin-moderation-cert-revoke` | `US-38E` | Modal Preview Kursus read-only di `/admin`, tab Moderasi Komunitas (`deleteCommunityPost`), metrik distribusi role/status, & tab Cabut (*Revoke*) Sertifikat dengan audit log. | `ADM-08` |
+| **BL-38F** | `task/bl-38f-ui-revamp-catalog-bento` | `US-38F` | Revamp UI Katalog & Beranda: Hero Bento Hub (ring XP + quick-launch), *hover elevation*, *quick preview syllabus drawer*, badge fitur, & *skeleton shimmer* loading. | `UIX-01` |
+| **BL-38G** | `task/bl-38g-ui-revamp-player-quiz-charts` | `US-38G` | Revamp UI Course Player & Asesmen: sidebar progress ring per modul, **Zen/Focus Mode**, animasi milestone toast lulus, serta *interactive hover tooltip* pada Kraepelin & Radar 5D. | `UIX-02` |
 
 ---
 
@@ -103,6 +115,7 @@
 | **BL-40** | `task/bl-40-short-answer-questions` | `US-40` | Dukungan tipe soal `short_answer` (isian singkat/rumus) + evaluator case-insensitive di `QuizRunnerPage` & `TeacherStudioPage`. | `TCH-08` |
 | **BL-40B** | `task/bl-40b-star-interview-cohort-item-analysis` | `US-40B` | Latihan Simulasi Interview metode STAR, penugasan/pengumuman bertarget `cohort_id`, drill-down rapor individual siswa, & Analitik Butir Soal (*Item Analysis*). | `CRS-11`, `TCH-10` |
 | **BL-40C** | `task/bl-40c-clone-supervision-broadcast` | `US-40C` | Duplikasi Kursus/Paket Soal di Mentor Studio, Supervisi Cohort lintas pengajar di `/admin`, & Pengumuman Global Platform (*System-Wide Banner*). | `TCH-11`, `ADM-09` |
+| **BL-40D** | `task/bl-40d-ui-revamp-studio-admin-interactive` | `US-40D` | Revamp UI `/teacher` & `/admin`: *drag-and-drop* modul/lesson, *live split preview* soal, *slide-over drawer* detail admin, grafik distribusi interaktif, & modal konfirmasi/toast modern. | `UIX-03` |
 | **BL-41** | `task/bl-41-stress-and-security-v2` | `US-41` | Suite stress test 5.000 operasi (Excel + SQL + Filter + Sanitasi XSS/CSV) sebelum masuk ke v3.0.0. | `PERF-02`, `SEC-02` |
 
 ---
