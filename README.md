@@ -82,6 +82,20 @@ Tampilan antarmuka **LokaTalenta** dirancang bersih, responsif, dan fokus pada k
 
 ---
 
+## 🧩 Ekosistem LokaTalenta
+
+Selain aplikasi inti **LMS Psikotes (`lms-psikotes`)**, alur kerja manajemen proyek, dokumentasi, telemetri, dan visualisasi 3D dikelola pada repositori terpisah berikut:
+
+| Repositori | Peran dalam Ekosistem | Path Lokal | GitHub |
+| :--- | :--- | :--- | :--- |
+| **LokaTalenta 3D Office** | Visualisasi gedung kantor 3D multi-lantai & telemetri agen live | `../lokatalenta-office-3d` | [`zixew/lokatalenta-office-3d`](https://github.com/zixew/lokatalenta-office-3d) |
+| **LokaTalenta Event Gateway** | Gateway event real-time (WebSocket, SSE, GitHub Webhooks) | `../lokatalenta-event-gateway` | [`zixew/lokatalenta-event-gateway`](https://github.com/zixew/lokatalenta-event-gateway) |
+| **LokaTalenta Docs** | Pusat dokumentasi arsitektur, kontrak API & rubrik lintas divisi | `../lokatalenta-docs` | [`zixew/lokatalenta-docs`](https://github.com/zixew/lokatalenta-docs) |
+| **LokaTalenta Sprint Planner** | Perencanaan sprint, kapasitas 6 divisi / 24 agen & burndown | `../lokatalenta-sprint-planner` | [`zixew/lokatalenta-sprint-planner`](https://github.com/zixew/lokatalenta-sprint-planner) |
+| **LokaTalenta Backlog** | Pengelolaan Epic/Story/Task, grooming & ekspor CSV aman | `../lokatalenta-backlog` | [`zixew/lokatalenta-backlog`](https://github.com/zixew/lokatalenta-backlog) |
+
+---
+
 <p align="center">
   <strong>LokaTalenta</strong> — <em>Siapkan Langkah Terbaik Menuju Karier Impianmu.</em>
 </p>

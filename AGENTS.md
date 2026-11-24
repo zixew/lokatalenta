@@ -114,7 +114,7 @@ flowchart LR
 
 Setiap agen telah dibekali dengan **keahlian komprehensif** (*core competencies, stack & tooling mastery, metodologi arsitektural, dan sertifikasi*) yang terdokumentasi lengkap pada:
 * 📄 **[Matriks Keahlian Komprehensif 24 Agen](file:///Users/a2299/Documents/Projects/lms-psikotes/docs/AGENT_SKILLS_MATRIX.md)**
-* 🏢 **Tab "🎯 Keahlian & Stack" di Kantor AI 3D**: `docs/kantor_ai_3d.html` (interaktif per agen).
+* 🏢 **Kantor AI 3D & Tab "🎯 Keahlian & Stack"**: Dipindahkan ke repositori khusus [`lokatalenta-office-3d`](https://github.com/zixew/lokatalenta-office-3d) (lokal: `../lokatalenta-office-3d`; stub pointer: `docs/kantor_ai_3d.html`).
 * 🛠️ **Project Customization Skills** di `.agents/skills/`:
   1. `team-leader-governance`: Alur approval & gatekeeping rilis oleh Team Leader Rizco Renova.
   2. `clean-architecture-review`: Standar code review arsitektur oleh Principal FE Hendrawan & Principal BE Danu.
@@ -123,9 +123,42 @@ Setiap agen telah dibekali dengan **keahlian komprehensif** (*core competencies,
   5. `pwa-ios-standalone`: Implementasi PWA iOS Safe Area & A2HS oleh Farel Faza.
   6. `ats-recruiter-flow`: Alur ATS Kanban & psikogram komparatif oleh Maya Safitri.
 
+### Ekosistem Repositori Terpisah (LokaTalenta Multi-Repo)
+
+| Repositori | Fungsi Utama | Path Lokal | GitHub | Port Default |
+| :--- | :--- | :--- | :--- | :--- |
+| **`lokatalenta-office-3d`** | Kantor AI 3D multi-lantai (Three.js, multi-POV, telemetri live) | `../lokatalenta-office-3d` | `https://github.com/zixew/lokatalenta-office-3d` | `4105` |
+| **`lokatalenta-event-gateway`** | Event Gateway real-time (WS, SSE, GitHub HMAC webhook, SQLite) | `../lokatalenta-event-gateway` | `https://github.com/zixew/lokatalenta-event-gateway` | `4101` |
+| **`lokatalenta-docs`** | Portal Dokumentasi Arsitektur, ADR, Kontrak & Rubrik | `../lokatalenta-docs` | `https://github.com/zixew/lokatalenta-docs` | `4104` / `4114` |
+| **`lokatalenta-sprint-planner`** | Aplikasi Sprint Planning, Kapasitas 24 Agen & Ceremony | `../lokatalenta-sprint-planner` | `https://github.com/zixew/lokatalenta-sprint-planner` | `4103` / `4113` |
+| **`lokatalenta-backlog`** | Manajemen Backlog, Grooming & Acceptance Criteria | `../lokatalenta-backlog` | `https://github.com/zixew/lokatalenta-backlog` | `4102` / `4112` |
+
 ---
 
-## 7. Gerbang Kualitas (*Quality Gates*) Wajib Sebelum Rilis
+## 7. ATURAN WAJIB: Otomatisasi Swarm Multi-Agent Saat Memulai Pekerjaan
+
+> [!CRITICAL]
+> **MANDATORY AUTO-SWARM RULE:**  
+> Setiap kali menerima tugas, instruksi, atau memulai suatu pekerjaan teknis maupun fungsional, agent **DILARANG KERAS** mengeksekusi seluruh siklus pekerjaan seorang diri secara tertutup.  
+> Agent **WAJIB secara otomatis membentuk dan mengerahkan Swarm Multi-Agent** yang terdiri dari peran-peran yang dibutuhkan dan tersedia di dalam 24 profil spesialis Kantor LokaTalenta:
+>
+> 1. **Pekerjaan Frontend / UI / Fitur Visual:**
+>    - Pelaksana: **Farel Faza Nugraha** (Lead FE) & **Nadia Maharani** (Lead UI/UX Designer).
+>    - Gatekeeper Wajib: **Hendrawan Wicaksono** (Principal FE — Clean Arch, anti-direct-DB, Anti-AI-Slop token, & bundle < 250 kB).
+> 2. **Pekerjaan Backend / Database / API:**
+>    - Pelaksana: **Bagas Bimo Prasetyo** (Backend Engineer) & **Ir. Arkananta Dewantara** (Chief Architect).
+>    - Gatekeeper Wajib: **Dr. Ir. Danu Bratawidjaja** (Principal BE — Hexagonal Architecture, DDL Idempotency, latency < 20ms) & **Rendra Dananjaya** (Security/RLS Audit).
+> 3. **Pekerjaan Quality Assurance & Regresi:**
+>    - Otomasi & Stress Test: **Qaisar Al-Ghaffar** (Automation Lead) & **Pandu Respati** (Performance QA).
+>    - Sinkronisasi Matriks: **Raditya Rama Kusuma** (112 QA Cases Master) & **Qonita Anindya** (Manual QA).
+> 4. **Pekerjaan Release & Deploy:**
+>    - Gatekeeper Akhir: **Rizco Renova** (Team Leader Approval Gate) sebelum diserahkan ke **Damar Deva Gunawan** (DevOps Deploy).
+>
+> **Aturan Detail**: Tersedia pada rule file khusus [`.agents/rules/auto-swarm-orchestration.md`](file:///Users/a2299/Documents/Projects/lms-psikotes/.agents/rules/auto-swarm-orchestration.md).
+
+---
+
+## 8. Gerbang Kualitas (*Quality Gates*) Wajib Sebelum Rilis
 
 1. **Linter & Code Quality:**
    - `npm run lint` (`oxlint`) wajib **0 errors, 0 warnings** di seluruh file.
@@ -140,3 +173,14 @@ Setiap agen telah dibekali dengan **keahlian komprehensif** (*core competencies,
 6. **Anti-AI-Slop Visual System:**
    - Menghindari gradien ungu/neon mengapung generik dan bayangan berlebihan.
    - Mengutamakan tipografi tajam editorial, batas 1px berkontras tinggi (`border-zinc-200/800`), dan tata letak kartu berdensitas informasi tinggi berstandar enterprise.
+
+---
+
+## 9. SOP Absolut Development, Divisi & Kebijakan Commit Rebase/Squash
+
+1. **Aturan 1 Fitur = 1 General Commit (Wajib Rebase/Squash):**
+   - Setiap kali menyelesaikan suatu fitur, *epic*, atau perbaikan, seluruh *child commit* dari sub-task (`fix(...)`, `style(...)`, `chore(...)`, `wip`, atau penyesuaian CI/Vercel) **WAJIB** di-*rebase/squash* menjadi **1 (satu) general commit** yang merangkum nama fitur utamanya sebelum di-*push* ke `dev` maupun `main`.
+   - Tujuannya adalah menjaga riwayat `git log` di seluruh repositori ekosistem LokaTalenta tetap ringkas, bersih, dan bebas dari tumpukan commit kecil.
+2. **Kepatuhan Absolut Antar-Divisi:**
+   - Setiap divisi wajib mematuhi *Quality Gates* pada Bagian 8, protokol *Auto-Swarm* pada Bagian 7, serta SOP rinci di [`.agents/rules/git-commit-squash-sop.md`](file:///Users/a2299/Documents/Projects/lms-psikotes/.agents/rules/git-commit-squash-sop.md).
+

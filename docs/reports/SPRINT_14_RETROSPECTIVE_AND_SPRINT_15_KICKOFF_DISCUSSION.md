@@ -77,7 +77,7 @@ Empat inisiatif backlog utama (*Major Deliverables*) telah terkirim secara fungs
 4. **BL-45: Anti-AI-Slop Visual System & High-Craft UI Revamp:**
    - Pembersihan menyeluruh elemen visual generik (menghilangkan gradien neon mengambang, efek blur pastel yang membebani GPU, dan kartu membulat tanpa hierarki).
    - Pengadopsian standar visual enterprise berkepadatan informasi tinggi: batas kontras 1px (`border-zinc-200 dark:border-zinc-800`), tipografi editorial tajam, transisi micro-interaction berlatensi rendah (< 150ms).
-   - Penciptaan kanvas representasi grafis *Virtual AI Office* 3D interaktif berbasis Three.js/WebGL (`docs/kantor_ai_3d.html`) yang memetakan seluruh peran dan telemetri sistem secara prosedural.
+   - Penciptaan kanvas representasi grafis *Virtual AI Office* 3D interaktif berbasis Three.js/WebGL (awalnya `docs/kantor_ai_3d.html`, kini diekstrak ke [`lokatalenta-office-3d`](https://github.com/zixew/lokatalenta-office-3d) / `../lokatalenta-office-3d`) yang memetakan seluruh peran dan telemetri sistem secara prosedural.
 
 ---
 
