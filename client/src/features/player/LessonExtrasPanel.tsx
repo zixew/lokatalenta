@@ -4,7 +4,6 @@ import {
   ClipboardList,
   MessageCircle,
   MessageSquare,
-  NotebookPen,
   Reply,
   Send,
   Star,
@@ -20,7 +19,7 @@ import { AssignmentPanel } from './AssignmentPanel';
 import { MentorChatPanel } from './MentorChatPanel';
 import { MentoringSessionsPanel } from './MentoringSessionsPanel';
 
-type ExtraTab = 'qa' | 'mentor_chat' | 'live_sessions' | 'notes' | 'assignments' | 'reviews';
+type ExtraTab = 'qa' | 'mentor_chat' | 'live_sessions' | 'assignments' | 'reviews';
 
 export function LessonExtrasPanel({
   courseId,
@@ -44,10 +43,6 @@ export function LessonExtrasPanel({
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  // Personal notes state (per-lesson draft overrides fetchedNote without useEffect)
-  const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
-  const [noteSaved, setNoteSaved] = useState(false);
-
   // Course review state
   const [rating, setRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
@@ -58,14 +53,6 @@ export function LessonExtrasPanel({
     queryFn: () => lmsApi.listLessonComments(lessonId),
     enabled: Boolean(lessonId),
   });
-
-  const { data: fetchedNote = '' } = useQuery({
-    queryKey: ['lesson-note', user?.id, lessonId],
-    queryFn: () => (user ? lmsApi.getLessonNote(user.id, lessonId) : Promise.resolve('')),
-    enabled: Boolean(user && lessonId),
-  });
-
-  const noteText = draftNotes[lessonId] ?? fetchedNote;
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['course-reviews', courseId],
@@ -105,15 +92,6 @@ export function LessonExtrasPanel({
     },
   });
 
-  const saveNoteMut = useMutation({
-    mutationFn: () => lmsApi.saveLessonNote(user!.id, lessonId, noteText),
-    onSuccess: () => {
-      setNoteSaved(true);
-      queryClient.invalidateQueries({ queryKey: ['lesson-note', user?.id, lessonId] });
-      setTimeout(() => setNoteSaved(false), 2500);
-    },
-  });
-
   const submitReviewMut = useMutation({
     mutationFn: () =>
       lmsApi.submitCourseReview({
@@ -147,19 +125,6 @@ export function LessonExtrasPanel({
         >
           <MessageSquare className="w-3.5 h-3.5" />
           Tanya Jawab ({comments.length})
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setTab('notes')}
-          className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
-            tab === 'notes'
-              ? 'bg-[#0F766E] text-white'
-              : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
-          }`}
-        >
-          <NotebookPen className="w-3.5 h-3.5" />
-          Catatan Pribadi
         </button>
 
         <button
@@ -385,36 +350,6 @@ export function LessonExtrasPanel({
                 })}
             </div>
           )}
-        </div>
-      )}
-
-      {/* TAB 2: PERSONAL NOTES */}
-      {tab === 'notes' && (
-        <div className="space-y-3">
-          <p className="text-xs text-[#71717A] dark:text-slate-400">
-            Catatan ini bersifat pribadi dan hanya dapat dilihat oleh akun Anda.
-          </p>
-          <textarea
-            rows={5}
-            value={noteText}
-            onChange={(e) =>
-              setDraftNotes((prev) => ({ ...prev, [lessonId]: e.target.value }))
-            }
-            placeholder="Catat kosakata baru, rumus penting, atau ringkasan materi di sini..."
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DC] dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-          />
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              {noteSaved ? 'Catatan berhasil disimpan.' : ''}
-            </span>
-            <Button
-              size="sm"
-              onClick={() => saveNoteMut.mutate()}
-              disabled={saveNoteMut.isPending}
-            >
-              {saveNoteMut.isPending ? 'Menyimpan...' : 'Simpan Catatan'}
-            </Button>
-          </div>
         </div>
       )}
 

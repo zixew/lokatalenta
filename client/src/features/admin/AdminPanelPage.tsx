@@ -170,7 +170,7 @@ export function AdminPanelPage() {
       {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-teal-50 text-[#0F766E] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-950/50 text-[#0F766E] dark:text-teal-400 flex items-center justify-center">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -182,7 +182,7 @@ export function AdminPanelPage() {
         </div>
 
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 text-[#059669] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-[#059669] dark:text-emerald-400 flex items-center justify-center">
             <BookOpen className="w-5 h-5" />
           </div>
           <div>
@@ -194,7 +194,7 @@ export function AdminPanelPage() {
         </div>
 
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-amber-50 text-[#D97706] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-[#D97706] dark:text-amber-400 flex items-center justify-center">
             <Shield className="w-5 h-5" />
           </div>
           <div>
@@ -256,7 +256,10 @@ export function AdminPanelPage() {
                 <input
                   type="text"
                   value={userSearch}
-                  onChange={(e) => setUserSearch(e.target.value)}
+                  onChange={(e) => {
+                    setUserSearch(e.target.value);
+                    setUserPage(1);
+                  }}
                   placeholder="Cari nama atau email pengguna..."
                   className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
@@ -267,7 +270,10 @@ export function AdminPanelPage() {
                   <button
                     key={r}
                     type="button"
-                    onClick={() => setRoleFilter(r)}
+                    onClick={() => {
+                      setRoleFilter(r);
+                      setUserPage(1);
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                       roleFilter === r
                         ? 'bg-[#0F766E] text-white'
@@ -287,7 +293,10 @@ export function AdminPanelPage() {
                   <button
                     key={st}
                     type="button"
-                    onClick={() => setStatusFilter(st)}
+                    onClick={() => {
+                      setStatusFilter(st);
+                      setUserPage(1);
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                       statusFilter === st
                         ? 'bg-[#18181B] dark:bg-white text-white dark:text-[#18181B]'
@@ -315,7 +324,73 @@ export function AdminPanelPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Stacked Cards (390px) */}
+          <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
+            {pagedProfiles.length === 0 ? (
+              <div className="px-4 py-8 text-center text-xs text-[#71717A]">
+                Tidak ada pengguna yang sesuai dengan filter.
+              </div>
+            ) : (
+              pagedProfiles.map((p) => {
+                const isSelf = p.id === currentUser?.id;
+                return (
+                  <div key={p.id} className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-[#18181B] dark:text-white truncate">
+                          {p.full_name}
+                        </p>
+                        <p className="text-xs text-[#71717A] dark:text-slate-400 truncate">
+                          {p.email}
+                        </p>
+                      </div>
+                      <Badge
+                        tone={
+                          p.role === 'admin' ? 'amber' : p.role === 'teacher' ? 'blue' : 'emerald'
+                        }
+                      >
+                        {p.role === 'student' ? 'Pelajar' : p.role === 'teacher' ? 'Pengajar' : 'Admin'}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {(['student', 'teacher', 'admin'] as UserRole[]).map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          disabled={updateRoleMut.isPending || isSelf}
+                          onClick={() => updateRoleMut.mutate({ userId: p.id, role })}
+                          className={`py-1.5 rounded-md text-xs font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                            p.role === role
+                              ? 'bg-[#0F766E] text-white'
+                              : 'border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                          }`}
+                        >
+                          {role === 'student' ? 'Pelajar' : role === 'teacher' ? 'Pengajar' : 'Admin'}
+                        </button>
+                      ))}
+                    </div>
+                    <Button
+                      variant={p.is_active === false ? 'primary' : 'danger'}
+                      size="sm"
+                      className="w-full"
+                      disabled={toggleActiveMut.isPending || isSelf}
+                      onClick={() =>
+                        toggleActiveMut.mutate({ userId: p.id, isActive: p.is_active === false })
+                      }
+                    >
+                      {isSelf
+                        ? 'Akun Aktif (Anda)'
+                        : p.is_active === false
+                          ? 'Aktifkan Akun'
+                          : 'Nonaktifkan'}
+                    </Button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
                 <tr>
@@ -514,7 +589,45 @@ export function AdminPanelPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Stacked Cards (390px) — Courses */}
+          <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
+            {pagedCourses.length === 0 ? (
+              <div className="px-4 py-8 text-center text-xs text-[#71717A]">
+                Tidak ada kursus yang sesuai dengan filter.
+              </div>
+            ) : (
+              pagedCourses.map((c) => (
+                <div key={c.id} className="p-4 space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-[#18181B] dark:text-white line-clamp-2">
+                        {c.title}
+                      </p>
+                      <p className="text-xs text-[#71717A] dark:text-slate-400">
+                        {c.category} • Pengajar: {c.teacher_name ?? 'Pengajar'}
+                      </p>
+                    </div>
+                    <Badge tone={c.is_published ? 'emerald' : 'amber'}>
+                      {c.is_published ? 'Terbit' : 'Draft'}
+                    </Badge>
+                  </div>
+                  <Button
+                    variant={c.is_published ? 'secondary' : 'primary'}
+                    size="sm"
+                    className="w-full"
+                    disabled={togglePublishMut.isPending}
+                    onClick={() =>
+                      togglePublishMut.mutate({ courseId: c.id, isPublished: !c.is_published })
+                    }
+                  >
+                    {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
                 <tr>
