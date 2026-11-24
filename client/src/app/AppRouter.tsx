@@ -49,6 +49,11 @@ const QuizRunnerPage = lazy(() =>
     default: m.QuizRunnerPage,
   }))
 );
+const TalentPassportPage = lazy(() =>
+  import('../features/talent/TalentPassportPage').then((m) => ({
+    default: m.TalentPassportPage,
+  }))
+);
 const TeacherStudioPage = lazy(() =>
   import('../features/teacher/TeacherStudioPage').then((m) => ({
     default: m.TeacherStudioPage,
@@ -150,6 +155,7 @@ export function AppRouter() {
                   />
                   <Route path="/verify" element={<VerifyCertificatePage />} />
                   <Route path="/verify/:certCode" element={<VerifyCertificatePage />} />
+                  <Route path="/talent/:userId" element={<TalentPassportPage />} />
                   <Route
                     path="/courses/:slug"
                     element={
