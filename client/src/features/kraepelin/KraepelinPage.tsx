@@ -70,6 +70,7 @@ export function KraepelinPage() {
   const [pairIdx, setPairIdx] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(preset.secondsPerCol);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [activeColIndex, setActiveColIndex] = useState<number | null>(null);
 
   const startSimulation = useCallback(() => {
     const freshCols = generateKraepelinColumns(preset.columns, preset.rows);
@@ -394,12 +395,148 @@ export function KraepelinPage() {
 
             {/* Per-Column Speed & Accuracy Curve */}
             <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 space-y-4">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-[#0F766E]" />
-                <h2 className="text-sm font-bold text-[#18181B] dark:text-white">
-                  Kurva Kecepatan &amp; Ketelitian per Kolom
-                </h2>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-[#0F766E]" />
+                  <h2 className="text-sm font-bold text-[#18181B] dark:text-white">
+                    Kurva Kecepatan &amp; Ketelitian per Kolom
+                  </h2>
+                </div>
+                {(() => {
+                  const activeStat = evaluation.columnStats.find(
+                    (s) => s.columnIndex === activeColIndex
+                  );
+                  if (!activeStat) {
+                    return (
+                      <span className="text-[11px] text-[#71717A] dark:text-slate-400">
+                        Arahkan atau klik batang grafik untuk detail kolom
+                      </span>
+                    );
+                  }
+                  return (
+                    <span className="text-xs font-mono-tabular font-semibold px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/50 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+                      Kolom {activeStat.columnIndex + 1}: {activeStat.correct}/{activeStat.attempted} benar • Akurasi {activeStat.accuracyPct}%
+                    </span>
+                  );
+                })()}
               </div>
+
+              {/* Pure-SVG Interactive Column Chart */}
+              {evaluation.columnStats.length > 0 && (() => {
+                const cols = evaluation.columnStats;
+                const chartW = 560;
+                const chartH = 160;
+                const padX = 24;
+                const baseY = 128;
+                const maxBarH = 92;
+                const slotW = (chartW - padX * 2) / cols.length;
+                const barW = Math.min(30, Math.max(12, slotW * 0.62));
+                const activeStat = cols.find((s) => s.columnIndex === activeColIndex) ?? null;
+
+                return (
+                  <div className="rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900/70 p-3">
+                    <svg
+                      viewBox={`0 0 ${chartW} ${chartH}`}
+                      className="w-full h-40 select-none"
+                      role="img"
+                      aria-label="Grafik Ketahanan dan Kecepatan per Kolom Kraepelin"
+                    >
+                      <line
+                        x1={padX}
+                        y1={baseY}
+                        x2={chartW - padX}
+                        y2={baseY}
+                        stroke="currentColor"
+                        className="text-slate-300 dark:text-slate-700"
+                        strokeWidth={1}
+                      />
+                      {cols.map((stat, i) => {
+                        const xCenter = padX + i * slotW + slotW / 2;
+                        const barH = Math.max(
+                          6,
+                          Math.round((stat.attempted / maxAttemptedInAnyCol) * maxBarH)
+                        );
+                        const y = baseY - barH;
+                        const isSelected = activeColIndex === stat.columnIndex;
+                        const fill =
+                          stat.accuracyPct >= 80
+                            ? '#059669'
+                            : stat.accuracyPct >= 50
+                              ? '#0F766E'
+                              : '#D97706';
+
+                        return (
+                          <g
+                            key={stat.columnIndex}
+                            className="cursor-pointer"
+                            onMouseEnter={() => setActiveColIndex(stat.columnIndex)}
+                            onClick={() =>
+                              setActiveColIndex((prev) =>
+                                prev === stat.columnIndex ? null : stat.columnIndex
+                              )
+                            }
+                          >
+                            <rect
+                              x={xCenter - slotW / 2}
+                              y={12}
+                              width={slotW}
+                              height={baseY - 12}
+                              fill="transparent"
+                            />
+                            <rect
+                              x={xCenter - barW / 2}
+                              y={y}
+                              width={barW}
+                              height={barH}
+                              rx={4}
+                              fill={fill}
+                              opacity={activeColIndex === null || isSelected ? 1 : 0.45}
+                              stroke={isSelected ? '#18181B' : 'none'}
+                              strokeWidth={isSelected ? 1.5 : 0}
+                            />
+                            <text
+                              x={xCenter}
+                              y={baseY + 15}
+                              textAnchor="middle"
+                              className="fill-[#71717A] dark:fill-slate-400 text-[10px] font-mono-tabular"
+                            >
+                              K{stat.columnIndex + 1}
+                            </text>
+                          </g>
+                        );
+                      })}
+                      {activeStat && (() => {
+                        const i = cols.findIndex((s) => s.columnIndex === activeStat.columnIndex);
+                        const xCenter = padX + i * slotW + slotW / 2;
+                        const boxW = 134;
+                        const boxX = Math.max(6, Math.min(chartW - boxW - 6, xCenter - boxW / 2));
+                        return (
+                          <g pointerEvents="none">
+                            <rect
+                              x={boxX}
+                              y={4}
+                              width={boxW}
+                              height={22}
+                              rx={6}
+                              fill="#18181B"
+                              opacity={0.92}
+                            />
+                            <text
+                              x={boxX + boxW / 2}
+                              y={18}
+                              textAnchor="middle"
+                              fill="#FFFFFF"
+                              className="text-[10px] font-mono-tabular font-semibold"
+                            >
+                              K{activeStat.columnIndex + 1}: {activeStat.correct}/{activeStat.attempted} ({activeStat.accuracyPct}%)
+                            </text>
+                          </g>
+                        );
+                      })()}
+                    </svg>
+                  </div>
+                );
+              })()}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 {evaluation.columnStats.map((stat) => {

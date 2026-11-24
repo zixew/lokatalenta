@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Calendar, CheckCircle2, Clock, Play, Trophy, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 import { lmsApi } from '../../shared/services/lmsApi';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
@@ -22,6 +23,7 @@ export function TryoutPage() {
   const [nowMs] = useState(() => Date.now());
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const events = useMemo(() => buildScheduledTryoutEvents(nowMs), [nowMs]);
+  const [selectedLeaderboardEventId, setSelectedLeaderboardEventId] = useState<string>('GLOBAL');
   const [registeredIds, setRegisteredIds] = useState<string[]>(() =>
     getRegisteredTryoutIds(userKey)
   );
@@ -40,9 +42,33 @@ export function TryoutPage() {
     queryFn: () => lmsApi.listPublishedCourses(),
   });
 
-  const { data: leaderboard = [] } = useQuery({
-    queryKey: ['public-leaderboard'],
-    queryFn: async () => (await lmsApi.listLeaderboard()).slice(0, 10),
+  const { data: leaderboard = [], isLoading: isLeaderboardLoading } = useQuery({
+    queryKey: ['public-leaderboard', selectedLeaderboardEventId],
+    queryFn: async () => {
+      if (selectedLeaderboardEventId === 'GLOBAL') {
+        const rows = await lmsApi.listLeaderboard();
+        return rows.slice(0, 10).map((r) => ({
+          user_id: r.user_id,
+          full_name: r.full_name,
+          metricValue: `${r.xp} XP`,
+        }));
+      }
+
+      if (isSupabaseConfigured && supabase) {
+        const { data, error } = await supabase.rpc('get_tryout_event_leaderboard', {
+          p_event_id: selectedLeaderboardEventId,
+        });
+        if (!error && Array.isArray(data)) {
+          return data.slice(0, 10).map((row: { user_id: string; full_name: string; best_score: number }) => ({
+            user_id: row.user_id,
+            full_name: row.full_name,
+            metricValue: `${Number(row.best_score ?? 0)} Skor`,
+          }));
+        }
+      }
+
+      return [];
+    },
   });
 
   const categories = useMemo(
@@ -237,9 +263,43 @@ export function TryoutPage() {
             </h2>
             <Badge tone="amber">Top 10</Badge>
           </div>
-          {leaderboard.length === 0 ? (
+
+          <div className="space-y-1.5">
+            <label
+              htmlFor="tryout-leaderboard-event-select"
+              className="block text-[11px] font-semibold uppercase tracking-wider text-[#71717A] dark:text-slate-400"
+            >
+              Pilih Papan Skor Event
+            </label>
+            <select
+              id="tryout-leaderboard-event-select"
+              value={selectedLeaderboardEventId}
+              onChange={(e) => setSelectedLeaderboardEventId(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg text-xs font-medium bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            >
+              <option value="GLOBAL">Global XP (Semua Aktivitas)</option>
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {isLeaderboardLoading ? (
+            <div className="space-y-2.5 animate-pulse">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-11 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800"
+                />
+              ))}
+            </div>
+          ) : leaderboard.length === 0 ? (
             <p className="text-xs text-[#71717A] dark:text-slate-400">
-              Belum ada skor peserta yang tercatat.
+              {selectedLeaderboardEventId === 'GLOBAL'
+                ? 'Belum ada skor peserta yang tercatat.'
+                : 'Belum ada skor peserta yang tercatat untuk event ini.'}
             </p>
           ) : (
             <div className="space-y-2.5">
@@ -257,7 +317,7 @@ export function TryoutPage() {
                     </span>
                   </div>
                   <span className="font-mono-tabular font-bold text-[#0F766E] dark:text-teal-400 shrink-0">
-                    {entry.xp} XP
+                    {entry.metricValue}
                   </span>
                 </div>
               ))}

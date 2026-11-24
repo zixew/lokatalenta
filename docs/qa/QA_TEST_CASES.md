@@ -1,8 +1,8 @@
-# Dokumen QA Test Cases — LokaTalenta (`v2.2.0-dev`)
+# Dokumen QA Test Cases — LokaTalenta (`v2.2.0`)
 
 > [!NOTE]
 > Sumber utama matriks QA tersedia dalam format Excel terstruktur: [QA_TEST_CASES_LOKATALENTA.xlsx](file:///Users/a2299/Documents/Projects/lms-psikotes/docs/qa/QA_TEST_CASES_LOKATALENTA.xlsx).
-> Total skenario terverifikasi: **91** (0 duplikasi ID).
+> Total skenario terverifikasi: **97** (0 duplikasi ID).
 
 | ID | Role | Modul | Tipe Flow | Judul Skenario | Prasyarat | Langkah Uji | Ekspektasi Hasil | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -97,3 +97,9 @@
 | QUZ-14 | Student | Quiz & Bookmark | Happy Flow | Bookmark Soal Sulit & Soal Tersimpan (BL-37) | Selesaikan kuis di `QuizResultPage` lalu buka `/profile` | Klik `Simpan ke Bookmark Soal Sulit`, cek `Soal Tersimpan` di `/profile`, lalu hapus bookmark | Bookmark tersimpan dan terhapus bersih tanpa error | **PASS** |
 | ADM-07 | Admin | Kesehatan Sistem | Happy Flow | Telemetry & Kesehatan Sistem Admin (BL-38) | Login sebagai Admin di `/admin` | Buka tab `Kesehatan Sistem` | Versi aktif, mode, status PWA/SW, latensi DB, & log error client tampil | **PASS** |
 | TYP-01 | Student | Tes Mengetik | Happy Flow | Tes Kecepatan & Ketepatan Mengetik (BL-38B) | Buka `/typing` | Pilih durasi `30 Detik` & paket `Indonesia`, lalu ketik teks target | WPM, CPM, Akurasi %, dan highlight karakter real-time tampil tanpa `NaN` | **PASS** |
+| CAT-08 | Student | Katalog & XP | Happy Flow | Pelacak XP Harian & Search/Sort Komunitas (BL-38C) | Login sebagai Student di `/` & `/community` | Cek XP Ring di `CatalogHeroBento`, search & sort `Terpopuler` di `/community` | Progres XP harian tampil akurat & topik komunitas terfilter/terurut | **PASS** |
+| TRY-03 | Student | Tryout Akbar | Happy Flow | Leaderboard Per Event Tryout (BL-38C) | Buka `/tryout` | Pilih event pada dropdown Leaderboard | Papan skor menampilkan peringkat sesuai event yang dipilih | **PASS** |
+| TCH-09 | Teacher/Mentor | Mentor Studio & Player | Happy Flow | Pratinjau Kursus Mentor, Anggota Cohort & Ringkasan `/profile` (BL-38D) | Login sebagai Teacher | Buka `/courses/:slug?preview=true`, cek anggota cohort & `/profile` | Banner Read-Only tampil, seluruh materi dapat dipratinjau, anggota cohort & ringkasan tampil | **PASS** |
+| ADM-08 | Admin | Admin Panel | Happy Flow | Preview Kursus, Moderasi Komunitas & Revoke Sertifikat (BL-38E) | Login sebagai Admin di `/admin` | Cek distribusi role, buka Preview Kursus, tab `Moderasi Komunitas` & `Sertifikat` | Modal preview read-only, moderasi posting & cabut sertifikat tercatat di Audit Log | **PASS** |
+| UIX-01 | Student | UI Revamp Katalog | Happy Flow | Hero Bento Hub, Syllabus Drawer & Hover Elevation (BL-38F) | Buka `/` di `1280x800` & `390x844` | Klik tombol `Silabus` pada kartu kursus lalu tutup drawer | `CourseSyllabusDrawer` terbuka/tertutup mulus dengan `overflowX = 0` | **PASS** |
+| UIX-02 | Student | UI Revamp Player & Chart | Happy Flow | Mode Fokus Zen Player & Tooltip Interaktif Radar 5D/Kraepelin (BL-38G) | Buka Course Player & `/profile` | Klik `Mode Fokus` di Player & hover/klik dimensi pada Radar 5D | Sidebar tersembunyi/kembali mulus & tooltip skor dimensi tampil interaktif | **PASS** |

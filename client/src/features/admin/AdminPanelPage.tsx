@@ -1,21 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Activity,
+  Award,
+  Ban,
   BookOpen,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Clock,
   Download,
+  Eye,
+  FileText,
+  HelpCircle,
+  MessageSquare,
   Search,
   Shield,
+  Trash2,
   Users,
+  Video,
+  X,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { lmsApi } from '../../shared/services/lmsApi';
-import type { UserRole } from '../../shared/types/lms';
+import type { Course, UserRole } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
+import {
+  type CertificateWithRevocation,
+  listAllCertificatesAsync,
+  revokeCertificateAsync,
+} from '../talent/talentApi';
 import { AdminAuditLogPanel } from './AdminAuditLogPanel';
 import { AdminHealthTelemetryPanel } from './AdminHealthTelemetryPanel';
 import {
@@ -28,7 +43,7 @@ import {
   downloadCsvFile,
 } from './adminCsvExport';
 
-type AdminTab = 'users' | 'courses' | 'audit' | 'health';
+type AdminTab = 'users' | 'courses' | 'community' | 'certificates' | 'audit' | 'health';
 const USER_PAGE_SIZE = 10;
 const COURSE_PAGE_SIZE = 10;
 
@@ -61,6 +76,17 @@ export function AdminPanelPage() {
   const [categoryFilter, setCategoryFilter] = useState('Semua');
   const [publishFilter, setPublishFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [coursePage, setCoursePage] = useState(1);
+  const [previewCourse, setPreviewCourse] = useState<Course | null>(null);
+
+  // Community moderation filters
+  const [communitySearch, setCommunitySearch] = useState('');
+  const [communityCategoryFilter, setCommunityCategoryFilter] = useState('Semua');
+
+  // Certificate filters & revoke modal
+  const [certSearch, setCertSearch] = useState('');
+  const [certStatusFilter, setCertStatusFilter] = useState<'all' | 'valid' | 'revoked'>('all');
+  const [revokeTarget, setRevokeTarget] = useState<CertificateWithRevocation | null>(null);
+  const [revokeReason, setRevokeReason] = useState('');
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['admin-profiles'],
@@ -70,6 +96,22 @@ export function AdminPanelPage() {
   const { data: courses = [] } = useQuery({
     queryKey: ['admin-courses'],
     queryFn: () => lmsApi.listAllCoursesForManagement(),
+  });
+
+  const { data: previewCourseDetail, isLoading: isPreviewLoading } = useQuery({
+    queryKey: ['admin-course-preview', previewCourse?.slug],
+    queryFn: () => lmsApi.getCourseBySlug(previewCourse!.slug),
+    enabled: Boolean(previewCourse?.slug),
+  });
+
+  const { data: communityPosts = [], isLoading: isCommunityLoading } = useQuery({
+    queryKey: ['admin-community-posts'],
+    queryFn: () => lmsApi.listCommunityPosts(),
+  });
+
+  const { data: certificates = [], isLoading: isCertsLoading } = useQuery({
+    queryKey: ['admin-certificates'],
+    queryFn: () => listAllCertificatesAsync(),
   });
 
   const updateRoleMut = useMutation({
@@ -136,6 +178,51 @@ export function AdminPanelPage() {
     },
   });
 
+  const deleteCommunityPostMut = useMutation({
+    mutationFn: (postId: string) => lmsApi.deleteCommunityPost(postId),
+    onSuccess: async (_data, postId) => {
+      const targetPost = communityPosts.find((p) => p.id === postId);
+      queryClient.invalidateQueries({ queryKey: ['admin-community-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+      const updated = await recordAdminAuditLogAsync({
+        actorId: currentUser?.id,
+        actorName: currentUser?.full_name || 'Admin',
+        action: 'COMMUNITY_POST_DELETED',
+        targetLabel: targetPost?.title || postId,
+        detail: `Menghapus postingan komunitas oleh ${targetPost?.author_name || 'Pengguna'} (${targetPost?.category || 'Umum'})`,
+      });
+      queryClient.setQueryData(['admin-audit-logs'], updated);
+      showFeedback('success', 'Postingan komunitas berhasil dihapus.');
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal menghapus postingan komunitas.');
+    },
+  });
+
+  const revokeCertMut = useMutation({
+    mutationFn: ({ certId, reason }: { certId: string; reason: string }) =>
+      revokeCertificateAsync(certId, reason),
+    onSuccess: async (updatedCert, vars) => {
+      const targetCert = updatedCert ?? certificates.find((c) => c.id === vars.certId);
+      queryClient.invalidateQueries({ queryKey: ['admin-certificates'] });
+      queryClient.invalidateQueries({ queryKey: ['verify-certificate'] });
+      const updated = await recordAdminAuditLogAsync({
+        actorId: currentUser?.id,
+        actorName: currentUser?.full_name || 'Admin',
+        action: 'CERTIFICATE_REVOKED',
+        targetLabel: targetCert?.cert_code || vars.certId,
+        detail: `Mencabut sertifikat ${targetCert?.student_name || ''} (${targetCert?.course_title || ''}) — Alasan: ${vars.reason.trim()}`,
+      });
+      queryClient.setQueryData(['admin-audit-logs'], updated);
+      setRevokeTarget(null);
+      setRevokeReason('');
+      showFeedback('success', `Sertifikat ${targetCert?.cert_code || ''} berhasil dicabut.`);
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal mencabut sertifikat.');
+    },
+  });
+
   const handleRoleChange = (userId: string, role: UserRole) => {
     const target = profiles.find((p) => p.id === userId);
     if (target?.role === role) return;
@@ -169,6 +256,62 @@ export function AdminPanelPage() {
     }
     togglePublishMut.mutate({ courseId, isPublished });
   };
+
+  const handleDeleteCommunityPost = (postId: string, title: string) => {
+    if (!window.confirm(`Hapus postingan "${title}" secara permanen?`)) {
+      return;
+    }
+    deleteCommunityPostMut.mutate(postId);
+  };
+
+  const userDistribution = useMemo(() => {
+    const total = profiles.length;
+    const student = profiles.filter((p) => p.role === 'student').length;
+    const teacher = profiles.filter((p) => p.role === 'teacher').length;
+    const admin = profiles.filter((p) => p.role === 'admin').length;
+    const active = profiles.filter((p) => p.is_active !== false).length;
+    const inactive = profiles.filter((p) => p.is_active === false).length;
+    return { total, student, teacher, admin, active, inactive };
+  }, [profiles]);
+
+  const communityCategories = useMemo(
+    () => ['Semua', ...Array.from(new Set(communityPosts.map((p) => p.category)))],
+    [communityPosts]
+  );
+
+  const filteredCommunityPosts = useMemo(() => {
+    const q = communitySearch.trim().toLowerCase();
+    return communityPosts.filter((p) => {
+      if (communityCategoryFilter !== 'Semua' && p.category !== communityCategoryFilter) {
+        return false;
+      }
+      if (
+        q &&
+        !`${p.title} ${p.content} ${p.author_name} ${p.category}`.toLowerCase().includes(q)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }, [communityPosts, communitySearch, communityCategoryFilter]);
+
+  const filteredCertificates = useMemo(() => {
+    const q = certSearch.trim().toLowerCase();
+    return certificates.filter((c) => {
+      const isRevoked = Boolean(c.revoked_at);
+      if (certStatusFilter === 'valid' && isRevoked) return false;
+      if (certStatusFilter === 'revoked' && !isRevoked) return false;
+      if (
+        q &&
+        !`${c.cert_code} ${c.student_name} ${c.course_title} ${c.teacher_name}`
+          .toLowerCase()
+          .includes(q)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }, [certificates, certSearch, certStatusFilter]);
 
   const filteredProfiles = useMemo(() => {
     const q = userSearch.trim().toLowerCase();
@@ -304,6 +447,30 @@ export function AdminPanelPage() {
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab('community')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+            activeTab === 'community'
+              ? 'bg-[#0F766E] text-white'
+              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4" />
+          Moderasi Komunitas ({communityPosts.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('certificates')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+            activeTab === 'certificates'
+              ? 'bg-[#0F766E] text-white'
+              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+          }`}
+        >
+          <Award className="w-4 h-4" />
+          Sertifikat ({certificates.length})
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('audit')}
           className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'audit'
@@ -331,6 +498,81 @@ export function AdminPanelPage() {
       {/* TAB 1: USER MANAGEMENT */}
       {activeTab === 'users' && (
         <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+          {/* Role & Status Distribution Summary Bar */}
+          <div className="px-4 sm:px-5 py-3.5 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#E5E3DC] dark:border-slate-800 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="font-semibold text-[#52525B] dark:text-slate-300">
+                  Distribusi Role
+                </span>
+                <div className="flex flex-wrap items-center gap-3 font-mono-tabular">
+                  <span className="inline-flex items-center gap-1.5 text-[#18181B] dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Pelajar: <strong>{userDistribution.student}</strong>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[#18181B] dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-sky-500" />
+                    Pengajar: <strong>{userDistribution.teacher}</strong>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[#18181B] dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Admin: <strong>{userDistribution.admin}</strong>
+                  </span>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-[#E5E3DC] dark:bg-slate-800 overflow-hidden flex">
+                {userDistribution.total > 0 && (
+                  <>
+                    <div
+                      className="bg-emerald-500 h-full transition-all"
+                      style={{ width: `${(userDistribution.student / userDistribution.total) * 100}%` }}
+                    />
+                    <div
+                      className="bg-sky-500 h-full transition-all"
+                      style={{ width: `${(userDistribution.teacher / userDistribution.total) * 100}%` }}
+                    />
+                    <div
+                      className="bg-amber-500 h-full transition-all"
+                      style={{ width: `${(userDistribution.admin / userDistribution.total) * 100}%` }}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="font-semibold text-[#52525B] dark:text-slate-300">
+                  Status Akun
+                </span>
+                <div className="flex flex-wrap items-center gap-3 font-mono-tabular">
+                  <span className="inline-flex items-center gap-1.5 text-[#18181B] dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+                    Aktif: <strong>{userDistribution.active}</strong>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[#18181B] dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                    Nonaktif: <strong>{userDistribution.inactive}</strong>
+                  </span>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-[#E5E3DC] dark:bg-slate-800 overflow-hidden flex">
+                {userDistribution.total > 0 && (
+                  <>
+                    <div
+                      className="bg-[#0F766E] h-full transition-all"
+                      style={{ width: `${(userDistribution.active / userDistribution.total) * 100}%` }}
+                    />
+                    <div
+                      className="bg-rose-500 h-full transition-all"
+                      style={{ width: `${(userDistribution.inactive / userDistribution.total) * 100}%` }}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
@@ -690,17 +932,27 @@ export function AdminPanelPage() {
                       {c.is_published ? 'Terbit' : 'Draft'}
                     </Badge>
                   </div>
-                  <Button
-                    variant={c.is_published ? 'secondary' : 'primary'}
-                    size="sm"
-                    className="w-full"
-                    disabled={togglePublishMut.isPending}
-                    onClick={() =>
-                      handleTogglePublish(c.id, !c.is_published)
-                    }
-                  >
-                    {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setPreviewCourse(c)}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Pratinjau
+                    </Button>
+                    <Button
+                      variant={c.is_published ? 'secondary' : 'primary'}
+                      size="sm"
+                      className="flex-1"
+                      disabled={togglePublishMut.isPending}
+                      onClick={() =>
+                        handleTogglePublish(c.id, !c.is_published)
+                      }
+                    >
+                      {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}
+                    </Button>
+                  </div>
                 </div>
               ))
             )}
@@ -732,15 +984,25 @@ export function AdminPanelPage() {
                       </Badge>
                     </td>
                     <td className="px-6 py-3.5 text-right">
-                      <Button
-                        variant={c.is_published ? 'secondary' : 'primary'}
-                        size="sm"
-                        onClick={() =>
-                          handleTogglePublish(c.id, !c.is_published)
-                        }
-                      >
-                        {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}
-                      </Button>
+                      <div className="inline-flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPreviewCourse(c)}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          Pratinjau
+                        </Button>
+                        <Button
+                          variant={c.is_published ? 'secondary' : 'primary'}
+                          size="sm"
+                          onClick={() =>
+                            handleTogglePublish(c.id, !c.is_published)
+                          }
+                        >
+                          {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -777,6 +1039,277 @@ export function AdminPanelPage() {
         </section>
       )}
 
+      {/* TAB: COMMUNITY MODERATION */}
+      {activeTab === 'community' && (
+        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 space-y-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={communitySearch}
+                  onChange={(e) => setCommunitySearch(e.target.value)}
+                  placeholder="Cari judul, isi, atau penulis postingan..."
+                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+              <Badge tone="slate">{filteredCommunityPosts.length} Postingan</Badge>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {communityCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCommunityCategoryFilter(cat)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium border cursor-pointer ${
+                    communityCategoryFilter === cat
+                      ? 'bg-[#0F766E] border-[#0F766E] text-white'
+                      : 'bg-[#F6F5F1] dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {isCommunityLoading ? (
+            <div className="p-6 space-y-3">
+              <div className="h-20 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-20 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+            </div>
+          ) : filteredCommunityPosts.length === 0 ? (
+            <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
+              Tidak ada postingan komunitas yang sesuai dengan filter.
+            </div>
+          ) : (
+            <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              {filteredCommunityPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/30"
+                >
+                  <div className="space-y-1.5 min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge tone="blue">{post.category}</Badge>
+                      <span className="text-xs font-semibold text-[#18181B] dark:text-slate-200">
+                        {post.author_name}
+                      </span>
+                      <Badge
+                        tone={
+                          post.author_role === 'admin'
+                            ? 'amber'
+                            : post.author_role === 'teacher'
+                              ? 'blue'
+                              : 'emerald'
+                        }
+                      >
+                        {post.author_role === 'student'
+                          ? 'Pelajar'
+                          : post.author_role === 'teacher'
+                            ? 'Pengajar'
+                            : 'Admin'}
+                      </Badge>
+                      <span className="text-xs text-[#71717A] dark:text-slate-400 font-mono-tabular">
+                        {new Date(post.created_at).toLocaleDateString('id-ID', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-[#52525B] dark:text-slate-300 line-clamp-2">
+                      {post.content}
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      disabled={deleteCommunityPostMut.isPending}
+                      onClick={() => handleDeleteCommunityPost(post.id, post.title)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Hapus
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* TAB: CERTIFICATES MANAGEMENT */}
+      {activeTab === 'certificates' && (
+        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={certSearch}
+                onChange={(e) => setCertSearch(e.target.value)}
+                placeholder="Cari kode sertifikat, penerima, atau kursus..."
+                className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              {(['all', 'valid', 'revoked'] as const).map((st) => (
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => setCertStatusFilter(st)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    certStatusFilter === st
+                      ? 'bg-[#0F766E] text-white'
+                      : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                  }`}
+                >
+                  {st === 'all' ? 'Semua Status' : st === 'valid' ? 'Aktif' : 'Dicabut'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {isCertsLoading ? (
+            <div className="p-6 space-y-3">
+              <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+            </div>
+          ) : filteredCertificates.length === 0 ? (
+            <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
+              Belum ada sertifikat yang sesuai dengan filter.
+            </div>
+          ) : (
+            <>
+              {/* Mobile Cards */}
+              <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                {filteredCertificates.map((cert) => {
+                  const isRevoked = Boolean(cert.revoked_at);
+                  return (
+                    <div key={cert.id} className="p-4 space-y-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-mono-tabular text-xs font-bold text-[#0F766E] dark:text-teal-400">
+                            {cert.cert_code}
+                          </p>
+                          <p className="font-semibold text-sm text-[#18181B] dark:text-white truncate">
+                            {cert.student_name}
+                          </p>
+                          <p className="text-xs text-[#71717A] dark:text-slate-400 truncate">
+                            {cert.course_title}
+                          </p>
+                        </div>
+                        <Badge tone={isRevoked ? 'rose' : 'emerald'}>
+                          {isRevoked ? 'Dicabut' : 'Aktif'}
+                        </Badge>
+                      </div>
+                      {isRevoked && cert.revoke_reason && (
+                        <p className="text-xs text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/30 px-2.5 py-1.5 rounded-lg">
+                          Alasan: {cert.revoke_reason}
+                        </p>
+                      )}
+                      {!isRevoked && (
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            setRevokeTarget(cert);
+                            setRevokeReason('');
+                          }}
+                        >
+                          <Ban className="w-3.5 h-3.5" />
+                          Cabut Sertifikat
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
+                    <tr>
+                      <th className="px-6 py-3">Kode Sertifikat</th>
+                      <th className="px-6 py-3">Penerima &amp; Kursus</th>
+                      <th className="px-6 py-3">Terbit</th>
+                      <th className="px-6 py-3">Status</th>
+                      <th className="px-6 py-3 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                    {filteredCertificates.map((cert) => {
+                      const isRevoked = Boolean(cert.revoked_at);
+                      return (
+                        <tr key={cert.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
+                          <td className="px-6 py-3.5 font-mono-tabular text-xs font-bold text-[#18181B] dark:text-white">
+                            {cert.cert_code}
+                          </td>
+                          <td className="px-6 py-3.5">
+                            <p className="font-semibold text-[#18181B] dark:text-white">
+                              {cert.student_name}
+                            </p>
+                            <p className="text-xs text-[#71717A] dark:text-slate-400">
+                              {cert.course_title} • {cert.teacher_name}
+                            </p>
+                            {isRevoked && cert.revoke_reason && (
+                              <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">
+                                Alasan dicabut: {cert.revoke_reason}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-6 py-3.5 text-xs text-[#52525B] dark:text-slate-300 font-mono-tabular">
+                            {new Date(cert.issued_at).toLocaleDateString('id-ID', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </td>
+                          <td className="px-6 py-3.5">
+                            <Badge tone={isRevoked ? 'rose' : 'emerald'}>
+                              {isRevoked ? 'Dicabut' : 'Aktif'}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-3.5 text-right">
+                            {isRevoked ? (
+                              <span className="text-xs text-[#71717A] dark:text-slate-400">
+                                Sudah Dicabut
+                              </span>
+                            ) : (
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => {
+                                  setRevokeTarget(cert);
+                                  setRevokeReason('');
+                                }}
+                              >
+                                <Ban className="w-3.5 h-3.5" />
+                                Cabut
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </section>
+      )}
+
       {/* TAB 3: ADMIN AUDIT LOG */}
       {activeTab === 'audit' && (
         <AdminAuditLogPanel
@@ -792,6 +1325,209 @@ export function AdminPanelPage() {
 
       {/* TAB 4: SYSTEM HEALTH TELEMETRY (BL-38) */}
       {activeTab === 'health' && <AdminHealthTelemetryPanel />}
+
+      {/* READ-ONLY COURSE PREVIEW MODAL */}
+      {previewCourse && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Pratinjau Kursus"
+        >
+          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-xl">
+            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-start justify-between gap-3">
+              <div className="space-y-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone="blue">Mode Pratinjau (Hanya Baca)</Badge>
+                  <Badge tone={previewCourse.is_published ? 'emerald' : 'amber'}>
+                    {previewCourse.is_published ? 'Terbit' : 'Draft'}
+                  </Badge>
+                </div>
+                <h2 className="text-lg font-bold text-[#18181B] dark:text-white truncate">
+                  {previewCourse.title}
+                </h2>
+                <p className="text-xs text-[#71717A] dark:text-slate-400">
+                  {previewCourse.category} • {previewCourse.level} • Pengajar:{' '}
+                  {previewCourse.teacher_name ?? 'Pengajar'} • {previewCourse.estimated_hours} jam
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewCourse(null)}
+                className="p-1.5 rounded-lg text-[#71717A] hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                aria-label="Tutup pratinjau"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto space-y-4">
+              <p className="text-sm text-[#52525B] dark:text-slate-300">
+                {previewCourse.description}
+              </p>
+
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
+                  Struktur Modul &amp; Pelajaran
+                </h3>
+
+                {isPreviewLoading ? (
+                  <div className="space-y-2">
+                    <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+                    <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+                  </div>
+                ) : (previewCourseDetail?.modules ?? previewCourse.modules ?? []).length === 0 ? (
+                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 text-xs text-[#71717A] dark:text-slate-400 text-center">
+                    Kursus ini belum memiliki modul atau pelajaran.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {(previewCourseDetail?.modules ?? previewCourse.modules ?? []).map(
+                      (mod, mIdx) => (
+                        <div
+                          key={mod.id}
+                          className="border border-[#E5E3DC] dark:border-slate-800 rounded-xl overflow-hidden"
+                        >
+                          <div className="px-4 py-2.5 bg-[#F6F5F1] dark:bg-slate-900/70 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2">
+                            <span className="text-xs font-bold text-[#18181B] dark:text-white">
+                              Modul {mIdx + 1}: {mod.title}
+                            </span>
+                            <span className="text-xs text-[#71717A] dark:text-slate-400 font-mono-tabular">
+                              {mod.lessons.length} pelajaran
+                            </span>
+                          </div>
+                          {mod.lessons.length === 0 ? (
+                            <div className="px-4 py-3 text-xs text-[#71717A] dark:text-slate-400">
+                              Belum ada pelajaran di modul ini.
+                            </div>
+                          ) : (
+                            <ul className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                              {mod.lessons.map((lesson, lIdx) => (
+                                <li
+                                  key={lesson.id}
+                                  className="px-4 py-2.5 flex items-center justify-between gap-3 text-xs"
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    {lesson.type === 'video' ? (
+                                      <Video className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                                    ) : lesson.type === 'quiz' ? (
+                                      <HelpCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                                    ) : (
+                                      <FileText className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400 shrink-0" />
+                                    )}
+                                    <span className="text-[#18181B] dark:text-slate-200 truncate">
+                                      {lIdx + 1}. {lesson.title}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0 text-[#71717A] dark:text-slate-400">
+                                    <Badge tone="slate">
+                                      {lesson.type === 'video'
+                                        ? 'Video'
+                                        : lesson.type === 'quiz'
+                                          ? 'Kuis'
+                                          : 'Artikel'}
+                                    </Badge>
+                                    <span className="inline-flex items-center gap-1 font-mono-tabular">
+                                      <Clock className="w-3 h-3" />
+                                      {lesson.duration_minutes}m
+                                    </span>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="px-5 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-end gap-2 bg-[#FAFAF9] dark:bg-slate-900/40">
+              <Button variant="secondary" size="sm" onClick={() => setPreviewCourse(null)}>
+                Tutup Pratinjau
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REVOKE CERTIFICATE MODAL */}
+      {revokeTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Cabut Sertifikat"
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!revokeReason.trim()) return;
+              revokeCertMut.mutate({ certId: revokeTarget.id, reason: revokeReason });
+            }}
+            className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                  Cabut Sertifikat
+                </h2>
+                <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5 font-mono-tabular">
+                  {revokeTarget.cert_code} — {revokeTarget.student_name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRevokeTarget(null)}
+                className="p-1 rounded-lg text-[#71717A] hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                aria-label="Tutup dialog"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="revoke-reason-input"
+                className="block text-xs font-semibold text-[#52525B] dark:text-slate-300"
+              >
+                Alasan Pencabutan (ditampilkan di halaman verifikasi)
+              </label>
+              <textarea
+                id="revoke-reason-input"
+                rows={3}
+                required
+                value={revokeReason}
+                onChange={(e) => setRevokeReason(e.target.value)}
+                placeholder="Contoh: Ditemukan pelanggaran integritas ujian atau kesalahan penerbitan data..."
+                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setRevokeTarget(null)}
+              >
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                variant="danger"
+                size="sm"
+                disabled={revokeCertMut.isPending || !revokeReason.trim()}
+              >
+                <Ban className="w-3.5 h-3.5" />
+                {revokeCertMut.isPending ? 'Mencabut...' : 'Konfirmasi Cabut'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

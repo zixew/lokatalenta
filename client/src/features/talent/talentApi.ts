@@ -4,28 +4,120 @@ import type { CertificateRecord } from '../../shared/types/lms';
 import { getLocalKraepelinHistory } from '../kraepelin/kraepelinHistory';
 import { extractCategoryScoresFromAttempts } from './talentRadar';
 
+const CERTIFICATES_STORAGE_KEY = 'lokatalenta_certificates_v1';
+
+export interface CertificateWithRevocation extends CertificateRecord {
+  revoked_at?: string | null;
+  revoke_reason?: string | null;
+}
+
+function readLocalCertificates(): CertificateWithRevocation[] {
+  try {
+    const raw = localStorage.getItem(CERTIFICATES_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as CertificateWithRevocation[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalCertificates(certs: CertificateWithRevocation[]): void {
+  try {
+    localStorage.setItem(CERTIFICATES_STORAGE_KEY, JSON.stringify(certs));
+  } catch {
+    // ignore storage errors
+  }
+}
+
 export async function listUserCertificatesAsync(
   userId: string
-): Promise<CertificateRecord[]> {
+): Promise<CertificateWithRevocation[]> {
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
         .from('certificates')
+        .select('id, cert_code, user_id, student_name, course_id, course_title, teacher_name, issued_at, revoked_at, revoke_reason')
+        .eq('user_id', userId)
+        .order('issued_at', { ascending: false });
+      if (!error && data) return data as CertificateWithRevocation[];
+
+      const fallback = await supabase
+        .from('certificates')
         .select('id, cert_code, user_id, student_name, course_id, course_title, teacher_name, issued_at')
         .eq('user_id', userId)
         .order('issued_at', { ascending: false });
-      if (!error && data) return data as CertificateRecord[];
+      if (!fallback.error && fallback.data) return fallback.data as CertificateWithRevocation[];
     } catch {
       // fall through to local fallback
     }
   }
-  try {
-    const raw = localStorage.getItem('lokatalenta_certificates_v1');
-    const all = raw ? (JSON.parse(raw) as CertificateRecord[]) : [];
-    return all.filter((c) => c.user_id === userId);
-  } catch {
-    return [];
+  return readLocalCertificates().filter((c) => c.user_id === userId);
+}
+
+export async function listAllCertificatesAsync(): Promise<CertificateWithRevocation[]> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('certificates')
+        .select('id, cert_code, user_id, student_name, course_id, course_title, teacher_name, issued_at, revoked_at, revoke_reason')
+        .order('issued_at', { ascending: false });
+      if (!error && data) return data as CertificateWithRevocation[];
+
+      const fallback = await supabase
+        .from('certificates')
+        .select('id, cert_code, user_id, student_name, course_id, course_title, teacher_name, issued_at')
+        .order('issued_at', { ascending: false });
+      if (!fallback.error && fallback.data) return fallback.data as CertificateWithRevocation[];
+    } catch {
+      // fall through to local fallback
+    }
   }
+  return readLocalCertificates().sort(
+    (a, b) => new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime()
+  );
+}
+
+export async function revokeCertificateAsync(
+  certId: string,
+  reason: string
+): Promise<CertificateWithRevocation | null> {
+  const cleanReason = reason.trim();
+  if (!cleanReason) {
+    throw new Error('Alasan pencabutan sertifikat wajib diisi.');
+  }
+  const revokedAt = new Date().toISOString();
+
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('certificates')
+      .update({ revoked_at: revokedAt, revoke_reason: cleanReason })
+      .eq('id', certId)
+      .select()
+      .single();
+    if (error) throw error;
+
+    const local = readLocalCertificates();
+    if (local.some((c) => c.id === certId)) {
+      writeLocalCertificates(
+        local.map((c) =>
+          c.id === certId ? { ...c, revoked_at: revokedAt, revoke_reason: cleanReason } : c
+        )
+      );
+    }
+    return data as CertificateWithRevocation;
+  }
+
+  const local = readLocalCertificates();
+  let updated: CertificateWithRevocation | null = null;
+  const next = local.map((c) => {
+    if (c.id !== certId) return c;
+    updated = { ...c, revoked_at: revokedAt, revoke_reason: cleanReason };
+    return updated;
+  });
+  if (!updated) {
+    throw new Error('Sertifikat tidak ditemukan.');
+  }
+  writeLocalCertificates(next);
+  return updated;
 }
 
 export interface TalentCertificateSummary {
@@ -151,11 +243,13 @@ export async function getTalentPassportAsync(
       avg_accuracy_pct: avgAccuracyPct,
       total_runs: totalRuns,
     },
-    certificates: certs.map((c) => ({
-      cert_code: c.cert_code,
-      course_title:
-        courses.find((cr) => cr.id === c.course_id)?.title || 'Program LokaTalenta',
-      issued_at: c.issued_at,
-    })),
+    certificates: certs
+      .filter((c) => !c.revoked_at)
+      .map((c) => ({
+        cert_code: c.cert_code,
+        course_title:
+          courses.find((cr) => cr.id === c.course_id)?.title || 'Program LokaTalenta',
+        issued_at: c.issued_at,
+      })),
   };
 }

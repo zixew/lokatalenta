@@ -179,7 +179,7 @@ export function AppRouter() {
                   <Route
                     path="/courses/:slug"
                     element={
-                      <RequireRole roles={['student']}>
+                      <RequireRole roles={['student', 'teacher']}>
                         <CoursePlayerPage />
                       </RequireRole>
                     }

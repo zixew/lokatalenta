@@ -1,6 +1,11 @@
 import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 
-export type AdminAuditAction = 'ROLE_UPDATED' | 'USER_STATUS_CHANGED' | 'COURSE_PUBLISH_TOGGLED';
+export type AdminAuditAction =
+  | 'ROLE_UPDATED'
+  | 'USER_STATUS_CHANGED'
+  | 'COURSE_PUBLISH_TOGGLED'
+  | 'COMMUNITY_POST_DELETED'
+  | 'CERTIFICATE_REVOKED';
 
 export interface AdminAuditEntry {
   id: string;

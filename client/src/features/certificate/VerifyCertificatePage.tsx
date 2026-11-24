@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { Award, CheckCircle2, Compass, Search, ShieldAlert } from 'lucide-react';
+import { Award, Ban, CheckCircle2, Compass, Search, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
 import { Badge } from '../../shared/ui/Badge';
 import { BrandLogo } from '../../shared/ui/BrandLogo';
 import { Button } from '../../shared/ui/Button';
+import type { CertificateWithRevocation } from '../talent/talentApi';
 
 export function VerifyCertificatePage() {
   const { certCode = '' } = useParams<{ certCode?: string }>();
@@ -106,48 +107,89 @@ export function VerifyCertificatePage() {
             {isLoading ? (
               <div className="h-32 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
             ) : cert ? (
-              <div className="p-5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Badge tone="emerald">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Sertifikat Asli &amp; Terverifikasi
-                  </Badge>
-                  <span className="font-mono-tabular text-xs font-bold text-[#18181B] dark:text-white">
-                    {cert.cert_code}
-                  </span>
-                </div>
+              (() => {
+                const certRecord = cert as CertificateWithRevocation;
+                const isRevoked = Boolean(certRecord.revoked_at);
+                return (
+                  <div
+                    className={`p-5 rounded-xl border space-y-4 ${
+                      isRevoked
+                        ? 'bg-rose-50/80 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800'
+                        : 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800'
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      {isRevoked ? (
+                        <Badge tone="rose">
+                          <Ban className="w-3.5 h-3.5" />
+                          DICABUT / REVOKED
+                        </Badge>
+                      ) : (
+                        <Badge tone="emerald">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Sertifikat Asli &amp; Terverifikasi
+                        </Badge>
+                      )}
+                      <span className="font-mono-tabular text-xs font-bold text-[#18181B] dark:text-white">
+                        {certRecord.cert_code}
+                      </span>
+                    </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-[#71717A] dark:text-slate-400 block">Nama Penerima</span>
-                    <span className="text-sm font-bold text-[#18181B] dark:text-white">
-                      {cert.student_name}
-                    </span>
+                    {isRevoked && (
+                      <div className="p-3.5 rounded-lg bg-white/80 dark:bg-slate-900/70 border border-rose-200 dark:border-rose-900/70 text-xs space-y-1">
+                        <p className="font-bold text-rose-700 dark:text-rose-300">
+                          Sertifikat ini telah dicabut dan tidak lagi berlaku
+                          {certRecord.revoked_at
+                            ? ` sejak ${new Date(certRecord.revoked_at).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric',
+                              })}`
+                            : ''}
+                          .
+                        </p>
+                        {certRecord.revoke_reason && (
+                          <p className="text-rose-700 dark:text-rose-200">
+                            <span className="font-semibold">Alasan pencabutan:</span>{' '}
+                            {certRecord.revoke_reason}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-[#71717A] dark:text-slate-400 block">Nama Penerima</span>
+                        <span className="text-sm font-bold text-[#18181B] dark:text-white">
+                          {certRecord.student_name}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[#71717A] dark:text-slate-400 block">Program / Kursus</span>
+                        <span className="text-sm font-bold text-[#18181B] dark:text-white">
+                          {certRecord.course_title}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[#71717A] dark:text-slate-400 block">Pengajar</span>
+                        <span className="font-semibold text-[#18181B] dark:text-slate-200">
+                          {certRecord.teacher_name}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[#71717A] dark:text-slate-400 block">Diterbitkan pada</span>
+                        <span className="font-semibold text-[#18181B] dark:text-slate-200">
+                          {new Date(certRecord.issued_at).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[#71717A] dark:text-slate-400 block">Program / Kursus</span>
-                    <span className="text-sm font-bold text-[#18181B] dark:text-white">
-                      {cert.course_title}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[#71717A] dark:text-slate-400 block">Pengajar</span>
-                    <span className="font-semibold text-[#18181B] dark:text-slate-200">
-                      {cert.teacher_name}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[#71717A] dark:text-slate-400 block">Diterbitkan pada</span>
-                    <span className="font-semibold text-[#18181B] dark:text-slate-200">
-                      {new Date(cert.issued_at).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                );
+              })()
             ) : (
               <div className="p-5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 flex items-start gap-3">
                 <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />

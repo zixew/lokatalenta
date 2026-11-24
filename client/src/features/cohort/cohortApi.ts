@@ -20,6 +20,11 @@ export interface CohortMembershipRecord {
   joined_at: string;
 }
 
+export interface CohortMemberProfile extends CohortMembershipRecord {
+  full_name?: string;
+  email?: string;
+}
+
 const COHORTS_KEY = 'lokatalenta_cohorts_v1';
 const COHORT_MEMBERS_KEY = 'lokatalenta_cohort_members_v1';
 
@@ -270,6 +275,79 @@ export async function leaveCohortAsync(userId: string, cohortId: string): Promis
   writeJson(
     COHORT_MEMBERS_KEY,
     members.filter((m) => !(m.cohort_id === cohortId && m.user_id === userId))
+  );
+}
+
+export async function listCohortMembers(cohortId: string): Promise<CohortMemberProfile[]> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('cohort_members')
+        .select('cohort_id, user_id, joined_at, profiles(full_name, email)')
+        .eq('cohort_id', cohortId)
+        .order('joined_at', { ascending: false });
+
+      if (!error && data) {
+        return data.map((row: Record<string, unknown>) => {
+          const prof = row.profiles as Record<string, unknown> | null;
+          return {
+            cohort_id: String(row.cohort_id),
+            user_id: String(row.user_id),
+            joined_at: String(row.joined_at),
+            full_name: prof?.full_name ? String(prof.full_name) : undefined,
+            email: prof?.email ? String(prof.email) : undefined,
+          };
+        });
+      }
+    } catch {
+      // fall through to local fallback
+    }
+  }
+
+  const members = readJson<CohortMembershipRecord[]>(COHORT_MEMBERS_KEY, []);
+  return members
+    .filter((m) => m.cohort_id === cohortId)
+    .map((m) => ({
+      ...m,
+      full_name: `Peserta (${m.user_id.slice(0, 8)})`,
+    }));
+}
+
+export async function removeCohortMember(cohortId: string, userId: string): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase
+      .from('cohort_members')
+      .delete()
+      .eq('cohort_id', cohortId)
+      .eq('user_id', userId);
+    if (error) {
+      throw new Error(error.message || 'Gagal mengeluarkan peserta dari cohort.');
+    }
+  }
+  const members = readJson<CohortMembershipRecord[]>(COHORT_MEMBERS_KEY, []);
+  writeJson(
+    COHORT_MEMBERS_KEY,
+    members.filter((m) => !(m.cohort_id === cohortId && m.user_id === userId))
+  );
+}
+
+export async function toggleCohortArchive(
+  cohortId: string,
+  nextIsActive: boolean
+): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase
+      .from('cohorts')
+      .update({ is_active: nextIsActive })
+      .eq('id', cohortId);
+    if (error) {
+      throw new Error(error.message || 'Gagal memperbarui status arsip cohort.');
+    }
+  }
+  const cohorts = readJson<CohortRecord[]>(COHORTS_KEY, []);
+  writeJson(
+    COHORTS_KEY,
+    cohorts.map((c) => (c.id === cohortId ? { ...c, is_active: nextIsActive } : c))
   );
 }
 
