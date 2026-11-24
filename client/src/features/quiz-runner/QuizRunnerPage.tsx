@@ -107,7 +107,8 @@ export function QuizRunnerPage() {
 
         const { attempt: activeAttempt, questions: safeQs } = await lmsApi.startQuizAttempt(
           user.id,
-          quizId
+          quizId,
+          { isSmartDrill: Boolean(subtestFilter) }
         );
         const drilledQs = subtestFilter
           ? safeQs.filter(
