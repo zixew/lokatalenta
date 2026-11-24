@@ -24,6 +24,8 @@ import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
 import { CourseOverviewGate } from './CourseOverviewGate';
 import { FlashcardDeck } from './FlashcardDeck';
+import { InteractiveSpreadsheetLab } from './InteractiveSpreadsheetLab';
+import { isTechnicalSpreadsheetCourse } from './spreadsheetEngine';
 import { LessonNotesAndCheckPanel } from './LessonNotesAndCheckPanel';
 import { LessonExtrasPanel } from './LessonExtrasPanel';
 import { SpeechPracticeBox } from './SpeechPracticeBox';
@@ -656,6 +658,17 @@ export function CoursePlayerPage() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* BL-23B: Interactive Spreadsheet & Excel Formula Lab */}
+              {activeLesson.type !== 'quiz' && (
+                <InteractiveSpreadsheetLab
+                  key={`lab-${course.id}-${activeLesson.id}`}
+                  defaultExpanded={isTechnicalSpreadsheetCourse(
+                    `${course.title} ${activeLesson.title}`,
+                    course.category
+                  )}
+                />
               )}
 
               {/* BL-04: Interactive Quick Check & Personal Notes */}
