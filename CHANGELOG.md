@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.3.0] - 2026-11-24
+
+### Minor
+- Sprint 13 (v2.3.0): Proctoring Lite, Short Answer, STAR Lab, Cohort Targeting, Item Analysis, Course Clone, System Broadcast, Studio/Admin Revamp & 5K Stress Gate
+
+---
+
 ## [2.2.0] - 2026-11-24
 
 ### Minor
