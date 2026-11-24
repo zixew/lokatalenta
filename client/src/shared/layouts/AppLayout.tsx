@@ -24,6 +24,7 @@ import { BrandLogo } from '../ui/BrandLogo';
 import { Button } from '../ui/Button';
 import { TopbarNav } from './TopbarNav';
 import { NotificationBell } from '../ui/NotificationBell';
+import { SystemBroadcastBanner } from '../ui/SystemBroadcastBanner';
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuthStore();
@@ -37,6 +38,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen overflow-x-hidden flex flex-col bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 transition-colors">
+      <SystemBroadcastBanner role={user?.role} />
       <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#161B22]/95 backdrop-blur border-b border-[#E5E3DC] dark:border-slate-800 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           {/* Brand + Desktop Nav */}
