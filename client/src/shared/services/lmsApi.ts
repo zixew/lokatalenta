@@ -887,6 +887,45 @@ export const lmsApi = {
     return newQ;
   },
 
+  async updateQuestionInQuiz(
+    questionId: string,
+    question: Omit<Question, 'id' | 'quiz_id' | 'order_index'>
+  ): Promise<Question> {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('questions')
+        .update({ ...question })
+        .eq('id', questionId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    }
+
+    const courses = await getDemoCourses();
+    let updatedQ: Question | null = null;
+    for (const c of courses) {
+      for (const m of c.modules ?? []) {
+        for (const l of m.lessons) {
+          if (l.quiz?.questions) {
+            l.quiz.questions = l.quiz.questions.map((q) => {
+              if (q.id === questionId) {
+                updatedQ = { ...q, ...question };
+                return updatedQ;
+              }
+              return q;
+            });
+          }
+        }
+      }
+    }
+    if (!updatedQ) {
+      throw new Error('Soal tidak ditemukan untuk diperbarui.');
+    }
+    writeLocal(STORAGE_KEYS.courses, courses);
+    return updatedQ;
+  },
+
   async toggleCoursePublish(courseId: string, isPublished: boolean): Promise<void> {
     if (isSupabaseConfigured && supabase) {
       const { error } = await supabase
