@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Clock,
+  Download,
   FileText,
   Lock,
   Megaphone,
@@ -28,6 +29,7 @@ import { LessonExtrasPanel } from './LessonExtrasPanel';
 import { SpeechPracticeBox } from './SpeechPracticeBox';
 import { WritingCanvas } from './WritingCanvas';
 import { getLastOpenedLessonId, saveLastOpenedLessonId } from './lastLessonStorage';
+import { buildCourseNotesMarkdown } from './lessonNotesStorage';
 
 export function CoursePlayerPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -223,22 +225,44 @@ export function CoursePlayerPage() {
           </p>
         </div>
 
-        {!isEnrolled && user ? (
-          <Button
-            size="lg"
-            onClick={() => enrollMutation.mutate()}
-            disabled={enrollMutation.isPending}
-          >
-            {enrollMutation.isPending ? 'Memproses...' : 'Gabung Course'}
-          </Button>
-        ) : user && allLessons.length > 0 && completedCount === allLessons.length ? (
-          <Link to={`/certificate/${course.id}`}>
-            <Button size="lg">
-              <Award className="w-4 h-4" />
-              Lihat &amp; Cetak Sertifikat
+        <div className="flex flex-wrap items-center gap-2.5">
+          {user && (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                const md = buildCourseNotesMarkdown(course, user.id);
+                const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `catatan-${course.slug}.md`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              Unduh Catatan (.md)
             </Button>
-          </Link>
-        ) : null}
+          )}
+          {!isEnrolled && user ? (
+            <Button
+              size="lg"
+              onClick={() => enrollMutation.mutate()}
+              disabled={enrollMutation.isPending}
+            >
+              {enrollMutation.isPending ? 'Memproses...' : 'Gabung Course'}
+            </Button>
+          ) : user && allLessons.length > 0 && completedCount === allLessons.length ? (
+            <Link to={`/certificate/${course.id}`}>
+              <Button size="lg">
+                <Award className="w-4 h-4" />
+                Lihat &amp; Cetak Sertifikat
+              </Button>
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       {/* Course Announcements Banner */}
