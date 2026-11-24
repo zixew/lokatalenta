@@ -1,5 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, ChevronLeft, ChevronRight, ClipboardList, Search, Shield, Users } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Download,
+  Search,
+  Shield,
+  Users,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { lmsApi } from '../../shared/services/lmsApi';
 import type { UserRole } from '../../shared/types/lms';
@@ -11,6 +20,11 @@ import {
   recordAdminAuditLogAsync,
   syncAdminAuditLogsFromServer,
 } from './adminAuditLog';
+import {
+  buildAuditLogsCsv,
+  buildUsersCsv,
+  downloadCsvFile,
+} from './adminCsvExport';
 
 type AdminTab = 'users' | 'courses' | 'audit';
 const COURSE_PAGE_SIZE = 10;
@@ -274,6 +288,20 @@ export function AdminPanelPage() {
                     {st === 'all' ? 'Semua Status' : st === 'active' ? 'Aktif' : 'Nonaktif'}
                   </button>
                 ))}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={filteredProfiles.length === 0}
+                  onClick={() =>
+                    downloadCsvFile(
+                      `lokatalenta-users-${new Date().toISOString().slice(0, 10)}.csv`,
+                      buildUsersCsv(filteredProfiles)
+                    )
+                  }
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Unduh CSV Pengguna
+                </Button>
               </div>
             </div>
           </div>
@@ -524,7 +552,17 @@ export function AdminPanelPage() {
       )}
 
       {/* TAB 3: ADMIN AUDIT LOG */}
-      {activeTab === 'audit' && <AdminAuditLogPanel logs={auditLogs} />}
+      {activeTab === 'audit' && (
+        <AdminAuditLogPanel
+          logs={auditLogs}
+          onExportCsv={(filteredLogs) =>
+            downloadCsvFile(
+              `lokatalenta-audit-logs-${new Date().toISOString().slice(0, 10)}.csv`,
+              buildAuditLogsCsv(filteredLogs)
+            )
+          }
+        />
+      )}
     </div>
   );
 }
