@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Activity,
   BookOpen,
   ChevronLeft,
   ChevronRight,
@@ -16,6 +17,7 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
 import { AdminAuditLogPanel } from './AdminAuditLogPanel';
+import { AdminHealthTelemetryPanel } from './AdminHealthTelemetryPanel';
 import {
   recordAdminAuditLogAsync,
   syncAdminAuditLogsFromServer,
@@ -26,7 +28,7 @@ import {
   downloadCsvFile,
 } from './adminCsvExport';
 
-type AdminTab = 'users' | 'courses' | 'audit';
+type AdminTab = 'users' | 'courses' | 'audit' | 'health';
 const USER_PAGE_SIZE = 10;
 const COURSE_PAGE_SIZE = 10;
 
@@ -311,6 +313,18 @@ export function AdminPanelPage() {
         >
           <ClipboardList className="w-4 h-4" />
           Audit Log ({auditLogs.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('health')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+            activeTab === 'health'
+              ? 'bg-[#0F766E] text-white'
+              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          Kesehatan Sistem
         </button>
       </div>
 
@@ -775,6 +789,9 @@ export function AdminPanelPage() {
           }
         />
       )}
+
+      {/* TAB 4: SYSTEM HEALTH TELEMETRY (BL-38) */}
+      {activeTab === 'health' && <AdminHealthTelemetryPanel />}
     </div>
   );
 }
