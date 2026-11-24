@@ -16,7 +16,12 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
+import { listStudentCohortsAsync } from '../cohort/cohortApi';
+import { StudentCohortCard } from '../cohort/StudentCohortCard';
 import { syncKraepelinHistoryFromServer } from '../kraepelin/kraepelinHistory';
+import { syncTryoutRegistrationsFromServer } from '../tryout/tryoutEvents';
+import { buildStudyAgendaItems } from './studyAgenda';
+import { StudyAgendaCard } from './StudyAgendaCard';
 import { CompetencyRadarCard } from '../talent/CompetencyRadarCard';
 import {
   getPassportVisibilityLocal,
@@ -70,6 +75,23 @@ export function ProfilePage() {
   const { data: userCertificates = [] } = useQuery({
     queryKey: ['user-certificates', user?.id],
     queryFn: () => (user ? listUserCertificatesAsync(user.id) : Promise.resolve([])),
+    enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const { data: registeredTryoutIds = [] } = useQuery({
+    queryKey: ['tryout-registrations', user?.id],
+    queryFn: () => (user ? syncTryoutRegistrationsFromServer(user.id) : Promise.resolve([])),
+    enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const { data: studentCohorts = [] } = useQuery({
+    queryKey: ['student-cohorts', user?.id],
+    queryFn: () => {
+      if (!user) return Promise.resolve([]);
+      const map: Record<string, string> = {};
+      for (const c of courses) map[c.id] = c.title;
+      return listStudentCohortsAsync(user.id, map);
+    },
     enabled: Boolean(user && user.role === 'student'),
   });
 
@@ -294,6 +316,19 @@ export function ProfilePage() {
                   </Button>
                 </Link>
               </section>
+
+              {/* BL-33: Cohort & Kelas Privat */}
+              <StudentCohortCard userId={user.id} courses={courses} />
+
+              {/* BL-34: Agenda & Tenggat Terdekat */}
+              <StudyAgendaCard
+                items={buildStudyAgendaItems({
+                  registeredTryoutIds,
+                  cohorts: studentCohorts,
+                  enrolledCourses,
+                  completedLessonIds,
+                })}
+              />
 
               {/* Enrolled Courses Progress */}
               <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
