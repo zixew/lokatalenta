@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, BookOpen, CheckCircle2, Circle, Compass, Flame, PlayCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -9,8 +10,8 @@ import { ProgressBar } from '../../shared/ui/ProgressBar';
 import {
   getSavedDailyXpTarget,
   getSavedLearningGoal,
-  saveDailyXpTarget,
-  saveLearningGoal,
+  saveStudyPreferencesAsync,
+  syncStudyPreferencesFromServer,
   type DailyXpTarget,
   type LearningGoalId,
 } from './learningGoalStorage';
@@ -35,6 +36,7 @@ export function CatalogPersonalizationSection({
   completedIds,
   attemptsCount = 0,
   isLoggedIn,
+  userId,
   onOpenTarget,
 }: {
   courses: Course[];
@@ -42,19 +44,31 @@ export function CatalogPersonalizationSection({
   completedIds: string[];
   attemptsCount?: number;
   isLoggedIn: boolean;
+  userId?: string;
   onOpenTarget: (e: React.MouseEvent, path: string) => void;
 }) {
   const [goal, setGoal] = useState<LearningGoalId>(() => getSavedLearningGoal());
   const [xpTarget, setXpTarget] = useState<DailyXpTarget>(() => getSavedDailyXpTarget());
 
+  useQuery({
+    queryKey: ['study-preferences', userId],
+    queryFn: async () => {
+      const synced = await syncStudyPreferencesFromServer(userId);
+      setGoal(synced.goal);
+      setXpTarget(synced.xpTarget);
+      return synced;
+    },
+    enabled: Boolean(userId),
+  });
+
   const selectGoal = (next: LearningGoalId) => {
     setGoal(next);
-    saveLearningGoal(next);
+    void saveStudyPreferencesAsync(userId, { goal: next, xpTarget });
   };
 
   const selectXpTarget = (next: DailyXpTarget) => {
     setXpTarget(next);
-    saveDailyXpTarget(next);
+    void saveStudyPreferencesAsync(userId, { goal, xpTarget: next });
   };
 
   const enrolledCourses = courses

@@ -1,9 +1,14 @@
+import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, HelpCircle, StickyNote, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { Lesson } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
-import { getLessonNote, saveLessonNote } from './lessonNotesStorage';
+import {
+  getLessonNote,
+  saveLessonNoteAsync,
+  syncLessonNoteFromServer,
+} from './lessonNotesStorage';
 
 interface QuickCheckQuestion {
   prompt: string;
@@ -56,11 +61,25 @@ export function LessonNotesAndCheckPanel({
 
   const [note, setNote] = useState(() => getLessonNote(userId, lesson.id));
   const [noteSaved, setNoteSaved] = useState(false);
+  const [cloudSynced, setCloudSynced] = useState(false);
+
+  useQuery({
+    queryKey: ['lesson-note-sync', userId, lesson.id],
+    queryFn: async () => {
+      const synced = await syncLessonNoteFromServer(userId, lesson.id);
+      if (synced && synced !== note) {
+        setNote(synced);
+      }
+      return synced;
+    },
+    enabled: Boolean(userId && lesson.id),
+  });
 
   const quickCheck = useMemo(() => buildQuickCheck(lesson), [lesson]);
 
-  const handleSaveNote = () => {
-    saveLessonNote(userId, lesson.id, note);
+  const handleSaveNote = async () => {
+    const res = await saveLessonNoteAsync(userId, lesson.id, note);
+    setCloudSynced(res.syncedToCloud);
     setNoteSaved(true);
     window.setTimeout(() => setNoteSaved(false), 2500);
   };
@@ -165,7 +184,11 @@ export function LessonNotesAndCheckPanel({
           />
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] text-[#71717A] dark:text-slate-400">
-              {noteSaved ? 'Catatan tersimpan di perangkat Anda.' : 'Tersimpan per materi pelajaran.'}
+              {noteSaved
+                ? cloudSynced
+                  ? 'Catatan tersimpan ke cloud & perangkat Anda.'
+                  : 'Catatan tersimpan di perangkat Anda.'
+                : 'Tersimpan per materi pelajaran.'}
             </span>
             <Button size="sm" variant="secondary" onClick={handleSaveNote}>
               Simpan Catatan

@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.10.0] - 2026-11-24
+
+### Minor
+- Sprint 7: Cloud Sync Catatan & Preferensi (BL-21, BL-22), Ekspor Catatan .md (BL-23), Lab Spreadsheet Excel Interaktif (BL-23B), serta Security Hardening & Performance Benchmark Suite (BL-23C)
+
+---
+
 ## [1.9.1] - 2026-11-24
 
 ### Patch
