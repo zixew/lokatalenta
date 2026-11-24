@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.0.0] - 2026-11-24
+
+### Major
+- LokaTalenta 2.0: Radar Kompetensi 5-Dimensi (BL-30), Talent Readiness Passport (BL-31), Portal Verifikasi 2.0 (BL-32), & Isolasi UI Admin Dashboard (BL-32B)
+
+---
+
 ## [1.12.0] - 2026-11-24
 
 ### Minor
