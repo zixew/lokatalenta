@@ -25,6 +25,7 @@ export function QuizRunnerPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const [searchParams] = useSearchParams();
   const challengeInfo = parseChallengeParams(searchParams.toString());
+  const subtestFilter = searchParams.get('subtest')?.trim() ?? '';
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,15 +100,22 @@ export function QuizRunnerPage() {
         }
 
         const existing = await lmsApi.getUserAttemptForQuiz(user.id, quizId);
-        if (existing && (existing.score ?? 0) >= passingScore && mounted) {
+        if (!subtestFilter && existing && (existing.score ?? 0) >= passingScore && mounted) {
           navigate(`/quiz/${quizId}/result/${existing.id}`, { replace: true });
           return;
         }
 
         const { attempt: activeAttempt, questions: safeQs } = await lmsApi.startQuizAttempt(
           user.id,
-          quizId
+          quizId,
+          { isSmartDrill: Boolean(subtestFilter) }
         );
+        const drilledQs = subtestFilter
+          ? safeQs.filter(
+              (q) => (q.category_tag ?? '').toLowerCase() === subtestFilter.toLowerCase()
+            )
+          : safeQs;
+        const effectiveQs = drilledQs.length > 0 ? drilledQs : safeQs;
         if (mounted) {
           const deadlineMs =
             new Date(activeAttempt.started_at).getTime() + durationMins * 60 * 1000;
@@ -115,7 +123,7 @@ export function QuizRunnerPage() {
           setAttempt(activeAttempt);
           setAnswers(activeAttempt.answers ?? {});
           setSecondsLeft(remaining);
-          setQuestions(safeQs);
+          setQuestions(effectiveQs);
           setLoading(false);
         }
       } catch (err: any) {
@@ -130,7 +138,7 @@ export function QuizRunnerPage() {
     return () => {
       mounted = false;
     };
-  }, [quizId, user, navigate]);
+  }, [quizId, user, navigate, subtestFilter]);
 
   const handleSubmit = useCallback(async () => {
     if (!attempt || submitting) return;
@@ -324,6 +332,18 @@ export function QuizRunnerPage() {
               <strong className="font-mono-tabular">&gt; {challengeInfo.targetScore}%</strong>
             </span>
             <Badge tone="emerald">Mode Tantangan</Badge>
+          </div>
+        </div>
+      )}
+
+      {subtestFilter && (
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-4">
+          <div className="px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs sm:text-sm text-amber-900 dark:text-amber-100 flex flex-wrap items-center justify-between gap-2">
+            <span>
+              <strong>Smart Drill Subtest:</strong> Fokus berlatih kategori{' '}
+              <strong>{subtestFilter}</strong> ({questions.length} soal)
+            </span>
+            <Badge tone="amber">Smart Drill</Badge>
           </div>
         </div>
       )}
