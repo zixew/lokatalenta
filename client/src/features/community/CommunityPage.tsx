@@ -35,7 +35,7 @@ export function CommunityPage() {
   const [category, setCategory] = useState(() => draft?.draftCategory ?? 'Tips Psikotes');
   const [content, setContent] = useState(() => draft?.draftContent ?? '');
 
-  const { data: posts = [] } = useQuery({
+  const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['community-posts'],
     queryFn: () => lmsApi.listCommunityPosts(),
   });
@@ -225,7 +225,21 @@ export function CommunityPage() {
       </div>
 
       {/* Posts Feed */}
-      {filteredPosts.length === 0 ? (
+      {postsLoading ? (
+        <div className="space-y-4" role="status" aria-label="Memuat topik diskusi">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-3 animate-pulse"
+            >
+              <div className="h-3 w-24 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="h-5 w-2/3 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="h-3 w-full rounded bg-slate-100 dark:bg-slate-800" />
+              <div className="h-3 w-5/6 rounded bg-slate-100 dark:bg-slate-800" />
+            </div>
+          ))}
+        </div>
+      ) : filteredPosts.length === 0 ? (
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-10 text-center text-sm text-[#71717A] dark:text-slate-400">
           Belum ada topik diskusi pada kategori ini.
         </div>

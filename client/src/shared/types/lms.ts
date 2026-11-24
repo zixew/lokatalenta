@@ -79,6 +79,7 @@ export interface MentoringBooking {
 export interface CourseAnnouncement {
   id: string;
   course_id: string;
+  cohort_id?: string | null;
   author_id?: string | null;
   author_name: string;
   title: string;
@@ -109,6 +110,9 @@ export interface QuizOption {
 export interface SafeQuestion {
   id: string;
   category_tag: string;
+  question_type?: 'mcq' | 'short_answer';
+  accepted_answers?: string[];
+  case_sensitive?: boolean;
   question_text: string;
   image_url?: string | null;
   audio_text?: string | null;
@@ -196,6 +200,8 @@ export interface QuizAttempt {
   category_breakdown: CategoryBreakdown | null;
   answers: Record<string, string>;
   question_ids?: string[] | null;
+  tab_switch_count?: number;
+  focus_loss_events?: Array<{ at: string; type: 'hidden' | 'blur' }>;
 }
 
 export interface ReviewQuestion extends SafeQuestion {
@@ -212,6 +218,7 @@ export interface AssignmentRubricItem {
 export interface CourseAssignment {
   id: string;
   course_id: string;
+  cohort_id?: string | null;
   lesson_id?: string | null;
   title: string;
   instructions: string;

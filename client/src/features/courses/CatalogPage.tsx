@@ -507,12 +507,16 @@ export function CatalogPage() {
                       : `/courses/${course.slug}`;
 
                     return (
-                      <Link
+                      <div
                         key={course.id}
-                        to={targetUrl}
-                        onClick={(e) => handleOpenTarget(e, targetUrl)}
-                        className="group bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:-translate-y-1 hover:border-[#0F766E]/60 dark:hover:border-teal-500/60 hover:shadow-md transition-all duration-200"
+                        className="group relative pointer-events-none bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:-translate-y-1 hover:border-[#0F766E]/60 dark:hover:border-teal-500/60 hover:shadow-md transition-all duration-200"
                       >
+                        <Link
+                          to={targetUrl}
+                          onClick={(e) => handleOpenTarget(e, targetUrl)}
+                          aria-label={course.title}
+                          className="pointer-events-auto absolute inset-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]"
+                        />
                         <div className="space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <Badge tone={directQuiz ? 'amber' : 'blue'}>{course.category}</Badge>
@@ -608,12 +612,8 @@ export function CatalogPage() {
                                 <div className="flex items-center gap-2">
                                   <button
                                     type="button"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      setPreviewCourse({ course, targetUrl });
-                                    }}
-                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:text-[#0F766E] dark:hover:text-teal-400 font-semibold transition-colors cursor-pointer"
+                                    onClick={() => setPreviewCourse({ course, targetUrl })}
+                                    className="pointer-events-auto relative z-10 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:text-[#0F766E] dark:hover:text-teal-400 font-semibold transition-colors cursor-pointer"
                                     title="Pratinjau silabus kursus"
                                   >
                                     <Eye className="w-3.5 h-3.5" />
@@ -628,7 +628,7 @@ export function CatalogPage() {
                             )}
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     );
                   })}
                 </div>

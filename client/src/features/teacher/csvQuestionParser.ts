@@ -6,6 +6,8 @@ export interface ParsedCsvQuestion {
   options: QuizOption[];
   correct_option: 'A' | 'B' | 'C' | 'D' | 'E';
   explanation: string;
+  question_type?: 'mcq' | 'short_answer';
+  accepted_answers?: string[];
 }
 
 export interface CsvParseResult {
@@ -72,11 +74,53 @@ export function parseQuestionsCsv(raw: string): CsvParseResult {
       return;
     }
 
-    const [categoryTag, questionText, optA, optB, optC, optD, optE, rawCorrect, explanation = ''] = cols;
+    const [
+      categoryTag,
+      questionText,
+      optA,
+      optB,
+      optC,
+      optD,
+      optE,
+      rawCorrect,
+      explanation = '',
+      rawQuestionType = '',
+      rawAcceptedAnswers = '',
+    ] = cols;
     if (!questionText) {
       errors.push(`Baris ${rowNum}: pertanyaan tidak boleh kosong.`);
       return;
     }
+
+    const normalizedType = rawQuestionType.trim().toLowerCase();
+    if (normalizedType === 'short_answer') {
+      const acceptedList = (rawAcceptedAnswers || rawCorrect || '')
+        .split('|')
+        .map((ans) => ans.trim())
+        .filter((ans) => ans.length > 0);
+      if (acceptedList.length === 0) {
+        errors.push(
+          `Baris ${rowNum}: soal short_answer wajib memiliki accepted_answers (pisahkan dengan |).`
+        );
+        return;
+      }
+      questions.push({
+        category_tag: categoryTag || 'Umum',
+        question_text: questionText,
+        options: [],
+        correct_option: 'A',
+        explanation: explanation || 'Pembahasan belum ditambahkan.',
+        question_type: 'short_answer',
+        accepted_answers: acceptedList,
+      });
+      return;
+    }
+
+    if (normalizedType && normalizedType !== 'mcq') {
+      errors.push(`Baris ${rowNum}: question_type "${rawQuestionType}" harus mcq atau short_answer.`);
+      return;
+    }
+
     if (!optA || !optB || !optC || !optD) {
       errors.push(`Baris ${rowNum}: opsi A, B, C, dan D wajib diisi.`);
       return;

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2,
+  ChevronDown,
   ClipboardCheck,
   ExternalLink,
   PlusCircle,
@@ -10,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 import { DEFAULT_ASSIGNMENT_RUBRIC, lmsApi } from '../../shared/services/lmsApi';
 import type {
   AssignmentRubricItem,
@@ -20,8 +22,10 @@ import type {
 } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
+import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
+import { listTeacherCohortsAsync } from '../cohort/cohortApi';
 
 export function TeacherAssignmentsTab({
   courses,
@@ -36,13 +40,20 @@ export function TeacherAssignmentsTab({
   const queryClient = useQueryClient();
 
   const [courseId, setCourseId] = useState(courses[0]?.id ?? '');
+  const [cohortId, setCohortId] = useState('');
+  const [assignmentCohortFilter, setAssignmentCohortFilter] = useState('all');
   const [title, setTitle] = useState('');
   const [taskBrief, setTaskBrief] = useState('');
   const [howToGuide, setHowToGuide] = useState('');
   const [rubric, setRubric] = useState<AssignmentRubricItem[]>(DEFAULT_ASSIGNMENT_RUBRIC);
+  const [rubricOpen, setRubricOpen] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [subSearch, setSubSearch] = useState('');
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'submitted' | 'approved' | 'rejected'>('all');
+  const [pendingDeleteAssignment, setPendingDeleteAssignment] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
 
   const { data: rawAssignments = [] } = useQuery({
     queryKey: ['all-assignments'],
@@ -54,8 +65,20 @@ export function TeacherAssignmentsTab({
     queryFn: () => lmsApi.listAllSubmissionsForTeacher(),
   });
 
+  const { data: cohorts = [] } = useQuery({
+    queryKey: ['teacher-cohorts', user?.id],
+    queryFn: () => (user?.id ? listTeacherCohortsAsync(user.id) : Promise.resolve([])),
+    enabled: Boolean(user?.id),
+  });
+  const cohortNameMap = new Map(cohorts.map((c) => [c.id, c.name]));
+
   const teacherCourseIds = new Set(courses.map((c) => c.id));
   const assignments = rawAssignments.filter((a) => teacherCourseIds.has(a.course_id));
+  const filteredAssignments = assignments.filter((a) => {
+    if (assignmentCohortFilter === 'all') return true;
+    if (assignmentCohortFilter === 'public') return !a.cohort_id;
+    return a.cohort_id === assignmentCohortFilter;
+  });
   const submissions = rawSubmissions.filter((sub) => {
     const asg = rawAssignments.find((a) => a.id === sub.assignment_id);
     const cid = asg?.course_id ?? sub.assignment_id.replace('asg-default-', '');
@@ -63,8 +86,8 @@ export function TeacherAssignmentsTab({
   });
 
   const createMut = useMutation({
-    mutationFn: () =>
-      lmsApi.createCourseAssignment({
+    mutationFn: async () => {
+      const created = await lmsApi.createCourseAssignment({
         course_id: courseId || courses[0]?.id || '',
         title: title.trim(),
         instructions: taskBrief.trim(),
@@ -75,12 +98,40 @@ export function TeacherAssignmentsTab({
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
         max_score: 100,
         created_by: user?.id ?? null,
-      }),
+      });
+      if (cohortId) {
+        if (isSupabaseConfigured && supabase) {
+          await supabase
+            .from('course_assignments')
+            .update({ cohort_id: cohortId })
+            .eq('id', created.id);
+        } else {
+          try {
+            const raw = localStorage.getItem('ruanglatih_demo_assignments_v1');
+            if (raw) {
+              const list = JSON.parse(raw) as CourseAssignment[];
+              localStorage.setItem(
+                'ruanglatih_demo_assignments_v1',
+                JSON.stringify(
+                  list.map((item) =>
+                    item.id === created.id ? { ...item, cohort_id: cohortId } : item
+                  )
+                )
+              );
+            }
+          } catch {
+            // ignore storage errors
+          }
+        }
+      }
+      return created;
+    },
     onSuccess: () => {
       setTitle('');
       setTaskBrief('');
       setHowToGuide('');
       setDueDate('');
+      setCohortId('');
       queryClient.invalidateQueries({ queryKey: ['all-assignments'] });
       queryClient.invalidateQueries({ queryKey: ['course-assignments'] });
       onSuccess('Tugas upload file beserta panduan & rubrik bintang 1–5 berhasil dibuat.');
@@ -113,7 +164,7 @@ export function TeacherAssignmentsTab({
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
             <PlusCircle className="w-4 h-4 text-[#0F766E]" />
-            Buat Tugas Upload File (3 Tab &amp; Rubrik ★ 1–5)
+            Buat Tugas Upload File &amp; Rubrik ★ 1–5
           </h2>
 
           <form
@@ -138,6 +189,26 @@ export function TeacherAssignmentsTab({
 
             <div>
               <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                Target Cohort (Opsional)
+              </label>
+              <select
+                value={cohortId}
+                onChange={(e) => setCohortId(e.target.value)}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+              >
+                <option value="">Semua Peserta</option>
+                {cohorts
+                  .filter((c) => c.is_active)
+                  .map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
                 Judul Tugas
               </label>
               <input
@@ -152,7 +223,7 @@ export function TeacherAssignmentsTab({
 
             <div>
               <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
-                Tab 1: Apa yang Harus Dikerjakan &amp; Aturan File
+                Instruksi Tugas &amp; Aturan Format File
               </label>
               <textarea
                 rows={3}
@@ -166,7 +237,7 @@ export function TeacherAssignmentsTab({
 
             <div>
               <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
-                Tab 2: Cara Mengerjakan (Langkah Demi Langkah)
+                Panduan Langkah Pengerjaan (Opsional)
               </label>
               <textarea
                 rows={3}
@@ -177,23 +248,38 @@ export function TeacherAssignmentsTab({
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300">
-                Tab 3: Deskripsi Penilaian Bintang 1 – 5
-              </label>
-              {rubric.map((r) => (
-                <div key={r.stars} className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-amber-500 w-10 shrink-0">
-                    ★ {r.stars}
-                  </span>
-                  <input
-                    type="text"
-                    value={r.description}
-                    onChange={(e) => updateRubricDesc(r.stars, e.target.value)}
-                    className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
-                  />
+            <div className="rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1]/60 dark:bg-slate-800/40 p-3 space-y-2">
+              <button
+                type="button"
+                onClick={() => setRubricOpen((v) => !v)}
+                className="w-full flex items-center justify-between text-left cursor-pointer"
+              >
+                <span className="text-xs font-semibold text-[#18181B] dark:text-slate-200">
+                  Rubrik Penilaian Bintang 1 – 5 (Default siap pakai)
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 text-[#71717A] transition-transform ${
+                    rubricOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {rubricOpen && (
+                <div className="space-y-1.5 pt-1">
+                  {rubric.map((r) => (
+                    <div key={r.stars} className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-amber-500 w-10 shrink-0">
+                        ★ {r.stars}
+                      </span>
+                      <input
+                        type="text"
+                        value={r.description}
+                        onChange={(e) => updateRubricDesc(r.stars, e.target.value)}
+                        className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
 
             <div>
@@ -215,35 +301,55 @@ export function TeacherAssignmentsTab({
         </div>
 
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-3">
-          <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
-            Daftar Tugas Kustom ({assignments.length})
-          </h3>
-          {assignments.length === 0 ? (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
+              Daftar Tugas Kustom ({filteredAssignments.length})
+            </h3>
+            {cohorts.length > 0 && (
+              <select
+                value={assignmentCohortFilter}
+                onChange={(e) => setAssignmentCohortFilter(e.target.value)}
+                className="px-2.5 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800 text-[#18181B] dark:text-white"
+              >
+                <option value="all">Semua Target</option>
+                <option value="public">Semua Peserta</option>
+                {cohorts.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    Cohort: {c.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+          {filteredAssignments.length === 0 ? (
             <p className="text-xs text-[#71717A] dark:text-slate-400">
               Setiap kursus sudah memiliki tugas upload file bawaan; Anda juga bisa membuat tugas khusus di atas.
             </p>
           ) : (
             <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-              {assignments.map((a) => (
+              {filteredAssignments.map((a) => (
                 <div
                   key={a.id}
                   className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 flex items-start justify-between gap-2"
                 >
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#18181B] dark:text-white truncate">
-                      {a.title}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="text-xs font-bold text-[#18181B] dark:text-white truncate">
+                        {a.title}
+                      </p>
+                      {a.cohort_id && (
+                        <Badge tone="blue">
+                          {cohortNameMap.get(a.cohort_id) ?? 'Khusus Cohort'}
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-[11px] text-[#71717A] dark:text-slate-400 truncate">
                       {courseName(a.course_id)}
                     </p>
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.confirm(`Hapus tugas "${a.title}"?`)) {
-                        deleteMut.mutate(a.id);
-                      }
-                    }}
+                    onClick={() => setPendingDeleteAssignment({ id: a.id, title: a.title })}
                     className="p-1.5 rounded-lg text-[#71717A] hover:text-rose-600 cursor-pointer"
                     title="Hapus tugas"
                   >
@@ -355,6 +461,25 @@ export function TeacherAssignmentsTab({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(pendingDeleteAssignment)}
+        title="Hapus Tugas"
+        description={
+          pendingDeleteAssignment
+            ? `Hapus tugas "${pendingDeleteAssignment.title}" secara permanen?`
+            : ''
+        }
+        confirmLabel="Hapus Tugas"
+        tone="danger"
+        onCancel={() => setPendingDeleteAssignment(null)}
+        onConfirm={() => {
+          if (pendingDeleteAssignment) {
+            deleteMut.mutate(pendingDeleteAssignment.id);
+          }
+          setPendingDeleteAssignment(null);
+        }}
+      />
     </div>
   );
 }

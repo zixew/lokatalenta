@@ -1,11 +1,15 @@
-import { ChevronDown, ChevronUp, Database, Table2 } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronDown, ChevronUp, Database, MessageSquareQuote, Table2 } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
 import { Badge } from '../../shared/ui/Badge';
 import { InteractiveSpreadsheetLab } from './InteractiveSpreadsheetLab';
 import { InteractiveSqlLab } from './InteractiveSqlLab';
 
+const StarInterviewLab = lazy(() => import('./StarInterviewLab'));
+
+type LabTab = 'excel' | 'sql' | 'star';
+
 interface HandsOnLabContainerProps {
-  defaultLab: 'excel' | 'sql';
+  defaultLab: LabTab;
   defaultExpanded?: boolean;
 }
 
@@ -14,7 +18,7 @@ export function HandsOnLabContainer({
   defaultExpanded = false,
 }: HandsOnLabContainerProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [activeLab, setActiveLab] = useState<'excel' | 'sql'>(defaultLab);
+  const [activeLab, setActiveLab] = useState<LabTab>(defaultLab);
 
   return (
     <section className="rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] overflow-hidden">
@@ -22,6 +26,8 @@ export function HandsOnLabContainer({
         <div className="flex items-center gap-2">
           {activeLab === 'sql' ? (
             <Database className="w-4 h-4 text-[#0F766E]" />
+          ) : activeLab === 'star' ? (
+            <MessageSquareQuote className="w-4 h-4 text-[#0F766E]" />
           ) : (
             <Table2 className="w-4 h-4 text-[#0F766E]" />
           )}
@@ -63,6 +69,21 @@ export function HandsOnLabContainer({
               <Database className="w-3.5 h-3.5" />
               Lab SQL (SELECT)
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLab('star');
+                setExpanded(true);
+              }}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                activeLab === 'star'
+                  ? 'bg-[#0F766E] text-white'
+                  : 'text-[#52525B] dark:text-slate-300'
+              }`}
+            >
+              <MessageSquareQuote className="w-3.5 h-3.5" />
+              Simulasi STAR
+            </button>
           </div>
 
           <button
@@ -87,8 +108,18 @@ export function HandsOnLabContainer({
         <div className="p-5">
           {activeLab === 'excel' ? (
             <InteractiveSpreadsheetLab defaultExpanded />
-          ) : (
+          ) : activeLab === 'sql' ? (
             <InteractiveSqlLab />
+          ) : (
+            <Suspense
+              fallback={
+                <div className="p-6 text-center text-xs text-[#71717A] dark:text-slate-400">
+                  Memuat Simulasi Wawancara STAR...
+                </div>
+              }
+            >
+              <StarInterviewLab />
+            </Suspense>
           )}
         </div>
       )}

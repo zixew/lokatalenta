@@ -269,6 +269,13 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** mentor menyusun modul/materi/soal atau admin menginspeksi pengguna/kursus & melakukan aksi sensitif,
   - **Then** mentor dapat melakukan *drag-and-drop* urutan modul/lesson & *live split preview* soal, sementara admin memiliki *slide-over detail drawer*, grafik distribusi role/pertumbuhan interaktif, dan modal konfirmasi + toast modern (menggantikan `window.confirm`).
 
+#### `US-40E` (BL-40E — Multi-POV UX Research): Riset Tata Letak & Keterpahaman UI (`student-pov`, `teacher-pov`, `admin-pov`)
+- **User Story:** *Sebagai **Tim Produk & UX**, saya ingin melakukan riset evaluasi tata letak UI, hierarki visual, label navigasi, dan kejelasan alur aplikasi menggunakan 3 subagent POV (`student-pov`, `teacher-pov`, `admin-pov`), sehingga diketahui apakah tata letak saat ini sudah mudah dimengerti oleh pengguna di setiap peran.*
+- **Acceptance Criteria:**
+  - **Given** subagent `student-pov`, `teacher-pov`, dan `admin-pov` mengaudit seluruh halaman utama aplikasi pada desktop (`1280x800`) dan mobile (`390x844`),
+  - **When** masing-masing subagent menilai *cognitive load*, kejelasan label/CTA, posisi komponen, dan *time-to-find* fitur inti,
+  - **Then** tersusun laporan skor keterpahaman UI per halaman, daftar *friction point* tata letak, dan rekomendasi perbaikan konkret yang langsung ditindaklanjuti sebelum rilis `v2.3.0`.
+
 #### `US-41` (BL-41): Security & Stress Benchmark Suite v2 (5.000 Operasi)
 - **User Story:** *Sebagai **Tim Engineering**, saya ingin menguji performa parser rumus, filter katalog, dan sanitasi payload pada skala 5.000 operasi sebelum masuk ke rilis Major `v3.0.0`.*
 - **Acceptance Criteria:**

@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Eye,
   Flag,
   Lock,
   Moon,
@@ -24,6 +25,11 @@ import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
 import { getLockedQuizMode, lockQuizMode, type QuizSessionMode } from './quizModeStorage';
 import { parseChallengeParams, saveActiveChallengeForQuiz } from './shareAndChallenge';
+import { evaluateShortAnswer } from './shortAnswerEvaluator';
+import {
+  persistFocusIntegrityForAttempt,
+  useFocusIntegrityMonitor,
+} from './useFocusIntegrityMonitor';
 
 export function QuizRunnerPage() {
   const { quizId } = useParams<{ quizId: string }>();
@@ -63,10 +69,42 @@ export function QuizRunnerPage() {
   >({});
   const [checkingPractice, setCheckingPractice] = useState(false);
 
+  const { tabSwitchCount, events: focusLossEvents } = useFocusIntegrityMonitor({
+    enabled: !loading && Boolean(attempt) && modeSelected && !submitting,
+  });
+
+  useEffect(() => {
+    if (attempt?.id && modeSelected) {
+      persistFocusIntegrityForAttempt(attempt.id, tabSwitchCount, focusLossEvents);
+    }
+  }, [attempt?.id, modeSelected, tabSwitchCount, focusLossEvents]);
+
   const handleCheckPractice = async () => {
     if (!quizId || !currentQuestion) return;
     const selected = answers[currentQuestion.id];
     if (!selected || checkingPractice) return;
+    if (
+      currentQuestion.question_type === 'short_answer' &&
+      currentQuestion.accepted_answers &&
+      currentQuestion.accepted_answers.length > 0
+    ) {
+      const isCorrect = evaluateShortAnswer(
+        selected,
+        currentQuestion.accepted_answers,
+        currentQuestion.case_sensitive
+      );
+      setPracticeFeedback((prev) => ({
+        ...prev,
+        [currentQuestion.id]: {
+          is_correct: isCorrect,
+          correct_option: currentQuestion.accepted_answers![0] ?? '',
+          explanation: isCorrect
+            ? 'Jawaban isian singkat Anda sesuai dengan kunci yang diterima.'
+            : `Jawaban yang diterima: ${currentQuestion.accepted_answers!.join(' / ')}`,
+        },
+      }));
+      return;
+    }
     setCheckingPractice(true);
     try {
       const res = await lmsApi.checkPracticeAnswer(quizId, currentQuestion.id, selected);
@@ -158,13 +196,15 @@ export function QuizRunnerPage() {
     if (!attempt || submitting) return;
     setSubmitting(true);
     try {
+      persistFocusIntegrityForAttempt(attempt.id, tabSwitchCount, focusLossEvents);
       const submitted = await lmsApi.submitQuizAttempt(attempt.id, answers);
+      persistFocusIntegrityForAttempt(submitted.id, tabSwitchCount, focusLossEvents);
       navigate(`/quiz/${quizId}/result/${submitted.id}`, { replace: true });
     } catch (err) {
       console.error(err);
       setSubmitting(false);
     }
-  }, [attempt, answers, navigate, quizId, submitting]);
+  }, [attempt, answers, focusLossEvents, navigate, quizId, submitting, tabSwitchCount]);
 
   // Countdown timer with auto-submit
   useEffect(() => {
@@ -200,13 +240,20 @@ export function QuizRunnerPage() {
   useEffect(() => {
     if (!currentQuestion || showConfirm) return;
     const onKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target instanceof HTMLElement && e.target.isContentEditable)
+      ) {
+        return;
+      }
       if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'n') {
         setCurrentIndex((i) => Math.min(questions.length - 1, i + 1));
       } else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'p') {
         setCurrentIndex((i) => Math.max(0, i - 1));
       } else if (e.key.toLowerCase() === 'f') {
         setFlagged((prev) => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }));
-      } else {
+      } else if (currentQuestion.question_type !== 'short_answer') {
         const keyMap: Record<string, string> = {
           '1': 'A',
           '2': 'B',
@@ -347,7 +394,7 @@ export function QuizRunnerPage() {
     );
   }
 
-  const answeredCount = questions.filter((q) => Boolean(answers[q.id])).length;
+  const answeredCount = questions.filter((q) => Boolean(answers[q.id]?.trim())).length;
   const flaggedCount = questions.filter((q) => Boolean(flagged[q.id])).length;
   const unansweredCount = questions.length - answeredCount;
   const isCriticalTime = secondsLeft < 300; // < 5 minutes
@@ -377,6 +424,20 @@ export function QuizRunnerPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <span
+              className={`hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold ${
+                tabSwitchCount === 0
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                  : tabSwitchCount <= 2
+                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
+              }`}
+              title="Indikator Fokus: mencatat perpindahan tab/jendela secara non-intrusif selama ujian"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              {tabSwitchCount === 0 ? 'Fokus Terjaga' : `Pindah Tab: ${tabSwitchCount}x`}
+            </span>
+
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-semibold ${
                 practiceMode
@@ -539,37 +600,59 @@ export function QuizRunnerPage() {
             )}
           </div>
 
-          {/* Options */}
-          <div className="space-y-2.5 pt-2">
-            {currentQuestion.options.map((opt) => {
-              const isSelected = answers[currentQuestion.id] === opt.key;
-              return (
-                <button
-                  key={opt.key}
-                  type="button"
-                  onClick={() => selectAnswer(currentQuestion.id, opt.key)}
-                  className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
-                    isSelected
-                      ? 'bg-teal-50 dark:bg-teal-950/50 border-[#0F766E] ring-1 ring-[#0F766E]'
-                      : 'bg-white dark:bg-slate-900/60 border-[#E5E3DC] dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <span
-                    className={`w-8 h-8 rounded-lg font-mono-tabular text-sm font-bold flex items-center justify-center shrink-0 ${
+          {/* Options or Short Answer Input */}
+          {currentQuestion.question_type === 'short_answer' ? (
+            <div className="space-y-2.5 pt-2">
+              <label
+                htmlFor={`short-answer-${currentQuestion.id}`}
+                className="block text-xs font-bold uppercase tracking-wider text-[#52525B] dark:text-slate-400"
+              >
+                Jawaban Singkat / Rumus
+              </label>
+              <input
+                id={`short-answer-${currentQuestion.id}`}
+                type="text"
+                value={answers[currentQuestion.id] ?? ''}
+                onChange={(e) => selectAnswer(currentQuestion.id, e.target.value)}
+                placeholder="Ketik jawaban singkat atau rumus (contoh: =SUM(A1:A5))..."
+                className="w-full px-4 py-3 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm sm:text-base font-mono-tabular text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E]"
+              />
+              <p className="text-xs text-[#71717A] dark:text-slate-400">
+                Spasi berlebih di awal/akhir atau di antara kata akan dirapikan otomatis saat penilaian.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5 pt-2">
+              {currentQuestion.options.map((opt) => {
+                const isSelected = answers[currentQuestion.id] === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => selectAnswer(currentQuestion.id, opt.key)}
+                    className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-[#0F766E] text-white'
-                        : 'bg-slate-100 dark:bg-slate-800 text-[#18181B] dark:text-slate-200'
+                        ? 'bg-teal-50 dark:bg-teal-950/50 border-[#0F766E] ring-1 ring-[#0F766E]'
+                        : 'bg-white dark:bg-slate-900/60 border-[#E5E3DC] dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
-                    {opt.key}
-                  </span>
-                  <span className="text-sm sm:text-base text-[#18181B] dark:text-slate-100 font-medium">
-                    {opt.text}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    <span
+                      className={`w-8 h-8 rounded-lg font-mono-tabular text-sm font-bold flex items-center justify-center shrink-0 ${
+                        isSelected
+                          ? 'bg-[#0F766E] text-white'
+                          : 'bg-slate-100 dark:bg-slate-800 text-[#18181B] dark:text-slate-200'
+                      }`}
+                    >
+                      {opt.key}
+                    </span>
+                    <span className="text-sm sm:text-base text-[#18181B] dark:text-slate-100 font-medium">
+                      {opt.text}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* BL-02: Practice Mode Instant Feedback */}
           {practiceMode && (
