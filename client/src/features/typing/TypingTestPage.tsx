@@ -224,10 +224,16 @@ export default function TypingTestPage() {
             {activePreset.title}
           </p>
           {status === 'finished' && (
-            <Badge tone="emerald">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Selesai! Hasil Tersimpan
-            </Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="emerald">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Selesai! Hasil Tersimpan
+              </Badge>
+              <Button type="button" size="sm" variant="secondary" onClick={() => handleReset()}>
+                <RotateCcw className="w-3.5 h-3.5" />
+                Ulangi Latihan
+              </Button>
+            </div>
           )}
         </div>
 

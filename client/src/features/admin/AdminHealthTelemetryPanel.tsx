@@ -73,7 +73,7 @@ export function AdminHealthTelemetryPanel() {
                 : 'Mode Lokal'}
             </p>
             <span className="text-[11px] text-[#71717A] dark:text-slate-400">
-              RPC `get_admin_health_metrics`
+              Koneksi Cloud Database
             </span>
           </div>
 
@@ -109,9 +109,14 @@ export function AdminHealthTelemetryPanel() {
         <div className="px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
-              Log Error Client Tertangkap ({errors.length})
-            </h3>
+            <div>
+              <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
+                Log Error Client Tertangkap ({errors.length})
+              </h3>
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400">
+                Cakupan lokal browser (<code className="font-mono">sessionStorage</code>) untuk sesi tab aktif ini.
+              </p>
+            </div>
           </div>
           {errors.length > 0 && (
             <Button size="sm" variant="secondary" onClick={handleClearErrors}>
@@ -123,7 +128,7 @@ export function AdminHealthTelemetryPanel() {
 
         {errors.length === 0 ? (
           <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
-            Tidak ada error runtime client yang tercatat pada sesi ini.
+            Tidak ada error runtime client yang tercatat pada sesi browser ini (sessionStorage).
           </div>
         ) : (
           <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">

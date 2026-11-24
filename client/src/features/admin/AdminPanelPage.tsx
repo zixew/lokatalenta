@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Clock,
   Download,
+  ExternalLink,
   Eye,
   FileText,
   HelpCircle,
@@ -23,11 +24,13 @@ import {
   X,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 import { lmsApi } from '../../shared/services/lmsApi';
-import type { Course, UserRole } from '../../shared/types/lms';
+import type { Course, Profile, UserRole } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
+import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
 import { useAuthStore } from '../auth/useAuthStore';
 import {
   type CertificateWithRevocation,
@@ -77,14 +80,47 @@ interface AdminCohortItem {
   created_at: string;
 }
 
+const VALID_ADMIN_TABS: readonly AdminTab[] = [
+  'users',
+  'courses',
+  'cohorts',
+  'community',
+  'certificates',
+  'broadcasts',
+  'audit',
+  'health',
+];
+
 const USER_PAGE_SIZE = 10;
 const COURSE_PAGE_SIZE = 10;
+const COMMUNITY_PAGE_SIZE = 10;
+const CERT_PAGE_SIZE = 10;
 
 export function AdminPanelPage() {
   const { user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<AdminTab>('users');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab') as AdminTab | null;
+  const activeTab: AdminTab =
+    tabParam && VALID_ADMIN_TABS.includes(tabParam) ? tabParam : 'users';
+
+  const setActiveTab = (tab: AdminTab) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next, { replace: true });
+  };
+
   const [feedback, setFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
+  const [confirmState, setConfirmState] = useState<{
+    title: string;
+    description: string;
+    confirmLabel: string;
+    tone: 'danger' | 'primary';
+    onConfirm: () => void;
+  } | null>(null);
+  const [drawerTarget, setDrawerTarget] = useState<
+    { type: 'user'; user: Profile } | { type: 'course'; course: Course } | null
+  >(null);
 
   const showFeedback = (tone: 'success' | 'error', message: string) => {
     setFeedback({ tone, message });
@@ -111,13 +147,24 @@ export function AdminPanelPage() {
   const [coursePage, setCoursePage] = useState(1);
   const [previewCourse, setPreviewCourse] = useState<Course | null>(null);
 
-  // Community moderation filters
+  // Community moderation filters & pagination
   const [communitySearch, setCommunitySearch] = useState('');
   const [communityCategoryFilter, setCommunityCategoryFilter] = useState('Semua');
+  const [communityPage, setCommunityPage] = useState(1);
+  const [previewPost, setPreviewPost] = useState<{
+    id: string;
+    title: string;
+    content: string;
+    category: string;
+    author_name: string;
+    author_role: UserRole;
+    created_at: string;
+  } | null>(null);
 
-  // Certificate filters & revoke modal
+  // Certificate filters, pagination & revoke modal
   const [certSearch, setCertSearch] = useState('');
   const [certStatusFilter, setCertStatusFilter] = useState<'all' | 'valid' | 'revoked'>('all');
+  const [certPage, setCertPage] = useState(1);
   const [revokeTarget, setRevokeTarget] = useState<CertificateWithRevocation | null>(null);
   const [revokeReason, setRevokeReason] = useState('');
 
@@ -422,10 +469,14 @@ export function AdminPanelPage() {
   const handleRoleChange = (userId: string, role: UserRole) => {
     const target = profiles.find((p) => p.id === userId);
     if (target?.role === role) return;
-    if (
-      role === 'admin' &&
-      !window.confirm(`Promosikan ${target?.full_name || target?.email || 'pengguna'} menjadi Admin?`)
-    ) {
+    if (role === 'admin') {
+      setConfirmState({
+        title: 'Promosikan menjadi Admin?',
+        description: `Pengguna ${target?.full_name || target?.email || 'ini'} akan mendapatkan akses penuh Admin Panel.`,
+        confirmLabel: 'Promosikan',
+        tone: 'primary',
+        onConfirm: () => updateRoleMut.mutate({ userId, role }),
+      });
       return;
     }
     updateRoleMut.mutate({ userId, role });
@@ -433,10 +484,14 @@ export function AdminPanelPage() {
 
   const handleToggleActive = (userId: string, isActive: boolean) => {
     const target = profiles.find((p) => p.id === userId);
-    if (
-      !isActive &&
-      !window.confirm(`Nonaktifkan akun ${target?.full_name || target?.email || 'pengguna'}?`)
-    ) {
+    if (!isActive) {
+      setConfirmState({
+        title: 'Nonaktifkan Akun Pengguna?',
+        description: `Akun ${target?.full_name || target?.email || 'pengguna'} tidak akan bisa masuk sampai diaktifkan kembali.`,
+        confirmLabel: 'Nonaktifkan',
+        tone: 'danger',
+        onConfirm: () => toggleActiveMut.mutate({ userId, isActive }),
+      });
       return;
     }
     toggleActiveMut.mutate({ userId, isActive });
@@ -444,20 +499,27 @@ export function AdminPanelPage() {
 
   const handleTogglePublish = (courseId: string, isPublished: boolean) => {
     const target = courses.find((c) => c.id === courseId);
-    if (
-      !isPublished &&
-      !window.confirm(`Tarik kursus "${target?.title || ''}" dari katalog ke Draft?`)
-    ) {
+    if (!isPublished) {
+      setConfirmState({
+        title: 'Tarik Kursus ke Draft?',
+        description: `Kursus "${target?.title || ''}" akan disembunyikan dari katalog publik pelajar.`,
+        confirmLabel: 'Tarik ke Draft',
+        tone: 'danger',
+        onConfirm: () => togglePublishMut.mutate({ courseId, isPublished }),
+      });
       return;
     }
     togglePublishMut.mutate({ courseId, isPublished });
   };
 
   const handleDeleteCommunityPost = (postId: string, title: string) => {
-    if (!window.confirm(`Hapus postingan "${title}" secara permanen?`)) {
-      return;
-    }
-    deleteCommunityPostMut.mutate(postId);
+    setConfirmState({
+      title: 'Hapus Postingan Komunitas?',
+      description: `Postingan "${title}" akan dihapus secara permanen dari forum komunitas.`,
+      confirmLabel: 'Hapus Permanen',
+      tone: 'danger',
+      onConfirm: () => deleteCommunityPostMut.mutate(postId),
+    });
   };
 
   const userDistribution = useMemo(() => {
@@ -553,6 +615,30 @@ export function AdminPanelPage() {
     safeCoursePage * COURSE_PAGE_SIZE
   );
 
+  const totalCommunityPages = Math.max(
+    1,
+    Math.ceil(filteredCommunityPosts.length / COMMUNITY_PAGE_SIZE)
+  );
+  const safeCommunityPage = Math.min(communityPage, totalCommunityPages);
+  const pagedCommunityPosts = filteredCommunityPosts.slice(
+    (safeCommunityPage - 1) * COMMUNITY_PAGE_SIZE,
+    safeCommunityPage * COMMUNITY_PAGE_SIZE
+  );
+
+  const totalCertPages = Math.max(1, Math.ceil(filteredCertificates.length / CERT_PAGE_SIZE));
+  const safeCertPage = Math.min(certPage, totalCertPages);
+  const pagedCertificates = filteredCertificates.slice(
+    (safeCertPage - 1) * CERT_PAGE_SIZE,
+    safeCertPage * CERT_PAGE_SIZE
+  );
+
+  const courseDistribution = useMemo(() => {
+    const total = courses.length;
+    const published = courses.filter((c) => c.is_published).length;
+    const draft = total - published;
+    return { total, published, draft };
+  }, [courses]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div>
@@ -601,6 +687,151 @@ export function AdminPanelPage() {
         </div>
       </div>
 
+      {/* Pure-SVG Grafik Distribusi Role & Status Kursus (BL-40D) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4 sm:p-5 flex items-center gap-5">
+          {(() => {
+            const total = Math.max(1, userDistribution.total);
+            const r = 28;
+            const c = 2 * Math.PI * r;
+            const studentLen = (userDistribution.student / total) * c;
+            const teacherLen = (userDistribution.teacher / total) * c;
+            const adminLen = (userDistribution.admin / total) * c;
+            return (
+              <svg width="76" height="76" viewBox="0 0 76 76" className="shrink-0 -rotate-90" aria-label="Grafik distribusi role pengguna">
+                <circle cx="38" cy="38" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-[#E5E3DC] dark:text-slate-800" />
+                {userDistribution.total > 0 && (
+                  <>
+                    <circle
+                      cx="38"
+                      cy="38"
+                      r={r}
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="10"
+                      strokeDasharray={`${studentLen} ${c}`}
+                      strokeDashoffset={0}
+                    />
+                    <circle
+                      cx="38"
+                      cy="38"
+                      r={r}
+                      fill="none"
+                      stroke="#0EA5E9"
+                      strokeWidth="10"
+                      strokeDasharray={`${teacherLen} ${c}`}
+                      strokeDashoffset={-studentLen}
+                    />
+                    <circle
+                      cx="38"
+                      cy="38"
+                      r={r}
+                      fill="none"
+                      stroke="#F59E0B"
+                      strokeWidth="10"
+                      strokeDasharray={`${adminLen} ${c}`}
+                      strokeDashoffset={-(studentLen + teacherLen)}
+                    />
+                  </>
+                )}
+              </svg>
+            );
+          })()}
+          <div className="space-y-1.5 min-w-0 flex-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
+              Grafik Distribusi Role
+            </h2>
+            <div className="grid grid-cols-3 gap-2 text-xs font-mono-tabular">
+              <div>
+                <span className="inline-flex items-center gap-1 text-[#71717A] dark:text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Pelajar
+                </span>
+                <p className="font-bold text-[#18181B] dark:text-white">{userDistribution.student}</p>
+              </div>
+              <div>
+                <span className="inline-flex items-center gap-1 text-[#71717A] dark:text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-sky-500" />
+                  Pengajar
+                </span>
+                <p className="font-bold text-[#18181B] dark:text-white">{userDistribution.teacher}</p>
+              </div>
+              <div>
+                <span className="inline-flex items-center gap-1 text-[#71717A] dark:text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Admin
+                </span>
+                <p className="font-bold text-[#18181B] dark:text-white">{userDistribution.admin}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4 sm:p-5 flex items-center gap-5">
+          {(() => {
+            const total = Math.max(1, courseDistribution.total);
+            const r = 28;
+            const c = 2 * Math.PI * r;
+            const pubLen = (courseDistribution.published / total) * c;
+            const draftLen = (courseDistribution.draft / total) * c;
+            return (
+              <svg width="76" height="76" viewBox="0 0 76 76" className="shrink-0 -rotate-90" aria-label="Grafik status publikasi kursus">
+                <circle cx="38" cy="38" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-[#E5E3DC] dark:text-slate-800" />
+                {courseDistribution.total > 0 && (
+                  <>
+                    <circle
+                      cx="38"
+                      cy="38"
+                      r={r}
+                      fill="none"
+                      stroke="#0F766E"
+                      strokeWidth="10"
+                      strokeDasharray={`${pubLen} ${c}`}
+                      strokeDashoffset={0}
+                    />
+                    <circle
+                      cx="38"
+                      cy="38"
+                      r={r}
+                      fill="none"
+                      stroke="#F59E0B"
+                      strokeWidth="10"
+                      strokeDasharray={`${draftLen} ${c}`}
+                      strokeDashoffset={-pubLen}
+                    />
+                  </>
+                )}
+              </svg>
+            );
+          })()}
+          <div className="space-y-1.5 min-w-0 flex-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
+              Status Publikasi Kursus
+            </h2>
+            <div className="grid grid-cols-3 gap-2 text-xs font-mono-tabular">
+              <div>
+                <span className="inline-flex items-center gap-1 text-[#71717A] dark:text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+                  Terbit
+                </span>
+                <p className="font-bold text-[#18181B] dark:text-white">{courseDistribution.published}</p>
+              </div>
+              <div>
+                <span className="inline-flex items-center gap-1 text-[#71717A] dark:text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Draft
+                </span>
+                <p className="font-bold text-[#18181B] dark:text-white">{courseDistribution.draft}</p>
+              </div>
+              <div>
+                <span className="text-[#71717A] dark:text-slate-400">Total</span>
+                <p className="font-bold text-[#18181B] dark:text-white">{courseDistribution.total}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Feedback Banner */}
       {feedback && (
         <div
@@ -616,11 +847,11 @@ export function AdminPanelPage() {
       )}
 
       {/* Section Switcher Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
+      <div className="flex flex-nowrap md:flex-wrap overflow-x-auto gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
         <button
           type="button"
           onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'users'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -632,7 +863,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('courses')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'courses'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -644,7 +875,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('cohorts')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'cohorts'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -656,7 +887,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('community')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'community'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -668,7 +899,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('certificates')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'certificates'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -680,7 +911,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('broadcasts')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'broadcasts'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -692,7 +923,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('audit')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'audit'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -704,7 +935,7 @@ export function AdminPanelPage() {
         <button
           type="button"
           onClick={() => setActiveTab('health')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'health'
               ? 'bg-[#0F766E] text-white'
               : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
@@ -913,21 +1144,31 @@ export function AdminPanelPage() {
                         </button>
                       ))}
                     </div>
-                    <Button
-                      variant={p.is_active === false ? 'primary' : 'danger'}
-                      size="sm"
-                      className="w-full"
-                      disabled={toggleActiveMut.isPending || isSelf}
-                      onClick={() =>
-                        handleToggleActive(p.id, p.is_active === false)
-                      }
-                    >
-                      {isSelf
-                        ? 'Akun Aktif (Anda)'
-                        : p.is_active === false
-                          ? 'Aktifkan Akun'
-                          : 'Nonaktifkan'}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDrawerTarget({ type: 'user', user: p })}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        Detail
+                      </Button>
+                      <Button
+                        variant={p.is_active === false ? 'primary' : 'danger'}
+                        size="sm"
+                        className="flex-1"
+                        disabled={toggleActiveMut.isPending || isSelf}
+                        onClick={() =>
+                          handleToggleActive(p.id, p.is_active === false)
+                        }
+                      >
+                        {isSelf
+                          ? 'Akun Aktif (Anda)'
+                          : p.is_active === false
+                            ? 'Aktifkan Akun'
+                            : 'Nonaktifkan'}
+                      </Button>
+                    </div>
                   </div>
                 );
               })
@@ -1010,25 +1251,35 @@ export function AdminPanelPage() {
                         {(() => {
                           const isSelf = p.id === currentUser?.id;
                           return (
-                            <Button
-                              variant={p.is_active === false ? 'secondary' : 'ghost'}
-                              size="sm"
-                              disabled={isSelf || toggleActiveMut.isPending}
-                              title={
-                                isSelf
-                                  ? 'Tidak dapat menonaktifkan akun Anda sendiri'
-                                  : undefined
-                              }
-                              onClick={() =>
-                                handleToggleActive(p.id, p.is_active === false)
-                              }
-                            >
-                              {isSelf
-                                ? 'Akun Aktif (Anda)'
-                                : p.is_active === false
-                                ? 'Aktifkan Akun'
-                                : 'Nonaktifkan'}
-                            </Button>
+                            <div className="inline-flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDrawerTarget({ type: 'user', user: p })}
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                Detail
+                              </Button>
+                              <Button
+                                variant={p.is_active === false ? 'primary' : 'danger'}
+                                size="sm"
+                                disabled={isSelf || toggleActiveMut.isPending}
+                                title={
+                                  isSelf
+                                    ? 'Tidak dapat menonaktifkan akun Anda sendiri'
+                                    : undefined
+                                }
+                                onClick={() =>
+                                  handleToggleActive(p.id, p.is_active === false)
+                                }
+                              >
+                                {isSelf
+                                  ? 'Akun Aktif (Anda)'
+                                  : p.is_active === false
+                                  ? 'Aktifkan Akun'
+                                  : 'Nonaktifkan'}
+                              </Button>
+                            </div>
                           );
                         })()}
                       </td>
@@ -1052,7 +1303,7 @@ export function AdminPanelPage() {
                   onClick={() => setUserPage((p) => Math.max(1, p - 1))}
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
-                  Prev
+                  Sebelumnya
                 </Button>
                 <Button
                   variant="secondary"
@@ -1060,7 +1311,7 @@ export function AdminPanelPage() {
                   disabled={safeUserPage >= totalUserPages}
                   onClick={() => setUserPage((p) => Math.min(totalUserPages, p + 1))}
                 >
-                  Next
+                  Berikutnya
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Button>
               </div>
@@ -1156,6 +1407,13 @@ export function AdminPanelPage() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() => setDrawerTarget({ type: 'course', course: c })}
+                    >
+                      Detail
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setPreviewCourse(c)}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -1208,6 +1466,13 @@ export function AdminPanelPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => setDrawerTarget({ type: 'course', course: c })}
+                        >
+                          Detail
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => setPreviewCourse(c)}
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -1231,10 +1496,9 @@ export function AdminPanelPage() {
           </div>
 
           {totalCoursePages > 1 && (
-            <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs">
-              <span className="text-[#71717A] dark:text-slate-400">
-                Menampilkan {pagedCourses.length} dari {filteredCourses.length} kursus (Hal{' '}
-                {safeCoursePage}/{totalCoursePages})
+            <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+              <span>
+                Halaman {safeCoursePage} dari {totalCoursePages} ({filteredCourses.length} kursus)
               </span>
               <div className="flex items-center gap-1.5">
                 <Button
@@ -1244,6 +1508,7 @@ export function AdminPanelPage() {
                   onClick={() => setCoursePage((p) => Math.max(1, p - 1))}
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
+                  Sebelumnya
                 </Button>
                 <Button
                   variant="secondary"
@@ -1251,6 +1516,7 @@ export function AdminPanelPage() {
                   disabled={safeCoursePage >= totalCoursePages}
                   onClick={() => setCoursePage((p) => Math.min(totalCoursePages, p + 1))}
                 >
+                  Berikutnya
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Button>
               </div>
@@ -1269,7 +1535,10 @@ export function AdminPanelPage() {
                 <input
                   type="text"
                   value={communitySearch}
-                  onChange={(e) => setCommunitySearch(e.target.value)}
+                  onChange={(e) => {
+                    setCommunitySearch(e.target.value);
+                    setCommunityPage(1);
+                  }}
                   placeholder="Cari judul, isi, atau penulis postingan..."
                   className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
@@ -1282,7 +1551,10 @@ export function AdminPanelPage() {
                 <button
                   key={cat}
                   type="button"
-                  onClick={() => setCommunityCategoryFilter(cat)}
+                  onClick={() => {
+                    setCommunityCategoryFilter(cat);
+                    setCommunityPage(1);
+                  }}
                   className={`px-2.5 py-1 rounded-full text-xs font-medium border cursor-pointer ${
                     communityCategoryFilter === cat
                       ? 'bg-[#0F766E] border-[#0F766E] text-white'
@@ -1305,62 +1577,99 @@ export function AdminPanelPage() {
               Tidak ada postingan komunitas yang sesuai dengan filter.
             </div>
           ) : (
-            <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
-              {filteredCommunityPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/30"
-                >
-                  <div className="space-y-1.5 min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone="blue">{post.category}</Badge>
-                      <span className="text-xs font-semibold text-[#18181B] dark:text-slate-200">
-                        {post.author_name}
-                      </span>
-                      <Badge
-                        tone={
-                          post.author_role === 'admin'
-                            ? 'amber'
+            <>
+              <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                {pagedCommunityPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/30"
+                  >
+                    <div className="space-y-1.5 min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge tone="blue">{post.category}</Badge>
+                        <span className="text-xs font-semibold text-[#18181B] dark:text-slate-200">
+                          {post.author_name}
+                        </span>
+                        <Badge
+                          tone={
+                            post.author_role === 'admin'
+                              ? 'amber'
+                              : post.author_role === 'teacher'
+                                ? 'blue'
+                                : 'emerald'
+                          }
+                        >
+                          {post.author_role === 'student'
+                            ? 'Pelajar'
                             : post.author_role === 'teacher'
-                              ? 'blue'
-                              : 'emerald'
-                        }
-                      >
-                        {post.author_role === 'student'
-                          ? 'Pelajar'
-                          : post.author_role === 'teacher'
-                            ? 'Pengajar'
-                            : 'Admin'}
-                      </Badge>
-                      <span className="text-xs text-[#71717A] dark:text-slate-400 font-mono-tabular">
-                        {new Date(post.created_at).toLocaleDateString('id-ID', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </span>
+                              ? 'Pengajar'
+                              : 'Admin'}
+                        </Badge>
+                        <span className="text-xs text-[#71717A] dark:text-slate-400 font-mono-tabular">
+                          {new Date(post.created_at).toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
+                        {post.title}
+                      </h3>
+                      <p className="text-xs text-[#52525B] dark:text-slate-300 line-clamp-2">
+                        {post.content}
+                      </p>
                     </div>
-                    <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
-                      {post.title}
-                    </h3>
-                    <p className="text-xs text-[#52525B] dark:text-slate-300 line-clamp-2">
-                      {post.content}
-                    </p>
+                    <div className="shrink-0 flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setPreviewPost(post)}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        Lihat Lengkap
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        disabled={deleteCommunityPostMut.isPending}
+                        onClick={() => handleDeleteCommunityPost(post.id, post.title)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Hapus
+                      </Button>
+                    </div>
                   </div>
-                  <div className="shrink-0">
+                ))}
+              </div>
+              {totalCommunityPages > 1 && (
+                <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+                  <span>
+                    Halaman {safeCommunityPage} dari {totalCommunityPages} ({filteredCommunityPosts.length} postingan)
+                  </span>
+                  <div className="flex items-center gap-1.5">
                     <Button
-                      variant="danger"
+                      variant="secondary"
                       size="sm"
-                      disabled={deleteCommunityPostMut.isPending}
-                      onClick={() => handleDeleteCommunityPost(post.id, post.title)}
+                      disabled={safeCommunityPage <= 1}
+                      onClick={() => setCommunityPage((p) => Math.max(1, p - 1))}
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Hapus
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      Sebelumnya
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={safeCommunityPage >= totalCommunityPages}
+                      onClick={() => setCommunityPage((p) => Math.min(totalCommunityPages, p + 1))}
+                    >
+                      Berikutnya
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </section>
       )}
@@ -1374,7 +1683,10 @@ export function AdminPanelPage() {
               <input
                 type="text"
                 value={certSearch}
-                onChange={(e) => setCertSearch(e.target.value)}
+                onChange={(e) => {
+                  setCertSearch(e.target.value);
+                  setCertPage(1);
+                }}
                 placeholder="Cari kode sertifikat, penerima, atau kursus..."
                 className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
@@ -1385,7 +1697,10 @@ export function AdminPanelPage() {
                 <button
                   key={st}
                   type="button"
-                  onClick={() => setCertStatusFilter(st)}
+                  onClick={() => {
+                    setCertStatusFilter(st);
+                    setCertPage(1);
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                     certStatusFilter === st
                       ? 'bg-[#0F766E] text-white'
@@ -1411,7 +1726,7 @@ export function AdminPanelPage() {
             <>
               {/* Mobile Cards */}
               <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
-                {filteredCertificates.map((cert) => {
+                {pagedCertificates.map((cert) => {
                   const isRevoked = Boolean(cert.revoked_at);
                   return (
                     <div key={cert.id} className="p-4 space-y-2.5">
@@ -1436,20 +1751,29 @@ export function AdminPanelPage() {
                           Alasan: {cert.revoke_reason}
                         </p>
                       )}
-                      {!isRevoked && (
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            setRevokeTarget(cert);
-                            setRevokeReason('');
-                          }}
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/verify/${encodeURIComponent(cert.cert_code)}`}
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#0F766E] dark:text-teal-400 hover:bg-[#F6F5F1] dark:hover:bg-slate-800"
                         >
-                          <Ban className="w-3.5 h-3.5" />
-                          Cabut Sertifikat
-                        </Button>
-                      )}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          Lihat Verifikasi
+                        </Link>
+                        {!isRevoked && (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              setRevokeTarget(cert);
+                              setRevokeReason('');
+                            }}
+                          >
+                            <Ban className="w-3.5 h-3.5" />
+                            Cabut Sertifikat
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -1468,7 +1792,7 @@ export function AdminPanelPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
-                    {filteredCertificates.map((cert) => {
+                    {pagedCertificates.map((cert) => {
                       const isRevoked = Boolean(cert.revoked_at);
                       return (
                         <tr key={cert.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
@@ -1501,23 +1825,32 @@ export function AdminPanelPage() {
                             </Badge>
                           </td>
                           <td className="px-6 py-3.5 text-right">
-                            {isRevoked ? (
-                              <span className="text-xs text-[#71717A] dark:text-slate-400">
-                                Sudah Dicabut
-                              </span>
-                            ) : (
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => {
-                                  setRevokeTarget(cert);
-                                  setRevokeReason('');
-                                }}
+                            <div className="inline-flex items-center gap-2">
+                              <Link
+                                to={`/verify/${encodeURIComponent(cert.cert_code)}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#0F766E] dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/40"
                               >
-                                <Ban className="w-3.5 h-3.5" />
-                                Cabut
-                              </Button>
-                            )}
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                Lihat Verifikasi
+                              </Link>
+                              {isRevoked ? (
+                                <span className="text-xs text-[#71717A] dark:text-slate-400">
+                                  Sudah Dicabut
+                                </span>
+                              ) : (
+                                <Button
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => {
+                                    setRevokeTarget(cert);
+                                    setRevokeReason('');
+                                  }}
+                                >
+                                  <Ban className="w-3.5 h-3.5" />
+                                  Cabut
+                                </Button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1525,6 +1858,33 @@ export function AdminPanelPage() {
                   </tbody>
                 </table>
               </div>
+              {totalCertPages > 1 && (
+                <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+                  <span>
+                    Halaman {safeCertPage} dari {totalCertPages} ({filteredCertificates.length} sertifikat)
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={safeCertPage <= 1}
+                      onClick={() => setCertPage((p) => Math.max(1, p - 1))}
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      Sebelumnya
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={safeCertPage >= totalCertPages}
+                      onClick={() => setCertPage((p) => Math.min(totalCertPages, p + 1))}
+                    >
+                      Berikutnya
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </section>
@@ -2053,6 +2413,281 @@ export function AdminPanelPage() {
           </form>
         </div>
       )}
+
+      {/* COMMUNITY POST FULL-CONTENT PREVIEW MODAL */}
+      {previewPost && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Detail Postingan Komunitas"
+        >
+          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-xl">
+            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-start justify-between gap-3">
+              <div className="space-y-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone="blue">{previewPost.category}</Badge>
+                  <span className="text-xs font-semibold text-[#18181B] dark:text-slate-200">
+                    {previewPost.author_name}
+                  </span>
+                  <span className="text-xs text-[#71717A] dark:text-slate-400 font-mono-tabular">
+                    {new Date(previewPost.created_at).toLocaleString('id-ID')}
+                  </span>
+                </div>
+                <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                  {previewPost.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewPost(null)}
+                className="p-1.5 rounded-lg text-[#71717A] hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                aria-label="Tutup pratinjau postingan"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto">
+              <p className="text-sm text-[#18181B] dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
+                {previewPost.content}
+              </p>
+            </div>
+            <div className="px-5 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2 bg-[#FAFAF9] dark:bg-slate-900/40">
+              <Button
+                variant="danger"
+                size="sm"
+                disabled={deleteCommunityPostMut.isPending}
+                onClick={() => {
+                  const target = previewPost;
+                  setPreviewPost(null);
+                  handleDeleteCommunityPost(target.id, target.title);
+                }}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Hapus Postingan
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setPreviewPost(null)}>
+                Tutup
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SLIDE-OVER DETAIL DRAWER (BL-40D) */}
+      {drawerTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex justify-end"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Detail Inspeksi"
+        >
+          <div className="bg-white dark:bg-[#161B22] border-l border-[#E5E3DC] dark:border-slate-800 w-full max-w-md h-full flex flex-col shadow-2xl">
+            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-3">
+              <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                {drawerTarget.type === 'user' ? 'Detail Pengguna' : 'Detail Kursus'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setDrawerTarget(null)}
+                className="p-1.5 rounded-lg text-[#71717A] hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                aria-label="Tutup drawer detail"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto space-y-5 flex-1 text-sm">
+              {drawerTarget.type === 'user' ? (
+                <>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        tone={
+                          drawerTarget.user.role === 'admin'
+                            ? 'amber'
+                            : drawerTarget.user.role === 'teacher'
+                              ? 'blue'
+                              : 'emerald'
+                        }
+                      >
+                        {drawerTarget.user.role === 'student'
+                          ? 'Pelajar'
+                          : drawerTarget.user.role === 'teacher'
+                            ? 'Pengajar'
+                            : 'Admin'}
+                      </Badge>
+                      <Badge tone={drawerTarget.user.is_active === false ? 'rose' : 'emerald'}>
+                        {drawerTarget.user.is_active === false ? 'Nonaktif' : 'Aktif'}
+                      </Badge>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#18181B] dark:text-white">
+                      {drawerTarget.user.full_name}
+                    </h3>
+                    <p className="text-xs text-[#71717A] dark:text-slate-400">
+                      {drawerTarget.user.email}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-2 text-xs">
+                    <div>
+                      <span className="text-[#71717A] dark:text-slate-400 block">ID Pengguna</span>
+                      <span className="font-mono text-[#18181B] dark:text-slate-200 break-all">
+                        {drawerTarget.user.id}
+                      </span>
+                    </div>
+                    {drawerTarget.user.bio && (
+                      <div>
+                        <span className="text-[#71717A] dark:text-slate-400 block">Bio</span>
+                        <span className="text-[#18181B] dark:text-slate-200">
+                          {drawerTarget.user.bio}
+                        </span>
+                      </div>
+                    )}
+                    {drawerTarget.user.created_at && (
+                      <div>
+                        <span className="text-[#71717A] dark:text-slate-400 block">Terdaftar</span>
+                        <span className="font-mono-tabular text-[#18181B] dark:text-slate-200">
+                          {new Date(drawerTarget.user.created_at).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {drawerTarget.user.id !== currentUser?.id && (
+                    <div className="space-y-3">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400 block">
+                        Aksi Cepat
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(['student', 'teacher', 'admin'] as UserRole[]).map((roleOpt) => (
+                          <button
+                            key={roleOpt}
+                            type="button"
+                            disabled={updateRoleMut.isPending}
+                            onClick={() => {
+                              handleRoleChange(drawerTarget.user.id, roleOpt);
+                              setDrawerTarget(null);
+                            }}
+                            className={`py-2 rounded-lg text-xs font-semibold cursor-pointer ${
+                              drawerTarget.user.role === roleOpt
+                                ? 'bg-[#0F766E] text-white'
+                                : 'border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                            }`}
+                          >
+                            {roleOpt === 'student'
+                              ? 'Pelajar'
+                              : roleOpt === 'teacher'
+                                ? 'Pengajar'
+                                : 'Admin'}
+                          </button>
+                        ))}
+                      </div>
+                      <Button
+                        variant={drawerTarget.user.is_active === false ? 'primary' : 'danger'}
+                        size="sm"
+                        className="w-full"
+                        disabled={toggleActiveMut.isPending}
+                        onClick={() => {
+                          handleToggleActive(
+                            drawerTarget.user.id,
+                            drawerTarget.user.is_active === false
+                          );
+                          setDrawerTarget(null);
+                        }}
+                      >
+                        {drawerTarget.user.is_active === false ? 'Aktifkan Akun' : 'Nonaktifkan Akun'}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge tone={drawerTarget.course.is_published ? 'emerald' : 'amber'}>
+                        {drawerTarget.course.is_published ? 'Terbit' : 'Draft'}
+                      </Badge>
+                      <Badge tone="blue">{drawerTarget.course.category}</Badge>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#18181B] dark:text-white">
+                      {drawerTarget.course.title}
+                    </h3>
+                    <p className="text-xs text-[#71717A] dark:text-slate-400">
+                      Pengajar: {drawerTarget.course.teacher_name ?? 'Pengajar'} • Level{' '}
+                      {drawerTarget.course.level} • {drawerTarget.course.estimated_hours} jam
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-[#52525B] dark:text-slate-300 leading-relaxed">
+                    {drawerTarget.course.description}
+                  </p>
+
+                  <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-1.5 text-xs">
+                    <div>
+                      <span className="text-[#71717A] dark:text-slate-400 block">Slug</span>
+                      <span className="font-mono text-[#18181B] dark:text-slate-200">
+                        {drawerTarget.course.slug}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[#71717A] dark:text-slate-400 block">Jumlah Modul</span>
+                      <span className="font-mono-tabular font-semibold text-[#18181B] dark:text-slate-200">
+                        {drawerTarget.course.modules?.length ?? 0} modul
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        const target = drawerTarget.course;
+                        setDrawerTarget(null);
+                        setPreviewCourse(target);
+                      }}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Pratinjau Modul &amp; Pelajaran
+                    </Button>
+                    <Button
+                      variant={drawerTarget.course.is_published ? 'danger' : 'primary'}
+                      size="sm"
+                      disabled={togglePublishMut.isPending}
+                      onClick={() => {
+                        const target = drawerTarget.course;
+                        setDrawerTarget(null);
+                        handleTogglePublish(target.id, !target.is_published);
+                      }}
+                    >
+                      {drawerTarget.course.is_published ? 'Tarik ke Draft' : 'Terbitkan Kursus'}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRMATION DIALOG (BL-40E) */}
+      <ConfirmDialog
+        open={Boolean(confirmState)}
+        title={confirmState?.title ?? ''}
+        description={confirmState?.description}
+        confirmLabel={confirmState?.confirmLabel ?? 'Konfirmasi'}
+        tone={confirmState?.tone ?? 'danger'}
+        onConfirm={() => {
+          confirmState?.onConfirm();
+          setConfirmState(null);
+        }}
+        onCancel={() => setConfirmState(null)}
+      />
     </div>
   );
 }

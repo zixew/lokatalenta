@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Course } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
+import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { downloadCsvFile } from '../admin/adminCsvExport';
 import {
   buildCohortSummaryCsv,
@@ -138,23 +139,20 @@ export function TeacherCohortPanel({
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1">
-              Tautkan Kursus Wajib (Opsional)
-            </label>
-            <select
-              value={courseId}
-              onChange={(e) => setCourseId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-            >
-              <option value="">-- Tanpa kursus spesifik --</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchablePicker
+            label="Tautkan Kursus Wajib (Opsional)"
+            options={[
+              { id: '', label: '-- Tanpa kursus spesifik --' },
+              ...courses.map((c) => ({
+                id: c.id,
+                label: c.title,
+                sublabel: c.category,
+              })),
+            ]}
+            value={courseId}
+            onChange={setCourseId}
+            placeholder="Cari atau pilih kursus..."
+          />
 
           <div>
             <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1">

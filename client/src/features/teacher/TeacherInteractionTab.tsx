@@ -23,6 +23,7 @@ import type {
 } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
+import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
 import { listTeacherCohortsAsync } from '../cohort/cohortApi';
@@ -42,6 +43,11 @@ export function TeacherInteractionTab({
   const queryClient = useQueryClient();
   const [subTab, setSubTab] = useState<SubTab>('qa');
   const [qaFilter, setQaFilter] = useState<'unanswered' | 'all'>('unanswered');
+  const [confirmDelete, setConfirmDelete] = useState<{
+    kind: 'session' | 'announcement';
+    id: string;
+    title: string;
+  } | null>(null);
 
   // Live session form
   const [sessCourseId, setSessCourseId] = useState(courses[0]?.id ?? '');
@@ -388,46 +394,91 @@ export function TeacherInteractionTab({
                     ))}
                 </select>
               </div>
-              <input
-                type="text"
-                required
-                value={sessTitle}
-                onChange={(e) => setSessTitle(e.target.value)}
-                placeholder="Judul Sesi (mis. Klinik Soal Deret Angka)"
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
-              />
-              <input
-                type="text"
-                value={sessTopic}
-                onChange={(e) => setSessTopic(e.target.value)}
-                placeholder="Topik pembahasan singkat..."
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
-              />
-              <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label
+                  htmlFor="sess-title"
+                  className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1"
+                >
+                  Judul Sesi
+                </label>
                 <input
-                  type="datetime-local"
+                  id="sess-title"
+                  type="text"
                   required
-                  value={sessDate}
-                  onChange={(e) => setSessDate(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
-                />
-                <input
-                  type="number"
-                  min={1}
-                  max={200}
-                  value={sessMax}
-                  onChange={(e) => setSessMax(Number(e.target.value) || 20)}
-                  placeholder="Kuota"
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
+                  value={sessTitle}
+                  onChange={(e) => setSessTitle(e.target.value)}
+                  placeholder="Contoh: Klinik Soal Deret Angka"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                 />
               </div>
-              <input
-                type="url"
-                value={sessUrl}
-                onChange={(e) => setSessUrl(e.target.value)}
-                placeholder="Tautan Google Meet / Zoom"
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
-              />
+              <div>
+                <label
+                  htmlFor="sess-topic"
+                  className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1"
+                >
+                  Topik Pembahasan (Opsional)
+                </label>
+                <input
+                  id="sess-topic"
+                  type="text"
+                  value={sessTopic}
+                  onChange={(e) => setSessTopic(e.target.value)}
+                  placeholder="Topik pembahasan singkat..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label
+                    htmlFor="sess-date"
+                    className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1"
+                  >
+                    Jadwal &amp; Waktu
+                  </label>
+                  <input
+                    id="sess-date"
+                    type="datetime-local"
+                    required
+                    value={sessDate}
+                    onChange={(e) => setSessDate(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="sess-max"
+                    className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1"
+                  >
+                    Kuota Peserta
+                  </label>
+                  <input
+                    id="sess-max"
+                    type="number"
+                    min={1}
+                    max={200}
+                    value={sessMax}
+                    onChange={(e) => setSessMax(Number(e.target.value) || 20)}
+                    placeholder="Kuota"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="sess-url"
+                  className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1"
+                >
+                  Tautan Meeting (Google Meet / Zoom)
+                </label>
+                <input
+                  id="sess-url"
+                  type="url"
+                  value={sessUrl}
+                  onChange={(e) => setSessUrl(e.target.value)}
+                  placeholder="https://meet.google.com/..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                />
+              </div>
               <Button type="submit" disabled={createSessionMut.isPending} className="w-full">
                 Publikasikan Jadwal Sesi
               </Button>
@@ -458,11 +509,9 @@ export function TeacherInteractionTab({
                     </div>
                     <button
                       type="button"
-                      onClick={() => {
-                        if (window.confirm(`Hapus sesi mentoring "${s.title}"?`)) {
-                          deleteSessionMut.mutate(s.id);
-                        }
-                      }}
+                      onClick={() =>
+                        setConfirmDelete({ kind: 'session', id: s.id, title: s.title })
+                      }
                       className="text-slate-400 hover:text-rose-600 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -580,11 +629,9 @@ export function TeacherInteractionTab({
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.confirm(`Hapus pengumuman "${a.title}"?`)) {
-                        deleteAnnMut.mutate(a.id);
-                      }
-                    }}
+                    onClick={() =>
+                      setConfirmDelete({ kind: 'announcement', id: a.id, title: a.title })
+                    }
                     className="text-slate-400 hover:text-rose-600 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -595,6 +642,29 @@ export function TeacherInteractionTab({
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(confirmDelete)}
+        title={confirmDelete?.kind === 'session' ? 'Hapus Sesi Live' : 'Hapus Pengumuman'}
+        description={
+          confirmDelete
+            ? confirmDelete.kind === 'session'
+              ? `Hapus sesi mentoring "${confirmDelete.title}"?`
+              : `Hapus pengumuman "${confirmDelete.title}"?`
+            : ''
+        }
+        confirmLabel="Hapus"
+        tone="danger"
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={() => {
+          if (confirmDelete?.kind === 'session') {
+            deleteSessionMut.mutate(confirmDelete.id);
+          } else if (confirmDelete?.kind === 'announcement') {
+            deleteAnnMut.mutate(confirmDelete.id);
+          }
+          setConfirmDelete(null);
+        }}
+      />
     </div>
   );
 }

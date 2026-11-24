@@ -16,7 +16,25 @@ const ACTION_FILTERS: Array<{ value: 'ALL' | AdminAuditAction; label: string }> 
   { value: 'ROLE_UPDATED', label: 'Role Diubah' },
   { value: 'USER_STATUS_CHANGED', label: 'Status Akun' },
   { value: 'COURSE_PUBLISH_TOGGLED', label: 'Publikasi Kursus' },
+  { value: 'COMMUNITY_POST_DELETED', label: 'Hapus Postingan' },
+  { value: 'CERTIFICATE_REVOKED', label: 'Cabut Sertifikat' },
 ];
+
+const ACTION_LABELS: Record<AdminAuditAction, string> = {
+  ROLE_UPDATED: 'Role Diubah',
+  USER_STATUS_CHANGED: 'Status Akun',
+  COURSE_PUBLISH_TOGGLED: 'Publikasi Kursus',
+  COMMUNITY_POST_DELETED: 'Hapus Postingan',
+  CERTIFICATE_REVOKED: 'Cabut Sertifikat',
+};
+
+const ACTION_TONES: Record<AdminAuditAction, 'blue' | 'amber' | 'emerald' | 'rose'> = {
+  ROLE_UPDATED: 'blue',
+  USER_STATUS_CHANGED: 'amber',
+  COURSE_PUBLISH_TOGGLED: 'emerald',
+  COMMUNITY_POST_DELETED: 'rose',
+  CERTIFICATE_REVOKED: 'rose',
+};
 
 export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProps) {
   const [actionFilter, setActionFilter] = useState<'ALL' | AdminAuditAction>('ALL');
@@ -122,16 +140,8 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
               >
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge
-                      tone={
-                        log.action === 'ROLE_UPDATED'
-                          ? 'blue'
-                          : log.action === 'USER_STATUS_CHANGED'
-                            ? 'amber'
-                            : 'emerald'
-                      }
-                    >
-                      {log.action}
+                    <Badge tone={ACTION_TONES[log.action] ?? 'slate'}>
+                      {ACTION_LABELS[log.action] ?? log.action}
                     </Badge>
                     <span className="font-bold text-[#18181B] dark:text-white">
                       {log.targetLabel}

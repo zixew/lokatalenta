@@ -41,12 +41,15 @@ import {
 } from '../talent/talentRadar';
 import { GamificationAnalyticsSection } from './GamificationAnalyticsSection';
 
+type StudentProfileTab = 'overview' | 'courses' | 'history' | 'cohort';
+
 export function ProfilePage() {
   const { user, setProfile } = useAuthStore();
   const queryClient = useQueryClient();
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [savedMsg, setSavedMsg] = useState('');
+  const [activeTab, setActiveTab] = useState<StudentProfileTab>('overview');
   const [passportPublic, setPassportPublic] = useState(() =>
     user ? getPassportVisibilityLocal(user.id) : true
   );
@@ -123,6 +126,12 @@ export function ProfilePage() {
     enabled: Boolean(user && user.role === 'teacher'),
   });
 
+  const { data: mentorManagedCourses = [] } = useQuery({
+    queryKey: ['courses', 'mentor-management', user?.id],
+    queryFn: () => (user ? lmsApi.listAllCoursesForManagement(user.id) : Promise.resolve([])),
+    enabled: Boolean(user && user.role === 'teacher'),
+  });
+
   const updateProfileMut = useMutation({
     mutationFn: () => lmsApi.updateProfile(user!.id, { full_name: fullName, bio }),
     onSuccess: (updated) => {
@@ -159,7 +168,9 @@ export function ProfilePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">Profil &amp; Progres</h1>
+          <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">
+            {user.role === 'teacher' ? 'Profil Mentor' : 'Profil & Progres'}
+          </h1>
           <p className="text-sm text-[#52525B] dark:text-slate-300 mt-0.5">
             Kelola informasi akun dan pantau perkembangan belajar secara menyeluruh.
           </p>
@@ -174,7 +185,7 @@ export function ProfilePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Edit Profile Card */}
-        <section className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
+        <section className="lg:col-span-4 order-last lg:order-first bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
           <div className="flex items-center gap-3.5 pb-4 border-b border-[#E5E3DC] dark:border-slate-800">
             <div className="w-12 h-12 rounded-full bg-teal-50 text-[#0F766E] flex items-center justify-center font-bold text-lg">
               {user.full_name.charAt(0).toUpperCase()}
@@ -257,285 +268,332 @@ export function ProfilePage() {
           {/* STUDENT PROGRESS VIEW (Ala Coursera / Dicoding) */}
           {user.role === 'student' && (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
-                  <span className="text-xs text-[#71717A] dark:text-slate-400 block">Kursus Diikuti</span>
-                  <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
-                    {enrolledCourses.length}
-                  </span>
-                </div>
-                <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
-                  <span className="text-xs text-[#71717A] dark:text-slate-400 block">Materi Selesai</span>
-                  <span className="text-2xl font-extrabold font-mono-tabular text-[#059669] mt-1 block">
-                    {completedLessonIds.length}
-                  </span>
-                </div>
-                <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
-                  <span className="text-xs text-[#71717A] dark:text-slate-400 block">Tes Dikerjakan</span>
-                  <span className="text-2xl font-extrabold font-mono-tabular text-[#0F766E] mt-1 block">
-                    {attempts.length}
-                  </span>
-                </div>
-                <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
-                  <span className="text-xs text-[#71717A] dark:text-slate-400 block">Rata-rata Skor</span>
-                  <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
-                    {avgScore}%
-                  </span>
-                </div>
+              <div
+                role="tablist"
+                aria-label="Bagian profil pelajar"
+                className="flex items-center gap-1.5 p-1.5 rounded-xl bg-[#F6F5F1] dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 overflow-x-auto"
+              >
+                {(
+                  [
+                    { id: 'overview', label: 'Ringkasan & Radar' },
+                    { id: 'courses', label: 'Kursus & Agenda' },
+                    { id: 'history', label: 'Bookmark & Riwayat' },
+                    { id: 'cohort', label: 'Cohort' },
+                  ] as const
+                ).map((tab) => {
+                  const selected = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={selected}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                        selected
+                          ? 'bg-white dark:bg-slate-800 text-[#0F766E] dark:text-teal-300 shadow-xs border border-[#E5E3DC] dark:border-slate-700'
+                          : 'text-[#52525B] dark:text-slate-400 hover:text-[#18181B] dark:hover:text-white'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
               </div>
 
-              <GamificationAnalyticsSection
-                attempts={attempts}
-                completedLessonsCount={completedLessonIds.length}
-                enrolledCount={enrolledCourses.length}
-                quizTitleMap={quizTitleMap}
-              />
-
-              {/* BL-30 & BL-31: 5D Competency Radar & Talent Passport */}
-              <CompetencyRadarCard
-                metrics={computeTalentRadarMetrics({
-                  categoryScores: extractCategoryScoresFromAttempts(attempts),
-                  avgQuizScore: avgScore,
-                  kraepelinHistory,
-                  completedLessonsCount: completedLessonIds.length,
-                  certificatesCount: userCertificates.length,
-                })}
-              />
-
-              <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-[#18181B] dark:text-white">
-                      Talent Readiness Passport 2.0
-                    </h3>
-                    <Badge tone={passportPublic ? 'emerald' : 'slate'}>
-                      {passportPublic ? 'Publik' : 'Privat'}
-                    </Badge>
+              {activeTab === 'overview' && (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Kursus Diikuti</span>
+                      <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
+                        {enrolledCourses.length}
+                      </span>
+                    </div>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Materi Selesai</span>
+                      <span className="text-2xl font-extrabold font-mono-tabular text-[#059669] mt-1 block">
+                        {completedLessonIds.length}
+                      </span>
+                    </div>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Tes Dikerjakan</span>
+                      <span className="text-2xl font-extrabold font-mono-tabular text-[#0F766E] mt-1 block">
+                        {attempts.length}
+                      </span>
+                    </div>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Rata-rata Skor</span>
+                      <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
+                        {avgScore}%
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-xs text-[#71717A] dark:text-slate-400">
-                    Bagikan profil kesiapan karier &amp; sertifikat terverifikasi kepada perekrut.
-                  </p>
-                  <label className="inline-flex items-center gap-2 pt-1 text-xs font-medium text-[#52525B] dark:text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={passportPublic}
-                      onChange={async (e) => {
-                        const next = e.target.checked;
-                        setPassportPublic(next);
-                        await setPassportVisibilityAsync(user.id, next);
-                      }}
-                      className="rounded border-slate-300 text-[#0F766E] focus:ring-[#0F766E]"
-                    />
-                    Izinkan perekrut melihat Talent Passport saya secara publik
-                  </label>
-                </div>
 
-                <Link to={`/talent/${encodeURIComponent(user.id)}`} className="shrink-0">
-                  <Button variant="primary" size="sm">
-                    <ShieldCheck className="w-4 h-4" />
-                    Buka &amp; Bagikan Talent Passport
-                  </Button>
-                </Link>
-              </section>
+                  <GamificationAnalyticsSection
+                    attempts={attempts}
+                    completedLessonsCount={completedLessonIds.length}
+                    enrolledCount={enrolledCourses.length}
+                    quizTitleMap={quizTitleMap}
+                  />
 
-              {/* BL-33: Cohort & Kelas Privat */}
-              <StudentCohortCard userId={user.id} courses={courses} />
+                  {/* BL-30 & BL-31: 5D Competency Radar & Talent Passport */}
+                  <CompetencyRadarCard
+                    metrics={computeTalentRadarMetrics({
+                      categoryScores: extractCategoryScoresFromAttempts(attempts),
+                      avgQuizScore: avgScore,
+                      kraepelinHistory,
+                      completedLessonsCount: completedLessonIds.length,
+                      certificatesCount: userCertificates.length,
+                    })}
+                  />
 
-              {/* BL-34: Agenda & Tenggat Terdekat */}
-              <StudyAgendaCard
-                items={buildStudyAgendaItems({
-                  registeredTryoutIds,
-                  cohorts: studentCohorts,
-                  enrolledCourses,
-                  completedLessonIds,
-                })}
-              />
-
-              {/* BL-36: Diagnostic Study Plan Otomatis */}
-              <DiagnosticStudyPlanCard attempts={attempts} courses={courses} />
-
-              {/* BL-37: Soal Tersimpan (Bookmark) */}
-              <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
-                    <Bookmark className="w-4 h-4 text-[#0F766E]" />
-                    Soal Tersimpan ({bookmarkedQuestions.length})
-                  </h2>
-                </div>
-                {bookmarkedQuestions.length === 0 ? (
-                  <p className="text-sm text-[#71717A] dark:text-slate-400">
-                    Belum ada soal sulit yang ditandai. Tandai soal pada halaman pembahasan kuis untuk mengulasnya kembali di sini.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {bookmarkedQuestions.map((bm) => (
-                      <div
-                        key={bm.id}
-                        className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-2"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Badge tone="slate">{bm.category_tag || 'Umum'}</Badge>
-                              <span className="text-xs text-[#71717A] dark:text-slate-400">
-                                {bm.quiz_title}
-                              </span>
-                            </div>
-                            <p className="text-sm font-medium text-[#18181B] dark:text-white">
-                              {bm.question_text}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeBookmarkMut.mutate(bm.question_id)}
-                            className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer shrink-0"
-                            title="Hapus dari bookmark"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        {bm.explanation && (
-                          <p className="text-xs text-[#52525B] dark:text-slate-300 border-t border-[#E5E3DC] dark:border-slate-800 pt-2">
-                            <span className="font-semibold text-[#0F766E] dark:text-teal-400">
-                              Pembahasan:{' '}
-                            </span>
-                            {bm.explanation}
-                          </p>
-                        )}
+                  <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-bold text-[#18181B] dark:text-white">
+                          Talent Readiness Passport 2.0
+                        </h3>
+                        <Badge tone={passportPublic ? 'emerald' : 'slate'}>
+                          {passportPublic ? 'Publik' : 'Privat'}
+                        </Badge>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </section>
+                      <p className="text-xs text-[#71717A] dark:text-slate-400">
+                        Bagikan profil kesiapan karier &amp; sertifikat terverifikasi kepada perekrut.
+                      </p>
+                      <label className="inline-flex items-center gap-2 pt-1 text-xs font-medium text-[#52525B] dark:text-slate-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={passportPublic}
+                          onChange={async (e) => {
+                            const next = e.target.checked;
+                            setPassportPublic(next);
+                            await setPassportVisibilityAsync(user.id, next);
+                          }}
+                          className="rounded border-slate-300 text-[#0F766E] focus:ring-[#0F766E]"
+                        />
+                        Izinkan perekrut melihat Talent Passport saya secara publik
+                      </label>
+                    </div>
 
-              {/* Enrolled Courses Progress */}
-              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
-                <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#0F766E]" />
-                  Progres Kursus Terstruktur
-                </h2>
-                {enrolledCourses.length === 0 ? (
-                  <div className="text-sm text-[#71717A] dark:text-slate-400 py-4">
-                    Anda belum mendaftar di kursus terstruktur mana pun.{' '}
-                    <Link to="/" className="text-[#0F766E] font-semibold hover:underline">
-                      Jelajahi Katalog
+                    <Link to={`/talent/${encodeURIComponent(user.id)}`} className="shrink-0">
+                      <Button variant="primary" size="sm">
+                        <ShieldCheck className="w-4 h-4" />
+                        Buka &amp; Bagikan Talent Passport
+                      </Button>
                     </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {enrolledCourses.map((course) => {
-                      const lessons = (course.modules ?? []).flatMap((m) => m.lessons);
-                      const done = lessons.filter(
-                        (l) =>
-                          completedLessonIds.includes(l.id) ||
-                          (l.type === 'quiz' &&
-                            l.quiz != null &&
-                            attempts.some(
-                              (a) =>
-                                a.quiz_id === l.quiz!.id &&
-                                (a.score ?? 0) >= (l.quiz!.passing_score ?? 70)
-                            ))
-                      ).length;
-                      const pct =
-                        lessons.length > 0 ? Math.round((done / lessons.length) * 100) : 0;
+                  </section>
+                </>
+              )}
 
-                      return (
-                        <div
-                          key={course.id}
-                          className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                        >
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <p className="font-bold text-sm text-[#18181B] dark:text-white">{course.title}</p>
-                              {pct === 100 && (
-                                <Badge tone="emerald">
-                                  <Award className="w-3 h-3" />
-                                  Lulus
-                                </Badge>
-                              )}
+              {activeTab === 'cohort' && (
+                /* BL-33: Cohort & Kelas Privat */
+                <StudentCohortCard userId={user.id} courses={courses} />
+              )}
+
+              {activeTab === 'courses' && (
+                <>
+                  {/* BL-34: Agenda & Tenggat Terdekat */}
+                  <StudyAgendaCard
+                    items={buildStudyAgendaItems({
+                      registeredTryoutIds,
+                      cohorts: studentCohorts,
+                      enrolledCourses,
+                      completedLessonIds,
+                    })}
+                  />
+
+                  {/* BL-36: Diagnostic Study Plan Otomatis */}
+                  <DiagnosticStudyPlanCard attempts={attempts} courses={courses} />
+
+                  {/* Enrolled Courses Progress */}
+                  <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-[#0F766E]" />
+                      Progres Kursus Terstruktur
+                    </h2>
+                    {enrolledCourses.length === 0 ? (
+                      <div className="text-sm text-[#71717A] dark:text-slate-400 py-4">
+                        Anda belum mendaftar di kursus terstruktur mana pun.{' '}
+                        <Link to="/" className="text-[#0F766E] font-semibold hover:underline">
+                          Jelajahi Katalog
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {enrolledCourses.map((course) => {
+                          const lessons = (course.modules ?? []).flatMap((m) => m.lessons);
+                          const done = lessons.filter(
+                            (l) =>
+                              completedLessonIds.includes(l.id) ||
+                              (l.type === 'quiz' &&
+                                l.quiz != null &&
+                                attempts.some(
+                                  (a) =>
+                                    a.quiz_id === l.quiz!.id &&
+                                    (a.score ?? 0) >= (l.quiz!.passing_score ?? 70)
+                                ))
+                          ).length;
+                          const pct =
+                            lessons.length > 0 ? Math.round((done / lessons.length) * 100) : 0;
+
+                          return (
+                            <div
+                              key={course.id}
+                              className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                            >
+                              <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-bold text-sm text-[#18181B] dark:text-white">{course.title}</p>
+                                  {pct === 100 && (
+                                    <Badge tone="emerald">
+                                      <Award className="w-3 h-3" />
+                                      Lulus
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3 text-xs text-[#71717A] dark:text-slate-400">
+                                  <span>
+                                    {done} dari {lessons.length} materi selesai
+                                  </span>
+                                  <span className="font-mono-tabular font-semibold text-[#18181B] dark:text-white">
+                                    {pct}%
+                                  </span>
+                                </div>
+                                <ProgressBar value={pct} tone="emerald" />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {pct === 100 && (
+                                  <Link to={`/certificate/${course.id}`}>
+                                    <Button size="sm">
+                                      <Award className="w-3.5 h-3.5" />
+                                      Sertifikat
+                                    </Button>
+                                  </Link>
+                                )}
+                                <Link to={`/courses/${course.slug}`}>
+                                  <Button variant="secondary" size="sm">
+                                    {pct === 100 ? 'Tinjau Materi' : 'Lanjutkan Belajar'}
+                                  </Button>
+                                </Link>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-[#71717A] dark:text-slate-400">
-                              <span>
-                                {done} dari {lessons.length} materi selesai
-                              </span>
-                              <span className="font-mono-tabular font-semibold text-[#18181B] dark:text-white">
-                                {pct}%
-                              </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {activeTab === 'history' && (
+                <>
+                  {/* BL-37: Soal Tersimpan (Bookmark) */}
+                  <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                        <Bookmark className="w-4 h-4 text-[#0F766E]" />
+                        Soal Tersimpan ({bookmarkedQuestions.length})
+                      </h2>
+                    </div>
+                    {bookmarkedQuestions.length === 0 ? (
+                      <p className="text-sm text-[#71717A] dark:text-slate-400">
+                        Belum ada soal sulit yang ditandai. Tandai soal pada halaman pembahasan kuis untuk mengulasnya kembali di sini.
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {bookmarkedQuestions.map((bm) => (
+                          <div
+                            key={bm.id}
+                            className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="space-y-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge tone="slate">{bm.category_tag || 'Umum'}</Badge>
+                                  <span className="text-xs text-[#71717A] dark:text-slate-400">
+                                    {bm.quiz_title}
+                                  </span>
+                                </div>
+                                <p className="text-sm font-medium text-[#18181B] dark:text-white">
+                                  {bm.question_text}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeBookmarkMut.mutate(bm.question_id)}
+                                className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer shrink-0"
+                                title="Hapus dari bookmark"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
-                            <ProgressBar value={pct} tone="emerald" />
+                            {bm.explanation && (
+                              <p className="text-xs text-[#52525B] dark:text-slate-300 border-t border-[#E5E3DC] dark:border-slate-800 pt-2">
+                                <span className="font-semibold text-[#0F766E] dark:text-teal-400">
+                                  Pembahasan:{' '}
+                                </span>
+                                {bm.explanation}
+                              </p>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            {pct === 100 && (
-                              <Link to={`/certificate/${course.id}`}>
-                                <Button size="sm">
-                                  <Award className="w-3.5 h-3.5" />
-                                  Sertifikat
+                        ))}
+                      </div>
+                    )}
+                  </section>
+
+                  {/* Quiz / Practice History */}
+                  <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                      <ClipboardCheck className="w-4 h-4 text-[#0F766E]" />
+                      Riwayat Latihan Soal &amp; Evaluasi
+                    </h2>
+                    {attempts.length === 0 ? (
+                      <p className="text-sm text-[#71717A] dark:text-slate-400 py-2">
+                        Belum ada latihan soal yang dikerjakan.
+                      </p>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {attempts.map((att) => (
+                          <div
+                            key={att.id}
+                            className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div>
+                              <p className="font-semibold text-sm text-[#18181B] dark:text-white">
+                                {findQuizTitle(att.quiz_id)}
+                              </p>
+                              <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
+                                Selesai pada{' '}
+                                {att.submitted_at
+                                  ? new Date(att.submitted_at).toLocaleString('id-ID')
+                                  : '-'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Badge tone={(att.score ?? 0) >= 70 ? 'emerald' : 'amber'}>
+                                Skor: {att.score ?? 0}%
+                              </Badge>
+                              <Link to={`/quiz/${att.quiz_id}/result/${att.id}`}>
+                                <Button variant="secondary" size="sm">
+                                  <FileCheck2 className="w-3.5 h-3.5" />
+                                  Ringkasan Jawaban
                                 </Button>
                               </Link>
-                            )}
-                            <Link to={`/courses/${course.slug}`}>
-                              <Button variant="secondary" size="sm">
-                                {pct === 100 ? 'Tinjau Materi' : 'Lanjutkan Belajar'}
-                              </Button>
-                            </Link>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Quiz / Practice History */}
-              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
-                <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
-                  <ClipboardCheck className="w-4 h-4 text-[#0F766E]" />
-                  Riwayat Latihan Soal &amp; Evaluasi
-                </h2>
-                {attempts.length === 0 ? (
-                  <p className="text-sm text-[#71717A] dark:text-slate-400 py-2">
-                    Belum ada latihan soal yang dikerjakan.
-                  </p>
-                ) : (
-                  <div className="space-y-2.5">
-                    {attempts.map((att) => (
-                      <div
-                        key={att.id}
-                        className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                      >
-                        <div>
-                          <p className="font-semibold text-sm text-[#18181B] dark:text-white">
-                            {findQuizTitle(att.quiz_id)}
-                          </p>
-                          <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
-                            Selesai pada{' '}
-                            {att.submitted_at
-                              ? new Date(att.submitted_at).toLocaleString('id-ID')
-                              : '-'}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Badge tone={(att.score ?? 0) >= 70 ? 'emerald' : 'amber'}>
-                            Skor: {att.score ?? 0}%
-                          </Badge>
-                          <Link to={`/quiz/${att.quiz_id}/result/${att.id}`}>
-                            <Button variant="secondary" size="sm">
-                              <FileCheck2 className="w-3.5 h-3.5" />
-                              Ringkasan Jawaban
-                            </Button>
-                          </Link>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </>
           )}
 
           {/* TEACHER MENTOR SUMMARY CARD */}
           {user.role === 'teacher' && (() => {
-            const mentorCoursesCount = courses.filter((c) => c.teacher_id === user.id).length;
+            const mentorCoursesCount = mentorManagedCourses.length;
             const activeCohortsCount = teacherCohorts.filter((c) => c.is_active).length;
             const totalCohortMembers = teacherCohorts.reduce((sum, c) => sum + c.member_count, 0);
 
@@ -551,12 +609,12 @@ export function ProfilePage() {
                         Ringkasan Mengajar Mentor
                       </h2>
                       <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
-                        Kelola kurikulum kursus, cohort peserta, dan progres belajar di Teacher Studio.
+                        Kelola kurikulum kursus, cohort peserta, dan progres belajar di Mentor Studio.
                       </p>
                     </div>
                   </div>
                   <Link to="/teacher">
-                    <Button size="sm">Buka Teacher Studio</Button>
+                    <Button size="sm">Buka Mentor Studio</Button>
                   </Link>
                 </div>
 

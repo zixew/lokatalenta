@@ -6,11 +6,13 @@ import { lmsApi } from '../../shared/services/lmsApi';
 import { Badge } from '../../shared/ui/Badge';
 import { BrandLogo } from '../../shared/ui/BrandLogo';
 import { Button } from '../../shared/ui/Button';
+import { useAuthStore } from '../auth/useAuthStore';
 import type { CertificateWithRevocation } from '../talent/talentApi';
 
 export function VerifyCertificatePage() {
   const { certCode = '' } = useParams<{ certCode?: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [verifyTab, setVerifyTab] = useState<'certificate' | 'passport'>('certificate');
   const [inputCode, setInputCode] = useState(certCode);
   const [passportIdInput, setPassportIdInput] = useState('');
@@ -206,14 +208,21 @@ export function VerifyCertificatePage() {
           </div>
         )}
 
-        <div className="pt-2 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+        <div className="pt-2 border-t border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-[#71717A] dark:text-slate-400">
           <span className="inline-flex items-center gap-1.5">
             <Award className="w-3.5 h-3.5 text-[#0F766E]" />
             LokaTalenta Credential Verification
           </span>
-          <Link to="/" className="text-[#0F766E] dark:text-teal-400 font-semibold hover:underline">
-            Kembali ke Katalog
-          </Link>
+          <div className="flex items-center gap-3">
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="text-[#0F766E] dark:text-teal-400 font-semibold hover:underline">
+                Kembali ke Admin Panel
+              </Link>
+            )}
+            <Link to="/" className="text-[#0F766E] dark:text-teal-400 font-semibold hover:underline">
+              Kembali ke Katalog
+            </Link>
+          </div>
         </div>
       </div>
     </div>

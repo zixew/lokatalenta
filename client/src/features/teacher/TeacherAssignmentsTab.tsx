@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2,
+  ChevronDown,
   ClipboardCheck,
   ExternalLink,
   PlusCircle,
@@ -21,6 +22,7 @@ import type {
 } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
+import { ConfirmDialog } from '../../shared/ui/ConfirmDialog';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
 import { listTeacherCohortsAsync } from '../cohort/cohortApi';
@@ -44,9 +46,14 @@ export function TeacherAssignmentsTab({
   const [taskBrief, setTaskBrief] = useState('');
   const [howToGuide, setHowToGuide] = useState('');
   const [rubric, setRubric] = useState<AssignmentRubricItem[]>(DEFAULT_ASSIGNMENT_RUBRIC);
+  const [rubricOpen, setRubricOpen] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [subSearch, setSubSearch] = useState('');
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'submitted' | 'approved' | 'rejected'>('all');
+  const [pendingDeleteAssignment, setPendingDeleteAssignment] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
 
   const { data: rawAssignments = [] } = useQuery({
     queryKey: ['all-assignments'],
@@ -157,7 +164,7 @@ export function TeacherAssignmentsTab({
         <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
             <PlusCircle className="w-4 h-4 text-[#0F766E]" />
-            Buat Tugas Upload File (3 Tab &amp; Rubrik ★ 1–5)
+            Buat Tugas Upload File &amp; Rubrik ★ 1–5
           </h2>
 
           <form
@@ -216,7 +223,7 @@ export function TeacherAssignmentsTab({
 
             <div>
               <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
-                Tab 1: Apa yang Harus Dikerjakan &amp; Aturan File
+                Instruksi Tugas &amp; Aturan Format File
               </label>
               <textarea
                 rows={3}
@@ -230,7 +237,7 @@ export function TeacherAssignmentsTab({
 
             <div>
               <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
-                Tab 2: Cara Mengerjakan (Langkah Demi Langkah)
+                Panduan Langkah Pengerjaan (Opsional)
               </label>
               <textarea
                 rows={3}
@@ -241,23 +248,38 @@ export function TeacherAssignmentsTab({
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300">
-                Tab 3: Deskripsi Penilaian Bintang 1 – 5
-              </label>
-              {rubric.map((r) => (
-                <div key={r.stars} className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-amber-500 w-10 shrink-0">
-                    ★ {r.stars}
-                  </span>
-                  <input
-                    type="text"
-                    value={r.description}
-                    onChange={(e) => updateRubricDesc(r.stars, e.target.value)}
-                    className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
-                  />
+            <div className="rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1]/60 dark:bg-slate-800/40 p-3 space-y-2">
+              <button
+                type="button"
+                onClick={() => setRubricOpen((v) => !v)}
+                className="w-full flex items-center justify-between text-left cursor-pointer"
+              >
+                <span className="text-xs font-semibold text-[#18181B] dark:text-slate-200">
+                  Rubrik Penilaian Bintang 1 – 5 (Default siap pakai)
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 text-[#71717A] transition-transform ${
+                    rubricOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {rubricOpen && (
+                <div className="space-y-1.5 pt-1">
+                  {rubric.map((r) => (
+                    <div key={r.stars} className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-amber-500 w-10 shrink-0">
+                        ★ {r.stars}
+                      </span>
+                      <input
+                        type="text"
+                        value={r.description}
+                        onChange={(e) => updateRubricDesc(r.stars, e.target.value)}
+                        className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
 
             <div>
@@ -327,11 +349,7 @@ export function TeacherAssignmentsTab({
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.confirm(`Hapus tugas "${a.title}"?`)) {
-                        deleteMut.mutate(a.id);
-                      }
-                    }}
+                    onClick={() => setPendingDeleteAssignment({ id: a.id, title: a.title })}
                     className="p-1.5 rounded-lg text-[#71717A] hover:text-rose-600 cursor-pointer"
                     title="Hapus tugas"
                   >
@@ -443,6 +461,25 @@ export function TeacherAssignmentsTab({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(pendingDeleteAssignment)}
+        title="Hapus Tugas"
+        description={
+          pendingDeleteAssignment
+            ? `Hapus tugas "${pendingDeleteAssignment.title}" secara permanen?`
+            : ''
+        }
+        confirmLabel="Hapus Tugas"
+        tone="danger"
+        onCancel={() => setPendingDeleteAssignment(null)}
+        onConfirm={() => {
+          if (pendingDeleteAssignment) {
+            deleteMut.mutate(pendingDeleteAssignment.id);
+          }
+          setPendingDeleteAssignment(null);
+        }}
+      />
     </div>
   );
 }
