@@ -31,18 +31,18 @@ export async function syncLessonNoteFromServer(
   try {
     const { data, error } = await supabase
       .from('lesson_notes')
-      .select('note_text')
+      .select('content')
       .eq('user_id', userId)
       .eq('lesson_id', lessonId)
       .maybeSingle();
 
-    if (error || !data || typeof data.note_text !== 'string') {
+    if (error || !data || typeof data.content !== 'string') {
       return localNote;
     }
 
-    if (data.note_text.trim() !== '') {
-      saveLessonNote(userId, lessonId, data.note_text);
-      return data.note_text;
+    if (data.content.trim() !== '') {
+      saveLessonNote(userId, lessonId, data.content);
+      return data.content;
     }
     return localNote;
   } catch {
@@ -66,7 +66,7 @@ export async function saveLessonNoteAsync(
       {
         user_id: userId,
         lesson_id: lessonId,
-        note_text: text,
+        content: text,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,lesson_id' }
