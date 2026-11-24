@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.1.1] - 2026-11-24
+
+### Hotfix
+- Isolasi penuh POV 3 Role (Student, Mentor, Admin) & tambah BL-38B Tes Kecepatan Ketik ke backlog Sprint 12
+
+---
+
 ## [2.1.0] - 2026-11-24
 
 ### Minor
