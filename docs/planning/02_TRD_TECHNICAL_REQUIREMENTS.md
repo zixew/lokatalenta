@@ -182,17 +182,28 @@ RPC publik `get_talent_passport(p_user_id uuid)` (`SECURITY DEFINER`) untuk mena
 
 ## 4. Strategi Pengujian & Quality Gates (SDLC)
 
-Setiap Sprint wajib melewati 4 gerbang verifikasi:
+Setiap Sprint wajib melewati 5 gerbang verifikasi bertingkat:
 1. **Static & Unit Gate (Local):**
    - `npm run lint` (`0 warnings, 0 errors`)
-   - `npm test` (`100% pass` termasuk unit test sprint baru `sprint7Features.test.ts` s.d. `sprint10Features.test.ts`)
+   - `npm test` (`100% pass` termasuk seluruh unit test sprint aktif)
    - `npm run build` (`tsc -b && vite build` tanpa chunk > 250 kB)
-2. **SIT Gate (`http://localhost:4179`):**
+2. **Principal Code Review & Clean Architecture Gate (Wajib oleh Principal FE & BE):**
+   - **Principal FE (Hendrawan Wicaksono):** Memverifikasi Clean Architecture UI (pemisahan view dari hooks/presenter, 0 direct Supabase calls di JSX, Anti-AI-Slop design system token 1px border, modularitas folder, dan chunk < 250 kB).
+   - **Principal BE (Dr. Ir. Danu Bratawidjaja):** Memverifikasi Hexagonal Ports & Adapters (isolasi domain core scoring logic, migrasi DDL idempotent, composite indexing query < 20ms, dan audit RLS policies).
+3. **SIT Gate (`http://localhost:4179`):**
    - Pengujian fungsional di browser lokal menggunakan akun `Rizco` / `Admin` + pemeriksaan `0` console/page error.
-3. **UAT Gate (`dev` → `https://lokatalenta-git-dev-zixew.vercel.app`):**
+4. **DevSecOps & Pentest Gate (Keamanan Siber):**
+   - Uji penetrasi DAST (Rendra Dananjaya) dan audit kepatuhan RLS / CSP (Saskia Wardhani) memastikan **0 High/Critical Vulnerabilities**, form input tersanitasi aman, dan isolasi tenant PostgreSQL terverifikasi kedap kebocoran.
+5. **UAT Gate (`dev` → `https://lokatalenta-git-dev-zixew.vercel.app`):**
    - Merge `feature/*` ke `dev`, push ke `origin/dev`, tunggu deploy Vercel Dev, dan verifikasi live di browser.
-4. **Staging & Release Gate (`prod` → `https://lokatalenta.vercel.app` → `main`):**
-   - Merge `dev` ke `prod`, verifikasi di URL produksi, lalu merge ke `main` dan jalankan `./scripts/release.sh <minor|major> "<deskripsi>"`.
+6. **User Acceptance Demo Gate (Wajib — Demo ke Pengguna):**
+   - Setiap selesai UAT di `dev`, tim/agen **WAJIB** menyelenggarakan sesi demo interaktif kepada User.
+   - Memastikan kembali bahwa seluruh *Acceptance Criteria* (AC) telah terpenuhi dan mendapatkan persetujuan (*User Acceptance Sign-Off*).
+7. **Team Leader Document Checker & Approval Gate (Rizco Renova):**
+   - Seluruh artefak rilis (PRD, TRD, 112 matriks QA, hasil pengujian, limit bundle < 250 kB, dan bukti User Sign-Off) diaudit komprehensif oleh **Team Leader: Rizco Renova**.
+   - Terbitnya otorisasi formal tertulis (*Lead Release Sign-Off*) menjadi syarat mutlak sebelum handoff ke DevOps.
+8. **Staging & Release Gate (`release/<versi>` → `main` → `https://lokatalenta.vercel.app`):**
+   - Setelah persetujuan formal Team Leader terbit, DevOps (Damar "Deva" Gunawan) menjalankan `./scripts/release.sh <patch|minor|major> "<deskripsi>"`, verifikasi staging di branch `release/*`, lalu merge ke `main` (Production Deploy) dan sync kembali ke `dev`.
 
 ---
 
@@ -210,3 +221,48 @@ Setiap Sprint wajib melewati 4 gerbang verifikasi:
 - `UserRole`: `'student' | 'teacher' | 'admin' | 'recruiter'`
 - Rute baru: `/recruiter` (dilindungi `<RequireRole roles={['recruiter', 'admin']}>`)
 - Update `TopbarNav.tsx`: menampilkan tautan **Portal Perekrut** pada menu `Lainnya` untuk role `recruiter` dan `admin`.
+
+### 5.3. Arsitektur Standalone PWA iOS iPhone & iPadOS (`Sprint 15` • `PWA-01`)
+Mengingat peramban Safari di iOS WebKit tidak mendukung event instalasi Chromium (`beforeinstallprompt`), arsitektur standalone PWA pada ekosistem Apple membutuhkan standardisasi khusus:
+
+1. **Apple Web Meta Tag & Manifest Standard (`client/index.html`):**
+   ```html
+   <!-- Standalone App Mode iOS -->
+   <meta name="apple-mobile-web-app-capable" content="yes" />
+   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+   <meta name="apple-mobile-web-app-title" content="LokaTalenta" />
+   <!-- Retina App Icons untuk iOS Home Screen -->
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+   <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167x167.png" />
+   <!-- Viewport Cover untuk Safe Area Insets -->
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+   ```
+
+2. **Penanganan Safe Area Insets (Dynamic Island, Notch, & Home Indicator):**
+   - Penambahan utilitas layout CSS:
+     - Header / Topbar: `padding-top: max(env(safe-area-inset-top), 0.75rem);`
+     - Bottom Nav / Sticky CTA / Footer: `padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);`
+   - Memastikan tidak ada tombol aksi atau timer ujian yang tertutup lengkungan layar atau home gesture swipe bar pada model iPhone seri X s.d. 16.
+
+3. **In-App A2HS (Add to Home Screen) Detection & Guidance Modal:**
+   - Deteksi platform iOS:
+     ```typescript
+     export const isIosSafari = (): boolean => {
+       const ua = window.navigator.userAgent;
+       const isIos = /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+       const isStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone === true ||
+                            window.matchMedia('(display-mode: standalone)').matches;
+       return isIos && !isStandalone;
+     };
+     ```
+   - Menampilkan modal atau toast bottom banner non-intrusif yang memandu pengguna:
+     1. Ketuk ikon **Bagikan (Share)** di bagian bawah Safari.
+     2. Gulir ke bawah dan ketuk opsi **Tambahkan ke Layar Utama (Add to Home Screen)**.
+     3. Ketuk **Tambah (Add)** di sudut kanan atas.
+     4. Luncurkan aplikasi langsung dari Home Screen untuk pengalaman mandiri tanpa address bar.
+
+4. **Integritas Navigasi Standalone & Service Worker Cache (`sw.js`):**
+   - Intersepsi navigasi anchor link internal agar tetap mempertahankan aplikasi di dalam *standalone WebApp context*, menghindari pembukaan tab baru di Safari.
+   - Cache shell aplikasi (HTML, CSS, JS, font lokal, icon) pada `sw.js` untuk peluncuran instan (*instant launch*) bahkan dalam kondisi jaringan offline/lemah.

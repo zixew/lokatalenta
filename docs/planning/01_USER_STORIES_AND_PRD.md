@@ -314,3 +314,19 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **Given** pengguna membuka aplikasi di mode terang maupun gelap pada desktop & mobile,
   - **When** melihat tata letak, komponen kartu, tabel data, formulir, dan navigasi,
   - **Then** antarmuka bersih dari gradien neon/pastel kabur ("AI slop"), radius kartu proporsional (`rounded-lg`/`rounded-xl`), garis batas kontras tajam 1px (`border-zinc-200/800`), hierarki tipografi tegas berdensitas tinggi, dan terdapat integrasi visualisasi **Kantor AI 3D** yang memetakan kolaborasi 15 peran agen kerja.
+
+---
+
+### I. Epik 9 — Sprint 15: Enterprise ATS Pipeline, Mobile Ergonomics & PWA iOS Standalone (`v3.1.0` Minor)
+
+#### `US-46` (BL-46 / PWA-01): Standalone PWA iPhone / iOS (Aplikasi Mandiri Tanpa Membuka Safari)
+- **User Story:** *Sebagai **Pelajar & Kandidat Pengguna iPhone (iOS / iPadOS)**, saya ingin dapat memasang LokaTalenta langsung ke Home Screen perangkat saya dan membukanya sebagai aplikasi mandiri (standalone fullscreen) tanpa perlu membuka peramban Safari terlebih dahulu, sehingga pengalaman belajar, simulasi Kraepelin, dan tes kerja terasa seperti aplikasi native tanpa distraksi bilah URL dan kontrol peramban.*
+- **Acceptance Criteria:**
+  - **Given** pengguna membuka LokaTalenta pada peramban Safari di iOS iPhone,
+  - **When** pengguna mengikuti panduan visual instalasi in-app dan memilih menu Share Safari -> *Tambahkan ke Layar Utama (Add to Home Screen)*,
+  - **Then** ikon aplikasi tajam beresolusi tinggi (*apple-touch-icon*) muncul di Home Screen dengan judul "LokaTalenta",
+  - **When** pengguna mengetuk ikon di Home Screen untuk meluncurkan aplikasi,
+  - **Then** aplikasi terbuka langsung dalam mode *standalone* layar penuh tanpa bilah alamat URL atau bar navigasi Safari peramban,
+  - **Then** warna status bar menyatu mulus (`apple-mobile-web-app-status-bar-style: black-translucent`),
+  - **Then** area atas dan bawah layout secara otomatis menyesuaikan *Safe Area Insets* iOS (`viewport-fit=cover`, `env(safe-area-inset-top)` & `env(safe-area-inset-bottom)`) sehingga tidak tertutup oleh Dynamic Island, notch kamera depan, maupun garis home indicator gesek bawah,
+  - **Then** navigasi tautan internal dan sesi login tetap berada di dalam jendela aplikasi standalone tanpa terlempar keluar kembali ke peramban Safari eksternal.
