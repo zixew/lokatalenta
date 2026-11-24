@@ -86,7 +86,8 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **BL-36** | `task/bl-36-diagnostic-study-plan` | `US-36` | Generator rencana belajar adaptif otomatis dari skor subtest terlemah di `ProfilePage`. | `PRF-06` |
 | **BL-37** | `task/bl-37-question-bookmarks` | `US-37` | Tombol **Bookmark Soal Sulit** di `QuizResultPage` + tab **Soal Tersimpan** di `ProfilePage`. | `QUZ-09` |
-| **BL-38** | `task/bl-38-admin-health-telemetry` | `US-38` | Telemetry collector & tab **Kesehatan Sistem** di `AdminPanelPage`. | `ADM-06` |
+| **BL-38** | `task/bl-38-admin-health-telemetry` | `US-38` | Telemetry collector & tab **Kesehatan Sistem** di `AdminPanelPage`. | `ADM-07` |
+| **BL-38B** | `task/bl-38b-typing-speed-accuracy` | `US-38B` | `typingEngine.ts` (kalkulator WPM, CPM, Akurasi %, Error Rate) + `TypingTestPage.tsx` (`/typing`) dengan highlight karakter real-time, pilihan durasi/teks, & riwayat hasil `typing_attempts`. | `TYP-01` |
 
 ---
 

@@ -40,6 +40,29 @@ function buildTopbarNavItems(
     ];
   }
 
+  if (role === 'teacher') {
+    return [
+      {
+        to: '/teacher',
+        label: 'Mentor Studio',
+        icon: <GraduationCap className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+      {
+        to: '/community',
+        label: 'Komunitas',
+        icon: <Users className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+      {
+        to: '/profile',
+        label: 'Profil Mentor',
+        icon: <User className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+    ];
+  }
+
   const items: TopbarNavItem[] = [
     {
       to: '/',
@@ -72,15 +95,6 @@ function buildTopbarNavItems(
       to: '/profile',
       label: 'Profil & Progres',
       icon: <User className="w-4 h-4 shrink-0" />,
-      priority: 'overflow',
-    });
-  }
-
-  if (role === 'teacher') {
-    items.push({
-      to: '/teacher',
-      label: 'Teacher Studio',
-      icon: <GraduationCap className="w-4 h-4 shrink-0" />,
       priority: 'overflow',
     });
   }

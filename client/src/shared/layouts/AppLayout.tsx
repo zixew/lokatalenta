@@ -39,7 +39,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {/* Brand + Desktop Nav */}
           <div className="flex items-center gap-4 xl:gap-7 min-w-0 flex-1">
             <Link
-              to={user?.role === 'admin' ? '/admin' : '/'}
+              to={
+                user?.role === 'admin'
+                  ? '/admin'
+                  : user?.role === 'teacher'
+                    ? '/teacher'
+                    : '/'
+              }
               className="flex items-center gap-2.5 shrink-0"
             >
               <BrandLogo className="w-9 h-9 shrink-0" />
@@ -97,7 +103,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <div className="flex items-center justify-end gap-1 mt-0.5">
                       <Badge tone={user.role === 'teacher' ? 'blue' : 'emerald'}>
                         <UserCheck className="w-3 h-3" />
-                        {user.role === 'student' ? 'Pelajar' : 'Pengajar'}
+                        {user.role === 'student' ? 'Pelajar' : 'Mentor'}
                       </Badge>
                     </div>
                   </Link>
@@ -149,6 +155,45 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   <ShieldCheck className="w-4 h-4" />
                   Admin Dashboard
                 </Link>
+              ) : user?.role === 'teacher' ? (
+                <>
+                  <Link
+                    to="/teacher"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/teacher')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    Mentor Studio
+                  </Link>
+                  <Link
+                    to="/community"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/community')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                    Komunitas
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/profile')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                    Profil Mentor
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link
@@ -199,20 +244,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <Users className="w-4 h-4" />
                     Komunitas
                   </Link>
-                  {user?.role === 'teacher' && (
-                    <Link
-                      to="/teacher"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                        isActive('/teacher')
-                          ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                          : 'text-[#52525B] dark:text-slate-300'
-                      }`}
-                    >
-                      <GraduationCap className="w-4 h-4" />
-                      Teacher Studio
-                    </Link>
-                  )}
                   {user && (
                     <Link
                       to="/profile"
