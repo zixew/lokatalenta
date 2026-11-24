@@ -84,7 +84,7 @@ flowchart LR
 | No | Peran / Role | Nama Persona | Divisi Gedung | Tanggung Jawab Utama |
 | :---: | :--- | :--- | :--- | :--- |
 | **0** | **Team Leader** | **Rizco Renova** | 🏛️ Eksekutif | **Chief Engineering Lead & Final Release Sign-Off Authority** — Approval & Checker dokumen sebelum naik ke DevOps. |
-| **1** | Bisnis Lead | Bramantyo Daniswara | 🏛️ Eksekutif | Business Strategist & B2B Recruiter Portal Monetization. |
+| **1** | Bisnis & Growth Lead | Bramantyo Daniswara | 🏛️ Eksekutif | Community Growth Strategist & 100% Free-Access Institutional Adoption (Zero Paywall). |
 | **2** | Product Owner (PO) | Pranadipa Wicaksana | 🏛️ Eksekutif | Backlog Arbiter & Acceptance Criteria Gatekeeper. |
 | **3** | System Analyst (SA) | Satria Adhyasta | 📐 Arsitektur | Deep-Link Flow & Multi-Tenant Data Isolation Analyst. |
 | **4** | IT Solution Architect | Ir. Arkananta Dewantara | 📐 Arsitektur | Database Optimization, Multi-Tenant RLS & Performance Architect. |

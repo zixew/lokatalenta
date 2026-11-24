@@ -51,7 +51,7 @@ Namun, untuk mencapai skalabilitas bisnis dan memenuhi kebutuhan industri, LokaT
 ```
 
 Peralihan ini menuntut rekayasa ulang pada lapisan arsitektur data, tata kelola keamanan, pengalaman pengguna (UI/UX), dan instrumen psikometri:
-1. **Multi-Tenancy & Isolasi Data:** Perusahaan klien menuntut isolasi mutlak atas hasil tes kandidat, daftar pelamar, dan token ujian berbayar mereka agar tidak bocor ke publik atau kompetitor.
+1. **Multi-Tenancy & Isolasi Data:** Perusahaan klien dan institusi mitra menuntut isolasi mutlak atas hasil tes kandidat, daftar pelamar, dan token ujian mereka agar tidak bocor ke publik atau kompetitor.
 2. **Standardisasi Psikometri Institusional:** Perekrut HR membutuhkan instrumen yang diakui secara saintifik (DISC, MBTI, Big Five OCEAN, CFIT Skala 2/3, Papikostick) dengan kurva norma nasional, bukan sekadar kuis pilihan ganda biner (benar/salah).
 3. **Integritas Ujian Tingkat Tinggi:** Ujian seleksi kerja berisiko tinggi (*high-stakes testing*) memerlukan proctoring yang andal (lockdown fullscreen, deteksi kehilangan fokus yang tercatat di cloud, dan verifikasi identitas).
 4. **Kepatuhan Regulasi:** Pengelolaan data kandidat dan riwayat penilaian wajib mematuhi Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022) di Indonesia.
@@ -164,9 +164,9 @@ Berdasarkan analisis kebutuhan industri psikotes kerja dan seleksi institusional
 #### Sprint 18 (`v3.4.0` Minor): Enterprise Anti-Cheat Lockdown Mode
 - **Lockdown Ujian Tingkat Enterprise (`SEC-04`):** Mode layar penuh wajib (*mandatory fullscreen*), pencegahan tombol ESC/Alt+Tab, pemblokiran salin-tempel (*clipboard block*), dan deteksi gawai multi-monitor.
 
-#### Sprint 19 (`v3.5.0` Minor): Saldo Kredit Asesmen B2B & Integrasi Billing Payment Gateway
-- **Sistem Kredit Asesmen Korporat (`FIN-01`):** Model monetisasi *pay-per-completed-assessment* dengan pengurangan saldo kredit otomatis saat kandidat men-submit asesmen.
-- **Otomasi Penagihan & Checkout (Midtrans / Xendit):** Pembelian paket kuota ujian korporat melalui Virtual Account, QRIS, dan invoice penagihan resmi otomatis.
+#### Sprint 19 (`v3.5.0` Minor): Akses Gratis 100% Tanpa Paywall & Onboarding Komunitas Terbuka
+- **Sistem Onboarding Organisasi Gratis (`FREE-01`):** Akses gratis 100% tanpa paywall bagi seluruh kandidat, pendidik, dan organisasi mitra dengan tata kelola kuota terbuka (*fair-use rate limiting*).
+- **Otomasi Aktivasi & Kemitraan Komunitas:** Pendaftaran ruang kerja institusi/komunitas secara mandiri (*self-service onboarding*) tanpa biaya langganan maupun gerbang pembayaran.
 
 #### Sprint 20 (`v4.0.0` Major): Open Assessment REST API & Ekosistem Webhooks
 - **Open REST & GraphQL API (`ARC-10`):** Akses terprogram bagi perusahaan untuk mengintegrasikan LokaTalenta dengan sistem HRIS pihak ketiga (Workday, SAP SuccessFactors, BambooHR, Mekari Talenta).
@@ -1263,7 +1263,7 @@ ADD COLUMN IF NOT EXISTS norm_table_id TEXT NULL;
    - *Kondisi Saat Ini:* Setiap kali kandidat memilih salah satu opsi jawaban, fungsi `selectAnswer` langsung mengeksekusi `lmsApi.saveAttemptProgress(attempt.id, next)` tanpa debouncing. Pada sesi tryout akbar atau rekrutmen massal dengan 2.000 kandidat serentak, frekuensi klik memicu ribuan query `UPDATE` per detik ke PostgreSQL Supabase, yang berpotensi memicu connection saturation (*HTTP 503 / 504*).
    - *Solusi Rekayasa:* Terapkan mekanisme **buffered auto-save dengan debouncing 3 detik**. Perubahan jawaban disimpan ke state in-memory lokal seketika (responsif), dan sinkronisasi ke cloud ditunda hingga tidak ada klik baru selama 3.000ms. Tambahkan event listener `window.addEventListener('beforeunload', ...)` yang menembakkan `navigator.sendBeacon` untuk memastikan jawaban terakhir tetap tersimpan saat tab ditutup paksa.
 2. **Kebutuhan Supabase Edge Functions (Deno Runtime pada Sprint 16 `ARC-07`):**
-   - Mengingat platform tidak memiliki backend server mandiri, seluruh operasi kritis yang memerlukan kredensial privat (API Secret OpenAI/Gemini, API Key Resend/SendGrid, Webhook Signature Xendit) dipindahkan ke **Supabase Edge Functions**. Hal ini mencegah kebocoran private API keys pada bundle klien.
+   - Mengingat platform tidak memiliki backend server mandiri, seluruh operasi kritis yang memerlukan kredensial privat (API Secret OpenAI/Gemini, API Key Resend/SendGrid, Webhook HMAC Secret) dipindahkan ke **Supabase Edge Functions**. Hal ini mencegah kebocoran private API keys pada bundle klien.
 3. **Kepatuhan UU Perlindungan Data Pribadi (UU PDP No. 27/2022):**
    - Tabel `public.admin_audit_logs` diperluas untuk mencatat aktivitas ekspor data pelamar (`CANDIDATE_DATA_EXPORTED`), akses rekap asesmen institusi, dan pengubahan hak akses. Perekrut dilarang mengunduh data sensitif tanpa pencatatan waktu, IP address, dan identitas pengunduh.
 
@@ -1452,7 +1452,7 @@ Tabel komprehensif di bawah ini mengkonsolidasikan seluruh rekomendasi teknis li
 | **ARC-04** | **Sprint 16** | **Enhancement (Architecture)** | **P1 (High)** | **Wildcard Subdomain Routing (`*.lokatalenta.app`)**<br>Implementasikan middleware resolver tenant berbasis host header untuk mendeteksi subdomain korporat secara dinamis. | Memberikan pengalaman white-label premium bagi klien institusi enterprise pada domain khusus mereka. |
 | **REC-11** | **Sprint 17** | **Enhancement (AI/Product)** | **P1 (High)** | **AI STAR Interview Grader & Job-Fit Scoring Engine**<br>Layanan evaluasi jawaban STAR berbasis LLM dengan pemberian saran kata kerja aksi serta kalkulasi persentase kecocokan profil kandidat terhadap kriteria jabatan. | Memangkas waktu evaluasi wawancara awal bagi HR dan menyediakan bimbingan karir cerdas bagi pencari kerja. |
 | **SEC-04** | **Sprint 18** | **Enhancement (Security)** | **P1 (High)** | **Enterprise Lockdown Mode & Anti-Cheat Device Telemetry**<br>Fitur mandatory fullscreen, pencegahan kombinasi tombol keluar, pembatasan copy-paste, dan deteksi penggunaan monitor eksternal. | Memenuhi standar kepatuhan ujian seleksi kerja berisiko tinggi tanpa pengawasan fisik langsung (*unproctored*). |
-| **FIN-01** | **Sprint 19** | **Enhancement (Monetization)** | **P2 (Medium)** | **Manajemen Saldo Kredit Asesmen Korporat & Billing Midtrans**<br>Sistem debit saldo kredit per asesmen kandidat yang selesai dan otomasi faktur pembayaran paket korporat via payment gateway. | Mengotomatisasi monetisasi B2B dan siklus penagihan pelanggan korporat secara mandiri. |
+| **FREE-01** | **Sprint 19** | **Enhancement (Open Access)** | **P2 (Medium)** | **Akses Gratis 100% Tanpa Paywall & Onboarding Organisasi Komunitas**<br>Sistem self-service onboarding ruang kerja organisasi/komunitas secara gratis tanpa paywall dengan fair-use rate limiting otomatis. | Mempercepat adopsi komunitas dan institusi pendidikan/rekrutmen secara inklusif tanpa hambatan biaya. |
 | **ARC-10** | **Sprint 20** | **Enhancement (Architecture)** | **P2 (Medium)** | **Open Assessment REST API & Webhooks Engine (`v4.0.0`)**<br>Ekosistem API publik dan dispatcher webhook bertanda tangan HMAC untuk integrasi data hasil asesmen ke sistem HRIS eksternal (Workday, Talenta). | Mentransformasi platform LokaTalenta menjadi infrastruktur terbuka untuk ekosistem rekrutmen regional. |
 
 ---

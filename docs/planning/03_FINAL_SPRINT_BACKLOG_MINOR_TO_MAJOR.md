@@ -196,9 +196,9 @@ Setiap memulai dan mengakhiri sprint, seluruh tim multi-agent lintas 18 peran (K
 │                                                                                                       │
 │                                                                                                       │
 │  [ SPRINT 19: v3.5.0 ] ────────────────────────────► [ SPRINT 20: v4.0.0 MAJOR ]                      │
-│  • Billing & Saldo Korporat                           • Open Assessment REST API & Webhooks Engine    │
-│  • Integrasi Payment Gateway Midtrans                 • Integrasi HRIS Enterprise (Workday, Talenta)   │
-│  • Otomasi Faktur Pajak B2B                           • Rilis Aplikasi Mobile PWA/TWA Resmi PlayStore │
+│  • Akses Gratis 100% Tanpa Paywall                    • Open Assessment REST API & Webhooks Engine    │
+│  • Self-Service Onboarding Organisasi                 • Integrasi HRIS Enterprise (Workday, Talenta)   │
+│  • Pelaporan Dampak Adopsi Komunitas                  • Rilis Aplikasi Mobile PWA/TWA Resmi PlayStore │
 └───────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -216,9 +216,9 @@ Setiap memulai dan mengakhiri sprint, seluruh tim multi-agent lintas 18 peran (K
    - `SEC-04`: Enterprise Anti-Cheat Lockdown Mode (Mandatory Fullscreen, Multi-Monitor Block, Clipboard Block).
    - `SEC-07`: Otomasi Audit Kepatuhan Privasi Data UU PDP No. 27/2022 (Consent Manager & Retention Auto-Purge).
    - `PERF-04`: Refactoring Halaman Raksasa `AdminPanelPage.tsx` & `TeacherStudioPage.tsx` menjadi sub-modul terisolasi.
-4. **Sprint 19 (`v3.5.0` Minor — B2B Monetization & Corporate Billing Engine):**
-   - `FIN-01`: Manajemen Saldo Kredit Asesmen Korporat & Payment Gateway Midtrans.
-   - `FIN-02`: Otomasi Faktur Pembayaran Pajak & Laporan Penggunaan Lisensi Institusi.
+4. **Sprint 19 (`v3.5.0` Minor — Free-Access Community Scaling & Open Institutional Onboarding):**
+   - `FREE-01`: Akses Gratis 100% Tanpa Paywall & Self-Service Onboarding Organisasi/Komunitas.
+   - `FREE-02`: Pelaporan Dampak Adopsi Komunitas & Analitik Pemanfaatan Lisensi Terbuka.
 5. **Sprint 20 (`v4.0.0` MAJOR — Open Assessment REST API & Ekosistem Terbuka):**
    - `ARC-10`: Open Assessment REST API & Webhooks Engine bertanda tangan HMAC.
    - `INT-01`: Integrasi Resmi ke Sistem HRIS Enterprise (Workday, SAP SuccessFactors, Talenta).

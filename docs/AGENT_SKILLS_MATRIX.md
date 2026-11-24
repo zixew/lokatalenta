@@ -75,16 +75,16 @@ flowchart TD
 * **Metodologi**: Clean Architecture SDLC Enforcement, Four Quality Gates Protocol, Anti-AI-Slop Craftsmanship Standard.
 * **Sertifikasi / Mandat**: Chief Engineering Lead, Certified Scrum Master (CSM), ISO/IEC 25010 Evaluator.
 
-#### #1 — Bramantyo Daniswara (Chief Commercial & Business Strategist)
+#### #1 — Bramantyo Daniswara (Chief Community Growth & Institutional Adoption Strategist)
 * **Kategori**: `product` | **Avatar**: 💼 | **Meja**: Posisi {-12.5, -10.5}
 * **Core Competencies**:
-  1. *B2B Revenue & Monetization Strategy (96%)*: Perancangan paket kuota assessment B2B, pricing tiers, dan subscription models.
+  1. *Free-Access Community Growth Strategy (96%)*: Perancangan adopsi terbuka 100% gratis tanpa paywall untuk kandidat, pendidik, dan organisasi mitra.
   2. *Enterprise ATS Pipeline Sourcing (95%)*: Strategi retensi kandidat, integrasi portal rekruter korporat, dan SLA hiring pipeline.
-  3. *Midtrans Payment Gateway Architecture (94%)*: Orkestrasi webhook pembayaran, settlement reconciliation, dan anti-fraud rules.
-  4. *Unit Economics & MRR Modeling (95%)*: Proyeksi Customer Lifetime Value (CLV), Customer Acquisition Cost (CAC), dan runway metrics.
-* **Stack & Tooling**: Midtrans Snap API, Mixpanel Analytics, PostgreSQL BI Queries, Google Analytics 4, Stripe Billing Sandbox.
-* **Metodologi**: Product-Led Growth (PLG), B2B SaaS Funnel Optimization, Cohort Retention Analysis.
-* **Sertifikasi / Mandat**: Chief Commercial Strategist, Reforge Growth & Monetization, Certified Product Executive.
+  3. *Open Institutional Onboarding Architecture (94%)*: Orkestrasi self-service onboarding organisasi, tata kelola kuota terbuka, dan kemitraan kampus/BUMN.
+  4. *Impact & Adoption Analytics Modeling (95%)*: Proyeksi tingkat adopsi pengguna, retensi kohort, dan efektivitas asesmen psikometri terbuka.
+* **Stack & Tooling**: Open-Access Telemetry, Mixpanel Analytics, PostgreSQL BI Queries, Google Analytics 4, Community Funnel Sandbox.
+* **Metodologi**: Product-Led Growth (PLG), Open-Access Adoption Funnel, Cohort Retention Analysis.
+* **Sertifikasi / Mandat**: Chief Community Growth Strategist, Reforge Product-Led Growth, Certified Product Executive.
 
 #### #2 — Pranadipa Wicaksana (Product Owner / PO)
 * **Kategori**: `product` | **Avatar**: 📋 | **Meja**: Posisi {-10.5, -8.5}

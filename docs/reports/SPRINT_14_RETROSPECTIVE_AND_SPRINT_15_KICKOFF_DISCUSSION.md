@@ -183,9 +183,9 @@ Diskusi sinkronisasi Agile diselenggarakan dengan menghadirkan seluruh **18 pera
 #### 2. Bisnis Lead — **Bramantyo Daniswara**
 - **Kutipan Dialog Langsung:**
   > *"Dari perspektif komersial, LokaTalenta 3.0 membuka pintu kemitraan B2B yang bernilai tinggi. Fitur pencarian kandidat berbasis Radar 5D dan generator undangan kuis korporat adalah nilai jual utama kita ke institusi perbankan, BUMN, dan tech company. Namun, klien enterprise menuntut jaminan SLA dan akurasi skor yang mutlak. Kita tidak bisa menjual paket seleksi kerja jika nilai isian singkat kandidat salah atau bukti pelanggaran tab-switch tidak bisa diakses recruiter dari dashboard mereka. Prioritas Sprint 15 harus menghadirkan Pipeline Kanban ATS agar HR dapat mengelola kandidat layaknya di Greenhouse atau Lever."*
-- **Tanggung Jawab Utama:** Business Strategist & B2B Monetization Architect. Mengawal model penetapan harga paket korporat, kuota undangan asesmen berbayar, kemitraan institusional, dan retensi klien enterprise.
-- **Kekhawatiran Utama:** Churn rate pelanggan enterprise akibat kegagalan sinkronisasi hasil ujian kandidat, kebocoran data kandidat antar perusahaan pesaing yang memicu sanksi hukum, dan ketiadaan visualisasi perbandingan kandidat (*Candidate Comparison Matrix*).
-- **Artefak yang Dikelola:** Proyeksi Monetisasi B2B, Struktur Harga Tier Korporat (Starter 50, Growth 200, Enterprise 1.000 invites/bulan), Dokumen Roadmap Kemitraan Strategis di `docs/BACKLOG_AND_ROADMAP_ANALYSIS.md`.
+- **Tanggung Jawab Utama:** Community Growth Strategist & Free-Access Institutional Adoption Lead. Mengawal model adopsi gratis 100% tanpa paywall, tata kelola kuota undangan asesmen terbuka (*fair-use*), kemitraan institusional, dan retensi komunitas.
+- **Kekhawatiran Utama:** Churn rate mitra akibat kegagalan sinkronisasi hasil ujian kandidat, kebocoran data kandidat antar perusahaan pesaing yang memicu sanksi hukum, dan ketiadaan visualisasi perbandingan kandidat (*Candidate Comparison Matrix*).
+- **Artefak yang Dikelola:** Proyeksi Adopsi Komunitas Gratis, Struktur Kuota Fair-Use Terbuka (Starter 50, Growth 200, Enterprise 1.000 invites/bulan — Gratis 100%), Dokumen Roadmap Kemitraan Strategis di `docs/BACKLOG_AND_ROADMAP_ANALYSIS.md`.
 - **Kriteria Tanda Tangan (Sign-off Criteria):**
   1. Mekanisme kuota dan isolasi brand organisasi terbukti berjalan sempurna tanpa risiko cross-tenant leakage.
   2. Alur ATS Kanban (`REC-06`) dan Matriks Komparasi Kandidat (`REC-08`) siap didemonstrasikan kepada calon mitra BUMN.
@@ -330,7 +330,7 @@ Diskusi sinkronisasi Agile diselenggarakan dengan menghadirkan seluruh **18 pera
 
 #### 14. Penetration Tester — **Rendra Dananjaya**
 - **Kutipan Dialog Langsung:**
-  > *"Selaku lead red team, saya telah menguji ketahanan rilis v3.0.0 terhadap serangan siber. Hasilnya: aplikasi kita aman dari XSS dasar dan injeksi DDE spreadsheet berkat securityGuards.ts. Namun, pada ranah arsitektur multi-tenant, terdapat 5 vektor kerentanan serius (SEC-05) pada RPC publik: get_attempt_review berpotensi membocorkan kunci jawaban ujian berbayar ke kandidat yang cerdik di network tab; get_public_leaderboard mencampuradukkan nilai asesmen korporat ke papan peringkat umum; dan tidak adanya RPC claim_and_start_assessment_invitation dengan row-level lock membuka celah race condition perampokan kuota ujian. Di Sprint 15, saya akan melakukan simulasi penetrasi mendalam untuk membuktikan 5 celah ini tertutup rapat oleh patch RLS dan fungsi PL/pgSQL."*
+  > *"Selaku lead red team, saya telah menguji ketahanan rilis v3.0.0 terhadap serangan siber. Hasilnya: aplikasi kita aman dari XSS dasar dan injeksi DDE spreadsheet berkat securityGuards.ts. Namun, pada ranah arsitektur multi-tenant, terdapat 5 vektor kerentanan serius (SEC-05) pada RPC publik: get_attempt_review berpotensi membocorkan kunci jawaban ujian ke kandidat yang cerdik di network tab; get_public_leaderboard mencampuradukkan nilai asesmen korporat ke papan peringkat umum; dan tidak adanya RPC claim_and_start_assessment_invitation dengan row-level lock membuka celah race condition perampokan kuota ujian. Di Sprint 15, saya akan melakukan simulasi penetrasi mendalam untuk membuktikan 5 celah ini tertutup rapat oleh patch RLS dan fungsi PL/pgSQL."*
 - **Tanggung Jawab Utama:** Lead Penetration Tester & Red Team Specialist. Melakukan peretasan etis, simulasi serangan OWASP Top 10, fuzzing parameter, pengujian manipulasi token otorisasi, dan validasi perisai sandbox.
 - **Kekhawatiran Utama:** Celah Broken Object-Level Authorization (BOLA/IDOR), bypass otorisasi role recruiter, serangan brute-force terhadap token undangan ujian, dan pencurian kunci jawaban kuis melalui inspeksi memori/peramban.
 - **Artefak yang Dikelola:** Rangkaian Uji Red Team Fuzzing di `sprint13StressAndSecurity.test.ts`, Laporan Audit Penetrasi DAST.
@@ -491,7 +491,7 @@ Sintesis investigasi mendalam mengungkap 10 butir utang teknis, hambatan arsitek
 ---
 
 ### 3.6 Kerentanan Privasi & Isolasi Data Multi-Tenant pada 5 Public RPC (SEC-05)
-Analisis keamanan pada `docs/BACKLOG_AND_ROADMAP_ANALYSIS.md:711-1050` mengidentifikasi 5 fungsi RPC publik yang berpotensi membocorkan data kandidat berbayar ke publik:
+Analisis keamanan pada `docs/BACKLOG_AND_ROADMAP_ANALYSIS.md:711-1050` mengidentifikasi 5 fungsi RPC publik yang berpotensi membocorkan data kandidat ke publik:
 1. `get_attempt_review`: Mengembalikan `correct_option` dan `explanation` ke peramban kandidat, membocorkan kunci jawaban rahasia ujian seleksi kerja.
 2. `get_public_leaderboard`: Memasukkan nilai ujian privat korporat ke papan peringkat umum siswa B2C.
 3. `get_quiz_item_analysis`: Memaparkan statistik jawaban kandidat korporat ke panel mentor publik.
@@ -630,9 +630,9 @@ Berdasarkan kesepakatan seluruh pimpinan domain, total kapasitas tim untuk Sprin
   │     • SEC-07: Otomasi Audit Kepatuhan Privasi Data UU PDP (Consent Manager & Retention Auto-Purge)
   │     • PERF-04: Refactoring Halaman Raksasa AdminPanelPage & TeacherStudioPage ke Sub-Modul
   │
-  ├─► SPRINT 19 (v3.5.0 - B2B Monetization & Corporate Billing Engine)
-  │     • FIN-01: Manajemen Saldo Kredit Asesmen Korporat & Payment Gateway Midtrans
-  │     • FIN-02: Otomasi Faktur Pembayaran Pajak & Laporan Penggunaan Lisensi Institusi
+  ├─► SPRINT 19 (v3.5.0 - Free-Access Community Scaling & Open Institutional Onboarding)
+  │     • FREE-01: Akses Gratis 100% Tanpa Paywall & Self-Service Onboarding Organisasi
+  │     • FREE-02: Pelaporan Dampak Adopsi Komunitas & Analitik Pemanfaatan Terbuka
   │
   └─► SPRINT 20 (v4.0.0 MAJOR - Open Assessment REST API & Ekosistem Terbuka)
         • ARC-10: Open Assessment REST API & Webhooks Engine bertanda tangan HMAC
