@@ -130,3 +130,103 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **Given** perekrut membuka `/verify`,
   - **When** perekrut memasukkan Kode Sertifikat (`LT-...`) atau ID Talent Passport,
   - **Then** sistem menampilkan hasil verifikasi keaslian beserta tautan menuju **Talent Readiness Passport** kandidat tersebut.
+
+---
+
+### E. Epik 5 — Cohort Kelas Privat, Timeline Tugas & SQL Sandbox (`Sprint 11` • `v2.1.0` Minor)
+
+#### `US-33` (BL-33): Manajemen Cohort / Kelas Privat & Kode Undangan
+- **User Story:** *Sebagai **Pengajar**, saya ingin membuat grup Cohort/Batch dengan kode undangan unik, sehingga peserta pelatihan atau kandidat rekrutmen dapat bergabung ke kelas privat dan dipantau progresnya dalam satu kelompok.*
+- **Acceptance Criteria:**
+  - **Given** pengajar membuka tab baru **Cohort** di `/teacher`,
+  - **When** pengajar membuat cohort baru dan membagikan kode (mis. `BUMN-BATCH-01`),
+  - **Then** pelajar dapat memasukkan kode di `/profile` atau `/` dan otomatis tergabung ke daftar peserta cohort tersebut.
+
+#### `US-34` (BL-34): Timeline Jadwal Belajar & Tenggat Tugas Mingguan
+- **User Story:** *Sebagai **Pelajar**, saya ingin melihat ringkasan jadwal Tryout Akbar, sesi live mentor, dan tenggat tugas dalam satu panel timeline terpadu, sehingga tidak ada jadwal penting yang terlewat.*
+- **Acceptance Criteria:**
+  - **Given** pelajar membuka `/profile` atau dashboard utama,
+  - **When** terdapat tugas aktif, sesi live, atau tryout terdaftar,
+  - **Then** tampil panel **Agenda & Tenggat Terdekat** yang diurutkan berdasarkan waktu terdekat.
+
+#### `US-35` (BL-35): Lab Query SQL Interaktif untuk Kursus Data & Administrasi
+- **User Story:** *Sebagai **Mentee** pada kursus teknis data/administrasi, saya ingin mengetik query SQL dasar (`SELECT`, `WHERE`, `ORDER BY`, `COUNT`) langsung pada tabel dataset contoh di Course Player, sehingga saya menguasai logika pengolahan data selain Excel.*
+- **Acceptance Criteria:**
+  - **Given** mentee membuka tab **Lab SQL** di Course Player kursus teknis,
+  - **When** mentee mengetik query valid (mis. `SELECT nama, nilai FROM kandidat WHERE nilai >= 80 ORDER BY nilai DESC`) dan menekan **Jalankan Query**,
+  - **Then** hasil tabel terfilter tampil instan beserta evaluasi misi praktik SQL.
+
+---
+
+### F. Epik 6 — Adaptive Diagnostic Plan, Bookmark Soal & Telemetry (`Sprint 12` • `v2.2.0` Minor)
+
+#### `US-36` (BL-36): Diagnostic Study Plan Otomatis
+- **User Story:** *Sebagai **Pelajar**, saya ingin sistem menyusun rencana belajar mingguan otomatis berdasarkan subtest terlemah saya, sehingga waktu belajar lebih terarah.*
+- **Acceptance Criteria:**
+  - **Given** pelajar telah mengerjakan minimal 1 simulasi/kuis,
+  - **When** pelajar membuka tab **Rencana Belajar** di `/profile`,
+  - **Then** sistem merekomendasikan 3 langkah prioritas (materi + Smart Drill) sesuai skor subtest terendah.
+
+#### `US-37` (BL-37): Bookmark Soal Sulit & Dek Ulasan Pribadi
+- **User Story:** *Sebagai **Pelajar**, saya ingin menandai (*bookmark*) soal-soal sulit pada halaman hasil kuis, sehingga saya dapat mengulasnya kembali kapan saja dari halaman profil.*
+- **Acceptance Criteria:**
+  - **Given** pelajar membuka ringkasan pembahasan di `QuizResultPage`,
+  - **When** pelajar menekan tombol **Simpan ke Bookmark Soal Sulit**,
+  - **Then** soal beserta pembahasan tersimpan dan dapat diakses/dihapus pada tab **Soal Tersimpan** di `/profile`.
+
+#### `US-38` (BL-38): Observability & Health Telemetry Panel di Admin
+- **User Story:** *Sebagai **Admin**, saya ingin memantau ringkasan metrik kesehatan aplikasi (jumlah error client tertangkap, status PWA/cache, dan performa lokal) di Admin Panel, sehingga isu pasca-rilis cepat terdeteksi.*
+- **Acceptance Criteria:**
+  - **Given** admin membuka `/admin` tab **Kesehatan Sistem**,
+  - **When** halaman dimuat,
+  - **Then** tampil ringkasan versi aktif, status storage/SW, serta log error runtime yang tertangkap oleh ErrorBoundary.
+
+---
+
+### G. Epik 7 — Multi-Format Assessment, Proctoring Lite & Stress Gate (`Sprint 13` • `v2.3.0` Minor)
+
+#### `US-39` (BL-39): Indikator Integritas Fokus (Anti-Tab-Switch / Proctoring Lite)
+- **User Story:** *Sebagai **Pengajar / Penyelenggara Tryout**, saya ingin mengetahui berapa kali peserta berpindah tab selama ujian resmi berlangsung, sehingga integritas hasil evaluasi lebih terjaga.*
+- **Acceptance Criteria:**
+  - **Given** pelajar mengerjakan kuis dengan mode ujian aktif di `QuizRunnerPage`,
+  - **When** pelajar berpindah tab/window (`visibilitychange`),
+  - **Then** peringatan fokus tampil dan jumlah perpindahan tab tersimpan di ringkasan attempt.
+
+#### `US-40` (BL-40): Soal Isian Singkat / Formula & Auto-Keyword Scoring
+- **User Story:** *Sebagai **Pengajar**, saya ingin membuat soal isian singkat (angka, kata kunci, atau rumus Excel) selain pilihan ganda A–E, sehingga evaluasi lebih realistis.*
+- **Acceptance Criteria:**
+  - **Given** pengajar membuat/mengimpor soal bertipe `short_answer`,
+  - **When** pelajar mengetik jawaban pada QuizRunner,
+  - **Then** sistem mencocokkan jawaban secara *case-insensitive trimmed* dan menghitung skor otomatis.
+
+#### `US-41` (BL-41): Security & Stress Benchmark Suite v2 (5.000 Operasi)
+- **User Story:** *Sebagai **Tim Engineering**, saya ingin menguji performa parser rumus, filter katalog, dan sanitasi payload pada skala 5.000 operasi sebelum masuk ke rilis Major `v3.0.0`.*
+- **Acceptance Criteria:**
+  - **Given** suite `sprint13StressAndSecurity.test.ts` dijalankan,
+  - **When** 5.000 kalkulasi & sanitasi dijalankan,
+  - **Then** seluruh benchmark selesai di bawah batas latensi target tanpa *memory leak* atau *bypass* sanitasi.
+
+---
+
+### H. Epik 8 — LokaTalenta 3.0: Recruiter Portal & Multi-Tenant Assessment (`Sprint 14` • `v3.0.0` MAJOR)
+
+#### `US-42` (BL-42): Portal Perekrut & Talent Discovery (`/recruiter`)
+- **User Story:** *Sebagai **Perekrut / HR Perusahaan**, saya ingin mengakses dashboard khusus `/recruiter` untuk menelusuri kandidat berprestasi berdasarkan Radar Kompetensi 5-Dimensi, skor Kraepelin, dan sertifikat terverifikasi, lalu menyimpannya ke daftar **Shortlist Kandidat**.*
+- **Acceptance Criteria:**
+  - **Given** user login dengan role `recruiter` (atau `admin`),
+  - **When** user membuka `/recruiter`, memfilter kandidat berdasarkan minimal skor/kompetensi, dan menekan **Simpan ke Shortlist**,
+  - **Then** kandidat tersimpan di daftar shortlist dan tautan Talent Passport kandidat dapat dibuka langsung.
+
+#### `US-43` (BL-43): Custom Assessment Link untuk Seleksi Perusahaan
+- **User Story:** *Sebagai **Perekrut / Pengajar**, saya ingin membuat tautan undangan asesmen khusus perusahaan (`/quiz/:quizId?org=...&invite=...`) beserta rekap hasil kandidat yang mengikuti tautan tersebut.*
+- **Acceptance Criteria:**
+  - **Given** perekrut membuat undangan asesmen di `/recruiter`,
+  - **When** kandidat mengakses tautan undangan dan menyelesaikan tes,
+  - **Then** nama organisasi tampil di header ujian dan skor kandidat masuk ke rekap asesmen perekrut.
+
+#### `US-44` (BL-44): Multi-Tenant Organization Branding & Role `recruiter` (`v3.0.0` Major)
+- **User Story:** *Sebagai **Admin & Perekrut**, saya ingin platform mendukung role `recruiter` di manajemen pengguna serta menampilkan identitas organisasi mitra pada halaman asesmen & sertifikat resmi.*
+- **Acceptance Criteria:**
+  - **Given** admin menetapkan role `recruiter` pada pengguna di `/admin`,
+  - **When** perekrut login,
+  - **Then** navbar (`TopbarNav`) menampilkan akses **Portal Perekrut (`/recruiter`)**, aplikasi berjalan pada rilis **`v3.0.0`**, dan seluruh regresi QA v1–v3 lulus 100%.

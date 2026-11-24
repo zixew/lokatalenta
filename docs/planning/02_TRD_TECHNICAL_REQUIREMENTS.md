@@ -193,3 +193,20 @@ Setiap Sprint wajib melewati 4 gerbang verifikasi:
    - Merge `feature/*` ke `dev`, push ke `origin/dev`, tunggu deploy Vercel Dev, dan verifikasi live di browser.
 4. **Staging & Release Gate (`prod` → `https://lokatalenta.vercel.app` → `main`):**
    - Merge `dev` ke `prod`, verifikasi di URL produksi, lalu merge ke `main` dan jalankan `./scripts/release.sh <minor|major> "<deskripsi>"`.
+
+---
+
+## 5. Evolusi Arsitektur & Skema Menuju `v3.0.0` Major (Sprint 11 – Sprint 14)
+
+### 5.1. Migrasi Database Tambahan (`supabase/migrations/`)
+1. **Sprint 11 (`v2.1.0`):** `public.cohorts` & `public.cohort_members` (kode undangan unik, teacher owner, RLS peserta & pengajar).
+2. **Sprint 12 (`v2.2.0`):** `public.bookmarked_questions` & `public.client_telemetry_logs` (bookmark soal sulit per user + log runtime error terstruktur).
+3. **Sprint 13 (`v2.3.0`):** Penambahan kolom `tab_switch_count integer default 0` pada `public.quiz_attempts` & dukungan tipe soal `short_answer` pada `public.questions`.
+4. **Sprint 14 (`v3.0.0` Major):**
+   - Penambahan nilai enum/check role `'recruiter'` pada `public.profiles`.
+   - Tabel `public.recruiter_shortlists` & `public.assessment_invitations` (token undangan asesmen perusahaan, batas waktu, nama organisasi, dan RLS khusus `recruiter`/`admin`).
+
+### 5.2. Perubahan Kontrak Routing & Role (`v3.0.0` Major)
+- `UserRole`: `'student' | 'teacher' | 'admin' | 'recruiter'`
+- Rute baru: `/recruiter` (dilindungi `<RequireRole roles={['recruiter', 'admin']}>`)
+- Update `TopbarNav.tsx`: menampilkan tautan **Portal Perekrut** pada menu `Lainnya` untuk role `recruiter` dan `admin`.
