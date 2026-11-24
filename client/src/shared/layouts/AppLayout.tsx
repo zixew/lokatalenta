@@ -211,7 +211,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     }`}
                   >
                     <BookOpen className="w-4 h-4" />
-                    Beranda &amp; Katalog
+                    Katalog
                   </Link>
                   <Link
                     to="/kraepelin"

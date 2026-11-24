@@ -216,7 +216,7 @@ export function TryoutPage() {
                     {ev.prizeNote}
                   </span>
                   <div className="flex flex-wrap items-center gap-2">
-                    {status !== 'ended' && (
+                    {status !== 'ended' && !(status === 'live' && defaultQuizId && !isRegistered) && (
                       <Button
                         type="button"
                         size="sm"
@@ -239,12 +239,20 @@ export function TryoutPage() {
                         <Button
                           type="button"
                           size="sm"
-                          disabled={!isRegistered}
-                          title={!isRegistered ? 'Daftar event terlebih dahulu untuk memulai tryout' : undefined}
-                          onClick={() => navigate(user ? `/quiz/${eventQuizId}` : '/auth')}
+                          onClick={async () => {
+                            if (!user) {
+                              navigate('/auth');
+                              return;
+                            }
+                            if (!isRegistered) {
+                              const updated = await toggleTryoutRegistrationAsync(userKey, ev.id);
+                              setRegisteredIds(updated);
+                            }
+                            navigate(`/quiz/${eventQuizId}`);
+                          }}
                         >
                           <Play className="w-3.5 h-3.5" />
-                          {isRegistered ? 'Mulai Tryout' : 'Daftar Dulu'}
+                          {isRegistered ? 'Mulai Tryout' : 'Daftar & Ikuti Tryout'}
                         </Button>
                       );
                     })()}

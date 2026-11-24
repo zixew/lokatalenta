@@ -9,6 +9,7 @@ import {
   Download,
   Eye,
   FileText,
+  ListOrdered,
   Lock,
   Maximize2,
   Megaphone,
@@ -16,6 +17,7 @@ import {
   PlayCircle,
   Trophy,
   Volume2,
+  X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -97,6 +99,7 @@ export function CoursePlayerPage() {
   const [writingMode, setWritingMode] = useState(false);
   const [speechMode, setSpeechMode] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
   const [milestoneToast, setMilestoneToast] = useState<{
     visible: boolean;
     title: string;
@@ -251,6 +254,85 @@ export function CoursePlayerPage() {
     if (nextLesson) setActiveLessonId(nextLesson.id);
   };
 
+  const renderCurriculumContent = (onSelectLesson?: () => void) => (
+    <>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2 text-xs">
+          <span className="font-semibold text-[#18181B] dark:text-white">Kurikulum Kursus</span>
+          {isMentorPreview ? (
+            <span className="font-semibold text-amber-700 dark:text-amber-300">
+              Mode Pratinjau — Semua Materi Terbuka
+            </span>
+          ) : (
+            <span className="font-mono-tabular font-semibold text-[#0F766E] dark:text-teal-400">
+              {completedCount}/{allLessons.length} Selesai ({progressPct}%)
+            </span>
+          )}
+        </div>
+        {!isMentorPreview && <ProgressBar value={progressPct} tone="emerald" />}
+      </div>
+
+      <div className="space-y-4">
+        {(course.modules ?? []).map((mod) => (
+          <div key={mod.id} className="space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
+              {mod.title}
+            </h3>
+            <div className="space-y-1.5">
+              {mod.lessons.map((les) => {
+                const isActive = les.id === activeLesson?.id;
+                const isDone = isLessonDone(les);
+                const locked = isLessonLocked(les.id);
+                return (
+                  <button
+                    key={les.id}
+                    type="button"
+                    disabled={locked}
+                    onClick={() => {
+                      if (!locked) {
+                        setActiveLessonId(les.id);
+                        onSelectLesson?.();
+                      }
+                    }}
+                    className={`w-full text-left p-3 rounded-xl border text-sm transition-colors flex items-start gap-2.5 ${
+                      locked
+                        ? 'bg-slate-50 dark:bg-slate-900/30 border-[#E5E3DC] dark:border-slate-800 text-[#94A3B8] dark:text-slate-500 opacity-65 cursor-not-allowed'
+                        : isActive
+                        ? 'bg-teal-50/70 dark:bg-teal-950/50 border-[#0F766E] text-[#18181B] dark:text-white cursor-pointer'
+                        : 'bg-white dark:bg-slate-900/60 border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'
+                    }`}
+                  >
+                    <div className="mt-0.5 shrink-0">
+                      {locked ? (
+                        <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      ) : isDone ? (
+                        <CheckCircle2 className="w-4 h-4 text-[#059669]" />
+                      ) : les.type === 'quiz' ? (
+                        <ClipboardCheck className="w-4 h-4 text-[#0F766E]" />
+                      ) : les.type === 'video' ? (
+                        <PlayCircle className="w-4 h-4 text-slate-400" />
+                      ) : (
+                        <FileText className="w-4 h-4 text-slate-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium leading-snug">{les.title}</p>
+                      <span className="text-[11px] text-[#71717A] dark:text-slate-400 mt-0.5 block">
+                        {locked
+                          ? 'Terkunci • Selesaikan materi sebelumnya'
+                          : `${les.type === 'quiz' ? 'Simulasi Tes' : 'Materi'} • ${les.duration_minutes} mnt`}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
       {/* Breadcrumb & Course Header */}
@@ -261,7 +343,7 @@ export function CoursePlayerPage() {
             className="inline-flex items-center gap-1.5 text-xs font-medium text-[#71717A] dark:text-slate-400 hover:text-[#18181B] dark:hover:text-white"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            {isMentorPreview ? 'Kembali ke Studio Mentor' : 'Kembali ke Katalog'}
+            {isMentorPreview ? 'Kembali ke Mentor Studio' : 'Kembali ke Katalog'}
           </Link>
           <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">{course.title}</h1>
           <p className="text-xs text-[#71717A] dark:text-slate-400">
@@ -271,6 +353,18 @@ export function CoursePlayerPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {!isFocusMode && (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="lg:hidden"
+              onClick={() => setMobileCurriculumOpen(true)}
+            >
+              <ListOrdered className="w-3.5 h-3.5" />
+              Daftar Materi
+            </Button>
+          )}
           <Button
             type="button"
             size="sm"
@@ -857,75 +951,46 @@ export function CoursePlayerPage() {
 
         {/* Right Sidebar: Syllabus & Progress */}
         {!isFocusMode && (
-        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-5 lg:sticky lg:top-24">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-[#18181B] dark:text-white">Kurikulum Kursus</span>
-              <span className="font-mono-tabular font-semibold text-[#0F766E] dark:text-teal-400">
-                {completedCount}/{allLessons.length} Selesai ({progressPct}%)
-              </span>
-            </div>
-            <ProgressBar value={progressPct} tone="emerald" />
-          </div>
-
-          <div className="space-y-4">
-            {(course.modules ?? []).map((mod) => (
-              <div key={mod.id} className="space-y-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
-                  {mod.title}
-                </h3>
-                <div className="space-y-1.5">
-                  {mod.lessons.map((les) => {
-                    const isActive = les.id === activeLesson?.id;
-                    const isDone = isLessonDone(les);
-                    const locked = isLessonLocked(les.id);
-                    return (
-                      <button
-                        key={les.id}
-                        type="button"
-                        disabled={locked}
-                        onClick={() => {
-                          if (!locked) setActiveLessonId(les.id);
-                        }}
-                        className={`w-full text-left p-3 rounded-xl border text-sm transition-colors flex items-start gap-2.5 ${
-                          locked
-                            ? 'bg-slate-50 dark:bg-slate-900/30 border-[#E5E3DC] dark:border-slate-800 text-[#94A3B8] dark:text-slate-500 opacity-65 cursor-not-allowed'
-                            : isActive
-                            ? 'bg-teal-50/70 dark:bg-teal-950/50 border-[#0F766E] text-[#18181B] dark:text-white cursor-pointer'
-                            : 'bg-white dark:bg-slate-900/60 border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'
-                        }`}
-                      >
-                        <div className="mt-0.5 shrink-0">
-                          {locked ? (
-                            <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-                          ) : isDone ? (
-                            <CheckCircle2 className="w-4 h-4 text-[#059669]" />
-                          ) : les.type === 'quiz' ? (
-                            <ClipboardCheck className="w-4 h-4 text-[#0F766E]" />
-                          ) : les.type === 'video' ? (
-                            <PlayCircle className="w-4 h-4 text-slate-400" />
-                          ) : (
-                            <FileText className="w-4 h-4 text-slate-400" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium leading-snug">{les.title}</p>
-                          <span className="text-[11px] text-[#71717A] dark:text-slate-400 mt-0.5 block">
-                            {locked
-                              ? 'Terkunci • Selesaikan materi sebelumnya'
-                              : `${les.type === 'quiz' ? 'Simulasi Tes' : 'Materi'} • ${les.duration_minutes} mnt`}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        </aside>
+          <aside className="hidden lg:block lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-5 lg:sticky lg:top-24">
+            {renderCurriculumContent()}
+          </aside>
         )}
       </div>
+
+      {/* Mobile Slide-Over Curriculum Drawer */}
+      {!isFocusMode && mobileCurriculumOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden flex justify-end bg-black/50 backdrop-blur-[2px]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setMobileCurriculumOpen(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Daftar Materi"
+            className="w-full max-w-sm h-full bg-white dark:bg-[#161B22] border-l border-[#E5E3DC] dark:border-slate-800 shadow-xl flex flex-col"
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800">
+              <span className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                <ListOrdered className="w-4 h-4 text-[#0F766E]" />
+                Daftar Materi
+              </span>
+              <button
+                type="button"
+                onClick={() => setMobileCurriculumOpen(false)}
+                aria-label="Tutup daftar materi"
+                className="p-1.5 rounded-lg text-[#71717A] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              {renderCurriculumContent(() => setMobileCurriculumOpen(false))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <MilestoneToast
         visible={milestoneToast.visible}
