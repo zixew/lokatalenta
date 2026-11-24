@@ -195,6 +195,27 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** pelajar memilih durasi (30s / 60s) atau paket teks (Indonesia / Inggris / Angka & Simbol) lalu mulai mengetik,
   - **Then** sistem menampilkan **WPM**, **CPM**, **Akurasi (%)**, highlight karakter benar/salah secara real-time, serta menyimpan riwayat hasil latihan ke lokal/cloud (`typing_attempts`).
 
+#### `US-38C` (BL-38C — Student POV): Pelacak XP Harian Real-Time & Leaderboard Per Event Tryout
+- **User Story:** *Sebagai **Pelajar**, saya ingin melihat progress bar XP harian terhadap target (30/60/100 XP), tautan aksi langsung dari Radar 5D ke latihan terkait, serta papan peringkat khusus per event Tryout dan filter/pencarian forum Komunitas, sehingga target harian dan kompetisi event lebih terukur.*
+- **Acceptance Criteria:**
+  - **Given** pelajar login di `/` atau membuka `/tryout` dan `/community`,
+  - **When** pelajar menyelesaikan materi/kuis atau membuka tab event Tryout tertentu,
+  - **Then** bar XP Harian menampilkan `earnedToday / xpTarget`, Leaderboard Tryout menampilkan peringkat khusus event tersebut, dan forum Komunitas mendukung pencarian serta sorting Terpopuler.
+
+#### `US-38D` (BL-38D — Teacher POV): Mode Pratinjau Mentor, Manajemen Anggota Cohort & Ringkasan Mengajar
+- **User Story:** *Sebagai **Mentor / Pengajar**, saya ingin mempratinjau kursus/soal buatan sendiri (`?preview=true`), melihat/mengeluarkan anggota cohort, mengedit metadata kursus & judul modul, serta melihat Ringkasan Mengajar di `/profile`, sehingga pengelolaan kelas lebih tuntas.*
+- **Acceptance Criteria:**
+  - **Given** pengajar membuka `/teacher` atau `/profile`,
+  - **When** pengajar menekan **Pratinjau Kursus** atau membuka detail Cohort,
+  - **Then** `/courses/:slug?preview=true` terbuka dalam mode read-only (tanpa mencatat progres/XP) khusus pemilik kursus, daftar anggota cohort tampil lengkap dengan opsi arsip/keluarkan anggota, dan `/profile` mentor menampilkan ringkasan kursus & jadwal live.
+
+#### `US-38E` (BL-38E — Admin POV): Preview Kursus Read-Only, Moderasi Komunitas & Revoke Sertifikat
+- **User Story:** *Sebagai **Admin Platform**, saya ingin meninjau struktur modul/materi kursus sebelum menerbitkan, memoderasi postingan forum Komunitas langsung dari `/admin`, memantau metrik status akun/distribusi role, dan mencabut (*revoke*) sertifikat jika terjadi pelanggaran.*
+- **Acceptance Criteria:**
+  - **Given** admin membuka `/admin`,
+  - **When** admin memilih **Preview Kursus**, tab **Moderasi Komunitas**, atau tab **Sertifikat**,
+  - **Then** modal read-only menampilkan daftar modul & lesson tanpa membuka rute `/courses/:slug`, admin dapat menghapus postingan bermasalah atau mencabut sertifikat dengan pencatatan otomatis ke `admin_audit_logs`.
+
 ---
 
 ### G. Epik 7 — Multi-Format Assessment, Proctoring Lite & Stress Gate (`Sprint 13` • `v2.3.0` Minor)
@@ -212,6 +233,20 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **Given** pengajar membuat/mengimpor soal bertipe `short_answer`,
   - **When** pelajar mengetik jawaban pada QuizRunner,
   - **Then** sistem mencocokkan jawaban secara *case-insensitive trimmed* dan menghitung skor otomatis.
+
+#### `US-40B` (BL-40B — Student & Teacher POV): Simulasi Interview STAR, Penugasan Per Cohort & Item Analysis
+- **User Story:** *Sebagai **Pelajar** dan **Mentor**, saya ingin berlatih wawancara metode STAR (*Situation–Task–Action–Result*), menargetkan tugas/pengumuman khusus `cohort_id`, melihat drill-down rapor individual siswa, dan analitik butir soal (*Item Analysis*).*
+- **Acceptance Criteria:**
+  - **Given** pelajar berlatih di Course Player atau mentor membuka `/teacher`,
+  - **When** mentor membuat tugas bertarget cohort atau membuka analitik butir soal,
+  - **Then** hanya anggota cohort terkait yang menerima tugas/pengumuman, dan grafik persentase benar per butir soal tampil di `TeacherAnalyticsPanel`.
+
+#### `US-40C` (BL-40C — Teacher & Admin POV): Duplikasi Kursus/Soal, Supervisi Cohort & Pengumuman Global
+- **User Story:** *Sebagai **Mentor** dan **Admin**, saya ingin menduplikasi template kursus/paket soal, mengawasi seluruh cohort aktif lintas pengajar, serta mengirim pengumuman global platform (*System-Wide Banner*).*
+- **Acceptance Criteria:**
+  - **Given** mentor di `/teacher` atau admin di `/admin`,
+  - **When** mentor menekan **Duplikasi Kursus/Quiz** atau admin mengirim **Broadcast Pengumuman**,
+  - **Then** salinan kursus/quiz berstatus Draft terbuat instan dan banner pengumuman global tampil di header aplikasi seluruh pengguna.
 
 #### `US-41` (BL-41): Security & Stress Benchmark Suite v2 (5.000 Operasi)
 - **User Story:** *Sebagai **Tim Engineering**, saya ingin menguji performa parser rumus, filter katalog, dan sanitasi payload pada skala 5.000 operasi sebelum masuk ke rilis Major `v3.0.0`.*

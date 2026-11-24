@@ -671,11 +671,12 @@ export function CoursePlayerPage() {
                   `${course.title} ${activeLesson.title}`,
                   course.category
                 );
+                if (!isSql && !isExcel) return null;
                 return (
                   <HandsOnLabContainer
                     key={`lab-${course.id}-${activeLesson.id}`}
                     defaultLab={isSql ? 'sql' : 'excel'}
-                    defaultExpanded={isSql || isExcel}
+                    defaultExpanded={true}
                   />
                 );
               })()}

@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.1.2] - 2026-11-24
+
+### Hotfix
+- Perbaikan bug POV Student, Teacher/Mentor, dan Admin serta update backlog Sprint 12-13
+
+---
+
 ## [2.1.1] - 2026-11-24
 
 ### Hotfix

@@ -72,8 +72,29 @@ export function TryoutPage() {
   }, [courses]);
 
   const handleToggleRegister = async (eventId: string) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
     const updated = await toggleTryoutRegistrationAsync(userKey, eventId);
     setRegisteredIds(updated);
+  };
+
+  const resolveEventQuizId = (category: string): string => {
+    const normalized = category.toLowerCase();
+    for (const c of courses) {
+      if (!c.category.toLowerCase().includes(normalized) && !c.title.toLowerCase().includes(normalized)) {
+        continue;
+      }
+      for (const m of c.modules ?? []) {
+        for (const l of m.lessons) {
+          if (l.type === 'quiz' && l.quiz?.id) {
+            return l.quiz.id;
+          }
+        }
+      }
+    }
+    return defaultQuizId;
   };
 
   return (
@@ -186,16 +207,21 @@ export function TryoutPage() {
                         )}
                       </Button>
                     )}
-                    {status === 'live' && defaultQuizId && (
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => navigate(user ? `/quiz/${defaultQuizId}` : '/auth')}
-                      >
-                        <Play className="w-3.5 h-3.5" />
-                        Mulai Tryout
-                      </Button>
-                    )}
+                    {status === 'live' && defaultQuizId && (() => {
+                      const eventQuizId = resolveEventQuizId(ev.category);
+                      return (
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={!isRegistered}
+                          title={!isRegistered ? 'Daftar event terlebih dahulu untuk memulai tryout' : undefined}
+                          onClick={() => navigate(user ? `/quiz/${eventQuizId}` : '/auth')}
+                        >
+                          <Play className="w-3.5 h-3.5" />
+                          {isRegistered ? 'Mulai Tryout' : 'Daftar Dulu'}
+                        </Button>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
