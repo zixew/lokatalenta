@@ -170,6 +170,7 @@ RPC publik `get_talent_passport(p_user_id uuid)` (`SECURITY DEFINER`) untuk mena
 | Modul | File Baru / Diperbarui | Fungsi & Kontrak Utama |
 | :--- | :--- | :--- |
 | **Player Notes Sync** | `src/features/player/lessonNotesStorage.ts` | `syncLessonNoteFromServer(userId, lessonId)`, `saveLessonNoteAsync(userId, lessonId, text)`, `exportCourseNotesMarkdown(course, userId)` |
+| **Interactive Spreadsheet Lab** | `src/features/player/spreadsheetEngine.ts` & `InteractiveSpreadsheetLab.tsx` | Safe parser tanpa `eval()`: referensi sel (`A1..E8`), range (`B2:B5`), fungsi `=SUM`, `=AVERAGE`, `=MIN`, `=MAX`, `=COUNT`, `=IF`, `=VLOOKUP`, operator aritmetika (`+`, `-`, `*`, `/`), serta auto-grader misi praktik rumus. |
 | **Study Preferences** | `src/features/courses/learningGoalStorage.ts` | `syncStudyPreferences(userId)`, `saveStudyPreferencesAsync(userId, prefs)` |
 | **Duel & Kraepelin** | `src/features/kraepelin/kraepelinHistory.ts` | `getKraepelinHistory(userId)`, `recordKraepelinAttempt(userId, summary)` |
 | **Teacher Question Edit** | `src/shared/services/lmsApi.ts` & `TeacherStudioPage.tsx` | `lmsApi.updateQuestionInQuiz(questionId, payload)` + mode `editingQuestionId` di form Question Builder |

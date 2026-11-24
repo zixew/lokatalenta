@@ -42,6 +42,13 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **When** pelajar menekan tombol **Unduh Semua Catatan Kursus (.md)** di Course Player,
   - **Then** file ringkasan berisi judul modul, judul materi, dan isi catatan berhasil terunduh.
 
+#### `US-23B` (BL-23B): Lab Spreadsheet & Rumus Excel Interaktif di Course Player (*Hands-On Formula Sandbox*)
+- **User Story:** *Sebagai **Mentee / Pelajar** pada kursus teknis (Excel, Komisi & Bonus, Akuntansi, Rekonsiliasi Data, Administrasi), saya ingin mencoba mengetik rumus Excel (`=SUM`, `=AVERAGE`, `=IF`, `=VLOOKUP`, operasi aritmetika sel) langsung pada tabel spreadsheet interaktif di dalam halaman materi, sehingga saya benar-benar paham cara kerja rumus secara praktik tanpa harus pindah aplikasi.*
+- **Acceptance Criteria:**
+  - **Given** mentee membuka materi pada kursus teknis (atau mengaktifkan **Lab Spreadsheet Interaktif** di Course Player),
+  - **When** mentee memilih sel (mis. `B6`, `D2`, `E2`), mengetik rumus pada Formula Bar `fx` (contoh: `=SUM(B2:B5)`, `=AVERAGE(B2:B5)`, `=IF(B2>=10000000,"Bonus 10%","Bonus 5%")`, `=VLOOKUP("A02",A2:C5,3,FALSE)`, atau `=B2*C2`),
+  - **Then** spreadsheet menghitung hasil rumus secara *real-time*, menampilkan evaluasi **Misi Praktik Rumus** (Benar / Petunjuk Perbaikan), dan menyediakan pilihan skenario latihan (*Rekap Penjualan `SUM/AVERAGE`*, *Komisi Bertingkat `IF`*, *Lookup Barang `VLOOKUP`*).
+
 ---
 
 ### B. Epik 2 — Multi-User 1v1 Duel Arena & Adaptive Subtest Drill (`Sprint 8` • `v1.11.0` Minor)
