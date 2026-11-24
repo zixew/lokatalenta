@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.10.1] - 2026-11-24
+
+### Hotfix
+- Fix cloud lesson_notes column name (content instead of note_text) on production
+
+---
+
 ## [1.10.0] - 2026-11-24
 
 ### Minor
