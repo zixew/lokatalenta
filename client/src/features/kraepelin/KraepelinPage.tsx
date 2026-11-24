@@ -1,14 +1,21 @@
-import { ArrowLeft, BarChart3, CheckCircle2, Clock, Play, RotateCcw, Zap } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, BarChart3, CheckCircle2, Clock, History, Play, RotateCcw, TrendingUp, Zap } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
+import { useAuthStore } from '../auth/useAuthStore';
 import {
   evaluateKraepelinSession,
   generateKraepelinColumns,
   pairKey,
 } from './kraepelinEngine';
+import {
+  computeKraepelinSummaryTrend,
+  recordKraepelinAttemptAsync,
+  syncKraepelinHistoryFromServer,
+} from './kraepelinHistory';
 
 type Stage = 'setup' | 'running' | 'result';
 
@@ -49,10 +56,13 @@ const PRESETS: Preset[] = [
 ];
 
 export function KraepelinPage() {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
   const [presetId, setPresetId] = useState<string>('quick');
   const preset = PRESETS.find((p) => p.id === presetId) ?? PRESETS[0];
 
   const [stage, setStage] = useState<Stage>('setup');
+  const [runId, setRunId] = useState<number>(1);
   const [columns, setColumns] = useState<number[][]>(() =>
     generateKraepelinColumns(preset.columns, preset.rows)
   );
@@ -68,6 +78,7 @@ export function KraepelinPage() {
     setPairIdx(0);
     setSecondsLeft(preset.secondsPerCol);
     setAnswers({});
+    setRunId((id) => id + 1);
     setStage('running');
   }, [preset]);
 
@@ -134,6 +145,32 @@ export function KraepelinPage() {
     () => evaluateKraepelinSession(columns, answers),
     [columns, answers]
   );
+
+  const { data: history = [] } = useQuery({
+    queryKey: ['kraepelin-history', user?.id ?? 'guest'],
+    queryFn: () => syncKraepelinHistoryFromServer(user?.id),
+  });
+
+  useQuery({
+    queryKey: ['kraepelin-record', runId, user?.id ?? 'guest'],
+    enabled: stage === 'result',
+    staleTime: Infinity,
+    queryFn: async () => {
+      const updated = await recordKraepelinAttemptAsync({
+        userId: user?.id,
+        presetId: preset.id,
+        durationSeconds: preset.columns * preset.secondsPerCol,
+        totalAnswered: evaluation.totalAttempted,
+        totalCorrect: evaluation.totalCorrect,
+        accuracyPct: evaluation.accuracyPct,
+        columnAttemptedCounts: evaluation.columnStats.map((s) => s.attempted),
+      });
+      queryClient.setQueryData(['kraepelin-history', user?.id ?? 'guest'], updated);
+      return updated;
+    },
+  });
+
+  const trend = useMemo(() => computeKraepelinSummaryTrend(history), [history]);
 
   const maxAttemptedInAnyCol = Math.max(
     1,
@@ -392,6 +429,75 @@ export function KraepelinPage() {
                 })}
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Riwayat & Tren Ketahanan (BL-26) */}
+      {stage !== 'running' && history.length > 0 && (
+        <section className="rounded-2xl border border-[#E4E4E7] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <History className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h2 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white">
+                Riwayat &amp; Tren Ketahanan
+              </h2>
+            </div>
+            {trend.totalRuns >= 2 && (
+              <Badge tone={trend.deltaAccuracyPct >= 0 ? 'emerald' : 'amber'}>
+                <TrendingUp className="h-3.5 w-3.5 mr-1 inline" />
+                {trend.deltaAccuracyPct >= 0 ? `+${trend.deltaAccuracyPct}%` : `${trend.deltaAccuracyPct}%`} vs sesi lalu
+              </Badge>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="rounded-xl bg-[#F8FAFC] dark:bg-slate-800/60 p-3">
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400">Total Sesi</p>
+              <p className="text-lg font-bold text-[#18181B] dark:text-white">{trend.totalRuns}x</p>
+            </div>
+            <div className="rounded-xl bg-[#F8FAFC] dark:bg-slate-800/60 p-3">
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400">Rata-rata Akurasi</p>
+              <p className="text-lg font-bold text-[#18181B] dark:text-white">{trend.avgAccuracyPct}%</p>
+            </div>
+            <div className="rounded-xl bg-[#F8FAFC] dark:bg-slate-800/60 p-3">
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400">Rata-rata Kecepatan</p>
+              <p className="text-lg font-bold text-[#18181B] dark:text-white">{trend.avgSpeedKpm} KPM</p>
+            </div>
+            <div className="rounded-xl bg-[#F8FAFC] dark:bg-slate-800/60 p-3">
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400">Stabilitas Terbaik</p>
+              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{trend.bestStability}%</p>
+            </div>
+          </div>
+
+          <div className="divide-y divide-[#E4E4E7] dark:divide-slate-800">
+            {history.slice(0, 5).map((item) => (
+              <div
+                key={item.id}
+                className="py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-[#18181B] dark:text-white">
+                    {new Date(item.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                  <span className="text-[#71717A] dark:text-slate-400">
+                    {item.total_correct}/{item.total_answered} benar
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge tone={item.accuracy_pct >= 80 ? 'emerald' : 'blue'}>
+                    Akurasi {item.accuracy_pct}%
+                  </Badge>
+                  <Badge tone="slate">{item.speed_kpm} KPM</Badge>
+                  <Badge tone="slate">Stabilitas {item.stability_score}%</Badge>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       )}

@@ -137,7 +137,7 @@ export function QuizRunnerPage() {
     return () => {
       mounted = false;
     };
-  }, [quizId, user, navigate]);
+  }, [quizId, user, navigate, subtestFilter]);
 
   const handleSubmit = useCallback(async () => {
     if (!attempt || submitting) return;
