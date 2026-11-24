@@ -38,7 +38,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           {/* Brand + Desktop Nav */}
           <div className="flex items-center gap-4 xl:gap-7 min-w-0 flex-1">
-            <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <Link
+              to={user?.role === 'admin' ? '/admin' : '/'}
+              className="flex items-center gap-2.5 shrink-0"
+            >
               <BrandLogo className="w-9 h-9 shrink-0" />
               <div className="leading-tight">
                 <span className="font-bold text-base tracking-tight text-[#18181B] dark:text-white block">
@@ -71,32 +74,34 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
             {user ? (
               <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800">
-                <Link
-                  to="/profile"
-                  className="hidden sm:block text-right leading-tight hover:opacity-80 transition-opacity"
-                >
-                  <p className="text-sm font-semibold text-[#18181B] dark:text-white max-w-[140px] truncate">
-                    {user.full_name}
-                  </p>
-                  <div className="flex items-center justify-end gap-1 mt-0.5">
-                    <Badge
-                      tone={
-                        user.role === 'admin'
-                          ? 'amber'
-                          : user.role === 'teacher'
-                          ? 'blue'
-                          : 'emerald'
-                      }
-                    >
-                      <UserCheck className="w-3 h-3" />
-                      {user.role === 'student'
-                        ? 'Pelajar'
-                        : user.role === 'teacher'
-                        ? 'Pengajar'
-                        : 'Admin'}
-                    </Badge>
+                {user.role === 'admin' ? (
+                  <div className="hidden sm:block text-right leading-tight">
+                    <p className="text-sm font-semibold text-[#18181B] dark:text-white max-w-[140px] truncate">
+                      {user.full_name}
+                    </p>
+                    <div className="flex items-center justify-end gap-1 mt-0.5">
+                      <Badge tone="amber">
+                        <UserCheck className="w-3 h-3" />
+                        Admin
+                      </Badge>
+                    </div>
                   </div>
-                </Link>
+                ) : (
+                  <Link
+                    to="/profile"
+                    className="hidden sm:block text-right leading-tight hover:opacity-80 transition-opacity"
+                  >
+                    <p className="text-sm font-semibold text-[#18181B] dark:text-white max-w-[140px] truncate">
+                      {user.full_name}
+                    </p>
+                    <div className="flex items-center justify-end gap-1 mt-0.5">
+                      <Badge tone={user.role === 'teacher' ? 'blue' : 'emerald'}>
+                        <UserCheck className="w-3 h-3" />
+                        {user.role === 'student' ? 'Pelajar' : 'Pengajar'}
+                      </Badge>
+                    </div>
+                  </Link>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
@@ -131,69 +136,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] px-4 py-4 space-y-3">
             <nav className="flex flex-col gap-1">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                  isActive('/')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300'
-                }`}
-              >
-                <BookOpen className="w-4 h-4" />
-                Beranda &amp; Katalog
-              </Link>
-              <Link
-                to="/kraepelin"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                  isActive('/kraepelin')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300'
-                }`}
-              >
-                Tes Kraepelin
-              </Link>
-
-              <Link
-                to="/tryout"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                  isActive('/tryout')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300'
-                }`}
-              >
-                Tryout Akbar
-              </Link>
-
-              <Link
-                to="/community"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                  isActive('/community')
-                    ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                    : 'text-[#52525B] dark:text-slate-300'
-                }`}
-              >
-                <Users className="w-4 h-4" />
-                Komunitas
-              </Link>
-              {(user?.role === 'teacher' || user?.role === 'admin') && (
-                <Link
-                  to="/teacher"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                    isActive('/teacher')
-                      ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                      : 'text-[#52525B] dark:text-slate-300'
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  Teacher Studio
-                </Link>
-              )}
-              {user?.role === 'admin' && (
+              {user?.role === 'admin' ? (
                 <Link
                   to="/admin"
                   onClick={() => setMobileMenuOpen(false)}
@@ -204,22 +147,87 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   }`}
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  Admin Panel
+                  Admin Dashboard
                 </Link>
-              )}
-              {user && (
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                    isActive('/profile')
-                      ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
-                      : 'text-[#52525B] dark:text-slate-300'
-                  }`}
-                >
-                  <User className="w-4 h-4" />
-                  Profil &amp; Progres
-                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Beranda &amp; Katalog
+                  </Link>
+                  <Link
+                    to="/kraepelin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/kraepelin')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    Tes Kraepelin
+                  </Link>
+
+                  <Link
+                    to="/tryout"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/tryout')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    Tryout Akbar
+                  </Link>
+
+                  <Link
+                    to="/community"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                      isActive('/community')
+                        ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                        : 'text-[#52525B] dark:text-slate-300'
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                    Komunitas
+                  </Link>
+                  {user?.role === 'teacher' && (
+                    <Link
+                      to="/teacher"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                        isActive('/teacher')
+                          ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                          : 'text-[#52525B] dark:text-slate-300'
+                      }`}
+                    >
+                      <GraduationCap className="w-4 h-4" />
+                      Teacher Studio
+                    </Link>
+                  )}
+                  {user && (
+                    <Link
+                      to="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                        isActive('/profile')
+                          ? 'bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400'
+                          : 'text-[#52525B] dark:text-slate-300'
+                      }`}
+                    >
+                      <User className="w-4 h-4" />
+                      Profil &amp; Progres
+                    </Link>
+                  )}
+                </>
               )}
             </nav>
           </div>
