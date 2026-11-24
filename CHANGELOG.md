@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [1.11.1] - 2026-11-24
+
+### Hotfix
+- Mode Latihan hanya dapat dipilih 1x sebelum memulai sesi latihan
+
+---
+
 ## [1.11.0] - 2026-11-24
 
 ### Minor
