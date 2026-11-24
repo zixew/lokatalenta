@@ -9,6 +9,7 @@ import {
   listQuizChallengesAsync,
   recordQuizChallengeAsync,
 } from '../features/quiz-runner/shareAndChallenge';
+import { getLockedQuizMode, lockQuizMode } from '../features/quiz-runner/quizModeStorage';
 
 function createMemoryStorage(): Storage {
   const store = new Map<string, string>();
@@ -125,5 +126,12 @@ describe('Sprint 8 Features (BL-24, BL-25, BL-26)', () => {
     expect(trend.avgAccuracyPct).toBe(85);
     expect(trend.deltaAccuracyPct).toBe(10); // 90 - 80
     expect(trend.bestStability).toBe(100);
+  });
+
+  it('locks quiz mode (exam/practice) per attempt once chosen at start', () => {
+    expect(getLockedQuizMode('att-mode-1')).toBeNull();
+    lockQuizMode('att-mode-1', 'practice');
+    expect(getLockedQuizMode('att-mode-1')).toBe('practice');
+    expect(getLockedQuizMode('att-mode-2')).toBeNull();
   });
 });
