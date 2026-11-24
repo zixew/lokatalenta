@@ -12,6 +12,8 @@ import {
   Eye,
   FileText,
   HelpCircle,
+  Layers,
+  Megaphone,
   MessageSquare,
   Search,
   Shield,
@@ -21,6 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 import { lmsApi } from '../../shared/services/lmsApi';
 import type { Course, UserRole } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
@@ -42,8 +45,38 @@ import {
   buildUsersCsv,
   downloadCsvFile,
 } from './adminCsvExport';
+import {
+  type BroadcastSeverity,
+  type BroadcastTargetRole,
+  createSystemBroadcast,
+  listAllBroadcasts,
+  toggleSystemBroadcast,
+} from './systemBroadcast';
 
-type AdminTab = 'users' | 'courses' | 'community' | 'certificates' | 'audit' | 'health';
+type AdminTab =
+  | 'users'
+  | 'courses'
+  | 'cohorts'
+  | 'community'
+  | 'certificates'
+  | 'broadcasts'
+  | 'audit'
+  | 'health';
+
+interface AdminCohortItem {
+  id: string;
+  name: string;
+  invite_code: string;
+  teacher_id: string;
+  teacher_name: string;
+  course_id: string | null;
+  course_title: string;
+  max_members: number;
+  member_count: number;
+  is_active: boolean;
+  created_at: string;
+}
+
 const USER_PAGE_SIZE = 10;
 const COURSE_PAGE_SIZE = 10;
 
@@ -88,6 +121,16 @@ export function AdminPanelPage() {
   const [revokeTarget, setRevokeTarget] = useState<CertificateWithRevocation | null>(null);
   const [revokeReason, setRevokeReason] = useState('');
 
+  // Cohort supervision filters
+  const [cohortSearch, setCohortSearch] = useState('');
+  const [cohortStatusFilter, setCohortStatusFilter] = useState<'all' | 'active' | 'archived'>('all');
+
+  // Global broadcast form state
+  const [broadcastTitle, setBroadcastTitle] = useState('');
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [broadcastSeverity, setBroadcastSeverity] = useState<BroadcastSeverity>('info');
+  const [broadcastTargetRole, setBroadcastTargetRole] = useState<BroadcastTargetRole>('all');
+
   const { data: profiles = [] } = useQuery({
     queryKey: ['admin-profiles'],
     queryFn: () => lmsApi.listAllProfiles(),
@@ -113,6 +156,159 @@ export function AdminPanelPage() {
     queryKey: ['admin-certificates'],
     queryFn: () => listAllCertificatesAsync(),
   });
+
+  const { data: allCohorts = [], isLoading: isCohortsLoading } = useQuery<AdminCohortItem[]>({
+    queryKey: ['admin-all-cohorts', profiles.length, courses.length],
+    queryFn: async () => {
+      const profileNameMap = new Map(profiles.map((p) => [p.id, p.full_name]));
+      const courseTitleMap = new Map(courses.map((c) => [c.id, c.title]));
+
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('cohorts')
+            .select('id, teacher_id, course_id, name, invite_code, max_members, is_active, created_at, cohort_members(count)')
+            .order('created_at', { ascending: false });
+
+          if (!error && data) {
+            return data.map((row: Record<string, unknown>) => {
+              const teacherId = String(row.teacher_id);
+              const courseId = row.course_id ? String(row.course_id) : null;
+              const membersArr = Array.isArray(row.cohort_members)
+                ? (row.cohort_members as Array<{ count?: number }>)
+                : [];
+              return {
+                id: String(row.id),
+                name: String(row.name),
+                invite_code: String(row.invite_code),
+                teacher_id: teacherId,
+                teacher_name: profileNameMap.get(teacherId) ?? 'Mentor',
+                course_id: courseId,
+                course_title: courseId ? (courseTitleMap.get(courseId) ?? 'Kursus') : 'Semua Kursus',
+                max_members: Number(row.max_members) || 30,
+                member_count: Number(membersArr[0]?.count ?? 0),
+                is_active: row.is_active !== false,
+                created_at: String(row.created_at),
+              };
+            });
+          }
+        } catch {
+          // fall through to local fallback
+        }
+      }
+
+      try {
+        const rawCohorts = localStorage.getItem('lokatalenta_cohorts_v1');
+        const rawMembers = localStorage.getItem('lokatalenta_cohort_members_v1');
+        const localCohorts = rawCohorts ? (JSON.parse(rawCohorts) as Array<Record<string, unknown>>) : [];
+        const localMembers = rawMembers ? (JSON.parse(rawMembers) as Array<{ cohort_id: string }>) : [];
+        return localCohorts.map((row) => {
+          const id = String(row.id);
+          const teacherId = String(row.teacher_id);
+          const courseId = row.course_id ? String(row.course_id) : null;
+          return {
+            id,
+            name: String(row.name),
+            invite_code: String(row.invite_code),
+            teacher_id: teacherId,
+            teacher_name: profileNameMap.get(teacherId) ?? 'Mentor',
+            course_id: courseId,
+            course_title: courseId
+              ? (courseTitleMap.get(courseId) ?? String(row.course_title ?? 'Kursus'))
+              : 'Semua Kursus',
+            max_members: Number(row.max_members) || 30,
+            member_count: localMembers.filter((m) => m.cohort_id === id).length,
+            is_active: row.is_active !== false,
+            created_at: String(row.created_at ?? new Date().toISOString()),
+          };
+        });
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  const toggleCohortActiveMut = useMutation({
+    mutationFn: async ({ cohortId, isActive }: { cohortId: string; isActive: boolean }) => {
+      if (isSupabaseConfigured && supabase) {
+        const { error } = await supabase
+          .from('cohorts')
+          .update({ is_active: isActive })
+          .eq('id', cohortId);
+        if (error) throw new Error(error.message);
+        return;
+      }
+      const rawCohorts = localStorage.getItem('lokatalenta_cohorts_v1');
+      const localCohorts = rawCohorts ? (JSON.parse(rawCohorts) as Array<Record<string, unknown>>) : [];
+      const next = localCohorts.map((c) => (String(c.id) === cohortId ? { ...c, is_active: isActive } : c));
+      localStorage.setItem('lokatalenta_cohorts_v1', JSON.stringify(next));
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-all-cohorts'] });
+      showFeedback('success', vars.isActive ? 'Cohort diaktifkan kembali.' : 'Cohort diarsipkan.');
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal mengubah status cohort.');
+    },
+  });
+
+  const { data: allBroadcasts = [], isLoading: isBroadcastsLoading } = useQuery({
+    queryKey: ['system-broadcasts-all'],
+    queryFn: listAllBroadcasts,
+  });
+
+  const createBroadcastMut = useMutation({
+    mutationFn: () =>
+      createSystemBroadcast({
+        title: broadcastTitle,
+        message: broadcastMessage,
+        severity: broadcastSeverity,
+        target_role: broadcastTargetRole,
+        created_by: currentUser?.id ?? null,
+      }),
+    onSuccess: () => {
+      setBroadcastTitle('');
+      setBroadcastMessage('');
+      setBroadcastSeverity('info');
+      setBroadcastTargetRole('all');
+      queryClient.invalidateQueries({ queryKey: ['system-broadcasts-all'] });
+      queryClient.invalidateQueries({ queryKey: ['system-broadcasts-active'] });
+      showFeedback('success', 'Pengumuman global berhasil diterbitkan.');
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal menerbitkan pengumuman global.');
+    },
+  });
+
+  const toggleBroadcastMut = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      toggleSystemBroadcast(id, isActive),
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['system-broadcasts-all'] });
+      queryClient.invalidateQueries({ queryKey: ['system-broadcasts-active'] });
+      showFeedback('success', vars.isActive ? 'Pengumuman diaktifkan.' : 'Pengumuman dinonaktifkan.');
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal memperbarui status pengumuman.');
+    },
+  });
+
+  const filteredCohorts = useMemo(() => {
+    const q = cohortSearch.trim().toLowerCase();
+    return allCohorts.filter((c) => {
+      const matchSearch =
+        !q ||
+        c.name.toLowerCase().includes(q) ||
+        c.teacher_name.toLowerCase().includes(q) ||
+        c.course_title.toLowerCase().includes(q) ||
+        c.invite_code.toLowerCase().includes(q);
+      const matchStatus =
+        cohortStatusFilter === 'all' ||
+        (cohortStatusFilter === 'active' && c.is_active) ||
+        (cohortStatusFilter === 'archived' && !c.is_active);
+      return matchSearch && matchStatus;
+    });
+  }, [allCohorts, cohortSearch, cohortStatusFilter]);
 
   const updateRoleMut = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: UserRole }) =>
@@ -447,6 +643,18 @@ export function AdminPanelPage() {
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab('cohorts')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+            activeTab === 'cohorts'
+              ? 'bg-[#0F766E] text-white'
+              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          Supervisi Cohort ({allCohorts.length})
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('community')}
           className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'community'
@@ -468,6 +676,18 @@ export function AdminPanelPage() {
         >
           <Award className="w-4 h-4" />
           Sertifikat ({certificates.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('broadcasts')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
+            activeTab === 'broadcasts'
+              ? 'bg-[#0F766E] text-white'
+              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+          }`}
+        >
+          <Megaphone className="w-4 h-4" />
+          Pengumuman Global ({allBroadcasts.filter((b) => b.is_active).length})
         </button>
         <button
           type="button"
@@ -1308,6 +1528,311 @@ export function AdminPanelPage() {
             </>
           )}
         </section>
+      )}
+
+      {/* TAB: SUPERVISI COHORT */}
+      {activeTab === 'cohorts' && (
+        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+          <div className="px-4 sm:px-5 py-4 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-[#18181B] dark:text-white">
+                Supervisi Cohort Lintas Mentor
+              </h2>
+              <p className="text-xs text-[#71717A] dark:text-slate-400">
+                Pantau seluruh cohort kelas privat, kuota peserta, dan status keaktifan dari semua mentor.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Badge tone="emerald">
+                Aktif: {allCohorts.filter((c) => c.is_active).length}
+              </Badge>
+              <Badge tone="slate">
+                Total Peserta: {allCohorts.reduce((acc, c) => acc + c.member_count, 0)}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="p-4 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={cohortSearch}
+                onChange={(e) => setCohortSearch(e.target.value)}
+                placeholder="Cari nama cohort, mentor, kursus, atau kode undangan..."
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+              />
+            </div>
+            <select
+              value={cohortStatusFilter}
+              onChange={(e) => setCohortStatusFilter(e.target.value as 'all' | 'active' | 'archived')}
+              aria-label="Filter status cohort"
+              className="px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+            >
+              <option value="all">Semua Status</option>
+              <option value="active">Aktif</option>
+              <option value="archived">Diarsipkan</option>
+            </select>
+          </div>
+
+          {isCohortsLoading ? (
+            <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
+              Memuat data cohort...
+            </div>
+          ) : filteredCohorts.length === 0 ? (
+            <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
+              Belum ada cohort yang sesuai filter.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="border-b border-[#E5E3DC] dark:border-slate-800 text-xs uppercase text-[#71717A] dark:text-slate-400 bg-[#FAFAF9] dark:bg-slate-900/40">
+                    <th className="py-3 px-4 font-semibold">Cohort</th>
+                    <th className="py-3 px-4 font-semibold">Mentor</th>
+                    <th className="py-3 px-4 font-semibold">Kursus</th>
+                    <th className="py-3 px-4 font-semibold">Kode</th>
+                    <th className="py-3 px-4 font-semibold">Peserta</th>
+                    <th className="py-3 px-4 font-semibold">Status</th>
+                    <th className="py-3 px-4 font-semibold text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                  {filteredCohorts.map((cohort) => (
+                    <tr key={cohort.id} className="hover:bg-[#FAFAF9] dark:hover:bg-slate-900/30">
+                      <td className="py-3 px-4">
+                        <p className="font-semibold text-[#18181B] dark:text-white">{cohort.name}</p>
+                        <p className="text-xs text-[#71717A] dark:text-slate-400">
+                          Dibuat {new Date(cohort.created_at).toLocaleDateString('id-ID')}
+                        </p>
+                      </td>
+                      <td className="py-3 px-4 text-[#52525B] dark:text-slate-300">
+                        {cohort.teacher_name}
+                      </td>
+                      <td className="py-3 px-4 text-[#52525B] dark:text-slate-300 max-w-[200px] truncate">
+                        {cohort.course_title}
+                      </td>
+                      <td className="py-3 px-4 font-mono text-xs text-[#18181B] dark:text-slate-200">
+                        {cohort.invite_code}
+                      </td>
+                      <td className="py-3 px-4 font-mono-tabular text-xs text-[#18181B] dark:text-slate-200">
+                        {cohort.member_count} / {cohort.max_members}
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge tone={cohort.is_active ? 'emerald' : 'slate'}>
+                          {cohort.is_active ? 'Aktif' : 'Diarsipkan'}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          disabled={toggleCohortActiveMut.isPending}
+                          onClick={() =>
+                            toggleCohortActiveMut.mutate({
+                              cohortId: cohort.id,
+                              isActive: !cohort.is_active,
+                            })
+                          }
+                        >
+                          {cohort.is_active ? 'Arsipkan' : 'Aktifkan'}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* TAB: PENGUMUMAN GLOBAL */}
+      {activeTab === 'broadcasts' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <section className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-4 h-fit">
+            <div>
+              <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
+                <Megaphone className="w-4 h-4 text-[#0F766E]" />
+                Buat Pengumuman Global
+              </h2>
+              <p className="text-xs text-[#71717A] dark:text-slate-400 mt-1">
+                Tampilkan banner pengumuman sistem di bagian atas aplikasi untuk peran target yang dipilih.
+              </p>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!broadcastTitle.trim() || !broadcastMessage.trim()) return;
+                createBroadcastMut.mutate();
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                  Judul Pengumuman
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={broadcastTitle}
+                  onChange={(e) => setBroadcastTitle(e.target.value)}
+                  placeholder="Contoh: Pemeliharaan Terjadwal Minggu Ini"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                  Isi Pesan
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  placeholder="Tuliskan detail informasi singkat dan jelas untuk pengguna..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                    Target Peran
+                  </label>
+                  <select
+                    value={broadcastTargetRole}
+                    onChange={(e) => setBroadcastTargetRole(e.target.value as BroadcastTargetRole)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                  >
+                    <option value="all">Semua Pengguna</option>
+                    <option value="student">Pelajar</option>
+                    <option value="teacher">Mentor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                    Prioritas
+                  </label>
+                  <select
+                    value={broadcastSeverity}
+                    onChange={(e) => setBroadcastSeverity(e.target.value as BroadcastSeverity)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                  >
+                    <option value="info">Info</option>
+                    <option value="warning">Peringatan</option>
+                    <option value="urgent">Penting / Mendesak</option>
+                  </select>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={
+                  createBroadcastMut.isPending ||
+                  !broadcastTitle.trim() ||
+                  !broadcastMessage.trim()
+                }
+              >
+                {createBroadcastMut.isPending ? 'Mengirim...' : 'Terbitkan Pengumuman Global'}
+              </Button>
+            </form>
+          </section>
+
+          <section className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+            <div className="px-5 py-4 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-[#18181B] dark:text-white">
+                  Daftar Pengumuman Global
+                </h3>
+                <p className="text-xs text-[#71717A] dark:text-slate-400">
+                  Kelola status aktif/nonaktif banner pengumuman sistem.
+                </p>
+              </div>
+              <Badge tone="blue">{allBroadcasts.length} Total</Badge>
+            </div>
+
+            {isBroadcastsLoading ? (
+              <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
+                Memuat pengumuman...
+              </div>
+            ) : allBroadcasts.length === 0 ? (
+              <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
+                Belum ada pengumuman global yang dibuat.
+              </div>
+            ) : (
+              <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                {allBroadcasts.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 flex flex-col sm:flex-row sm:items-start justify-between gap-3"
+                  >
+                    <div className="space-y-1.5 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          tone={
+                            item.severity === 'urgent'
+                              ? 'rose'
+                              : item.severity === 'warning'
+                                ? 'amber'
+                                : 'blue'
+                          }
+                        >
+                          {item.severity === 'urgent'
+                            ? 'Mendesak'
+                            : item.severity === 'warning'
+                              ? 'Peringatan'
+                              : 'Info'}
+                        </Badge>
+                        <Badge tone="slate">
+                          Target:{' '}
+                          {item.target_role === 'all'
+                            ? 'Semua'
+                            : item.target_role === 'student'
+                              ? 'Pelajar'
+                              : item.target_role === 'teacher'
+                                ? 'Mentor'
+                                : 'Admin'}
+                        </Badge>
+                        <Badge tone={item.is_active ? 'emerald' : 'slate'}>
+                          {item.is_active ? 'Aktif' : 'Nonaktif'}
+                        </Badge>
+                      </div>
+                      <h4 className="font-semibold text-sm text-[#18181B] dark:text-white">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-[#52525B] dark:text-slate-300">
+                        {item.message}
+                      </p>
+                      <p className="text-[11px] text-[#71717A] dark:text-slate-400">
+                        Dibuat {new Date(item.created_at).toLocaleString('id-ID')}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      disabled={toggleBroadcastMut.isPending}
+                      onClick={() =>
+                        toggleBroadcastMut.mutate({
+                          id: item.id,
+                          isActive: !item.is_active,
+                        })
+                      }
+                      className="shrink-0"
+                    >
+                      {item.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
       )}
 
       {/* TAB 3: ADMIN AUDIT LOG */}

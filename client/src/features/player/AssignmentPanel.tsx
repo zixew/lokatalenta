@@ -17,6 +17,7 @@ import type { AssignmentSubmission, CourseAssignment } from '../../shared/types/
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { useAuthStore } from '../auth/useAuthStore';
+import { listStudentCohortsAsync } from '../cohort/cohortApi';
 
 type GuideTab = 'brief' | 'howto' | 'rubric';
 
@@ -44,9 +45,22 @@ export function AssignmentPanel({
     enabled: Boolean(user),
   });
 
-  const visibleAssignments = assignments.filter(
-    (a) => !a.lesson_id || a.lesson_id === lessonId
-  );
+  const { data: myCohorts = [] } = useQuery({
+    queryKey: ['student-cohorts', user?.id],
+    queryFn: () => (user ? listStudentCohortsAsync(user.id) : Promise.resolve([])),
+    enabled: Boolean(user?.id),
+  });
+
+  const myCohortIds = new Set(myCohorts.map((c) => c.id));
+  const cohortNameMap = new Map(myCohorts.map((c) => [c.id, c.name]));
+
+  const visibleAssignments = assignments.filter((a) => {
+    const lessonMatch = !a.lesson_id || a.lesson_id === lessonId;
+    if (!lessonMatch) return false;
+    if (!a.cohort_id) return true;
+    if (user?.role === 'teacher' || user?.role === 'admin') return true;
+    return myCohortIds.has(a.cohort_id);
+  });
 
   if (visibleAssignments.length === 0) {
     return (
@@ -67,6 +81,7 @@ export function AssignmentPanel({
           <AssignmentCard
             key={assignment.id}
             assignment={assignment}
+            cohortName={assignment.cohort_id ? cohortNameMap.get(assignment.cohort_id) : undefined}
             submission={submission}
             courseSlug={courseSlug ?? courseId}
             onSubmitted={() => {
@@ -82,11 +97,13 @@ export function AssignmentPanel({
 
 function AssignmentCard({
   assignment,
+  cohortName,
   submission,
   courseSlug,
   onSubmitted,
 }: {
   assignment: CourseAssignment;
+  cohortName?: string;
   submission?: AssignmentSubmission;
   courseSlug: string;
   onSubmitted: () => void;
@@ -178,7 +195,12 @@ function AssignmentCard({
     <div className="p-4 sm:p-5 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/50 border border-[#E5E3DC] dark:border-slate-700 space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h4 className="text-sm font-bold text-[#18181B] dark:text-white">{assignment.title}</h4>
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="text-sm font-bold text-[#18181B] dark:text-white">{assignment.title}</h4>
+            {assignment.cohort_id && (
+              <Badge tone="blue">{cohortName ? `Cohort: ${cohortName}` : 'Khusus Cohort'}</Badge>
+            )}
+          </div>
           {assignment.due_date && (
             <p className="text-[11px] text-[#71717A] dark:text-slate-400 inline-flex items-center gap-1 mt-0.5">
               <Calendar className="w-3 h-3" />

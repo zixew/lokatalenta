@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Clock,
+  Copy,
   Download,
   GraduationCap,
   ImagePlus,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { lmsApi } from '../../shared/services/lmsApi';
+import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 import { sanitizeCsvCell } from '../../shared/lib/securityGuards';
 import type { Course, Lesson, QuizOption } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
@@ -38,6 +40,63 @@ import { TeacherInteractionTab } from './TeacherInteractionTab';
 import { TeacherCohortPanel } from '../cohort/TeacherCohortPanel';
 
 type StudioTab = 'courses' | 'questions' | 'assignments' | 'interaction' | 'students' | 'cohorts';
+
+function cloneCourseLocal(source: Course, teacherId: string): Course {
+  const ts = Date.now();
+  const newCourseId = `course-clone-${ts}`;
+  const clonedModules = (source.modules ?? []).map((mod, mi) => {
+    const newModId = `mod-clone-${ts}-${mi}`;
+    return {
+      ...mod,
+      id: newModId,
+      course_id: newCourseId,
+      lessons: mod.lessons.map((les, li) => {
+        const newLesId = `les-clone-${ts}-${mi}-${li}`;
+        const newQuiz = les.quiz
+          ? {
+              ...les.quiz,
+              id: `quiz-clone-${ts}-${mi}-${li}`,
+              lesson_id: newLesId,
+              questions: (les.quiz.questions ?? []).map((q, qi) => ({
+                ...q,
+                id: `q-clone-${ts}-${mi}-${li}-${qi}`,
+                quiz_id: `quiz-clone-${ts}-${mi}-${li}`,
+                options: q.options.map((o) => ({ ...o })),
+                accepted_answers: q.accepted_answers ? [...q.accepted_answers] : undefined,
+              })),
+            }
+          : les.quiz;
+        return {
+          ...les,
+          id: newLesId,
+          module_id: newModId,
+          quiz: newQuiz,
+        };
+      }),
+    };
+  });
+
+  const cloned: Course = {
+    ...source,
+    id: newCourseId,
+    teacher_id: teacherId,
+    title: `${source.title} (Salinan)`,
+    slug: `${source.slug}-copy-${ts.toString(36)}`,
+    is_published: false,
+    created_at: new Date().toISOString(),
+    modules: clonedModules,
+  };
+
+  try {
+    const raw = localStorage.getItem('ruanglatih_demo_courses_v14');
+    const existing = raw ? (JSON.parse(raw) as Course[]) : [];
+    localStorage.setItem('ruanglatih_demo_courses_v14', JSON.stringify([cloned, ...existing]));
+  } catch {
+    // ignore storage errors
+  }
+
+  return cloned;
+}
 
 export function TeacherStudioPage() {
   const { user } = useAuthStore();
@@ -73,6 +132,9 @@ export function TeacherStudioPage() {
   const [lessonUseSubtests, setLessonUseSubtests] = useState(true);
 
   const [qCategory, setQCategory] = useState('Verbal');
+  const [qType, setQType] = useState<'mcq' | 'short_answer'>('mcq');
+  const [acceptedAnswersText, setAcceptedAnswersText] = useState('');
+  const [caseSensitive, setCaseSensitive] = useState(false);
   const [qText, setQText] = useState('');
   const [qImageUrl, setQImageUrl] = useState('');
   const [qAudioText, setQAudioText] = useState('');
@@ -98,6 +160,9 @@ export function TeacherStudioPage() {
 
   const resetQuestionForm = () => {
     setEditingQuestionId(null);
+    setQType('mcq');
+    setAcceptedAnswersText('');
+    setCaseSensitive(false);
     setQText('');
     setQImageUrl('');
     setQAudioText('');
@@ -260,23 +325,34 @@ export function TeacherStudioPage() {
   });
 
   const addQuestionMut = useMutation({
-    mutationFn: () =>
-      lmsApi.addQuestionToQuiz(selectedQuizId, {
+    mutationFn: () => {
+      const parsedAccepted = acceptedAnswersText
+        .split(/[|\n]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      return lmsApi.addQuestionToQuiz(selectedQuizId, {
         category_tag: qCategory,
+        question_type: qType,
+        accepted_answers: qType === 'short_answer' ? parsedAccepted : undefined,
+        case_sensitive: qType === 'short_answer' ? caseSensitive : undefined,
         question_text: qText,
         image_url: qImageUrl || null,
         audio_text: qAudioText.trim() || null,
         audio_lang: qAudioText.trim() ? qAudioLang : null,
-        options: [
-          { key: 'A', text: optA },
-          { key: 'B', text: optB },
-          { key: 'C', text: optC },
-          { key: 'D', text: optD },
-          { key: 'E', text: optE },
-        ],
-        correct_option: correctOpt,
+        options:
+          qType === 'short_answer'
+            ? []
+            : [
+                { key: 'A', text: optA },
+                { key: 'B', text: optB },
+                { key: 'C', text: optC },
+                { key: 'D', text: optD },
+                { key: 'E', text: optE },
+              ],
+        correct_option: qType === 'short_answer' ? 'A' : correctOpt,
         explanation,
-      }),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
@@ -289,20 +365,30 @@ export function TeacherStudioPage() {
   const updateQuestionMut = useMutation({
     mutationFn: () => {
       if (!editingQuestionId) throw new Error('Tidak ada soal yang sedang diedit.');
+      const parsedAccepted = acceptedAnswersText
+        .split(/[|\n]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
       return lmsApi.updateQuestionInQuiz(editingQuestionId, {
         category_tag: qCategory,
+        question_type: qType,
+        accepted_answers: qType === 'short_answer' ? parsedAccepted : undefined,
+        case_sensitive: qType === 'short_answer' ? caseSensitive : undefined,
         question_text: qText,
         image_url: qImageUrl || null,
         audio_text: qAudioText.trim() || null,
         audio_lang: qAudioText.trim() ? qAudioLang : null,
-        options: [
-          { key: 'A', text: optA },
-          { key: 'B', text: optB },
-          { key: 'C', text: optC },
-          { key: 'D', text: optD },
-          { key: 'E', text: optE },
-        ],
-        correct_option: correctOpt,
+        options:
+          qType === 'short_answer'
+            ? []
+            : [
+                { key: 'A', text: optA },
+                { key: 'B', text: optB },
+                { key: 'C', text: optC },
+                { key: 'D', text: optD },
+                { key: 'E', text: optE },
+              ],
+        correct_option: qType === 'short_answer' ? 'A' : correctOpt,
         explanation,
       });
     },
@@ -352,6 +438,30 @@ export function TeacherStudioPage() {
       queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       showSuccess('Materi berhasil dihapus.');
+    },
+    onError: (err: Error) => setErrorBanner(err.message),
+  });
+
+  const cloneCourseMut = useMutation({
+    mutationFn: async (courseToClone: Course) => {
+      if (isSupabaseConfigured && supabase) {
+        const { data, error } = await supabase.rpc('clone_course_with_content', {
+          p_source_course_id: courseToClone.id,
+          p_new_title: `${courseToClone.title} (Salinan)`,
+        });
+        if (!error && data) {
+          return String(data);
+        }
+        if (error) throw new Error(error.message);
+      }
+      const cloned = cloneCourseLocal(courseToClone, user?.id ?? courseToClone.teacher_id);
+      return cloned.id;
+    },
+    onSuccess: async (newCourseId) => {
+      await queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
+      await queryClient.invalidateQueries({ queryKey: ['courses'] });
+      if (newCourseId) setSelectedCourseId(newCourseId);
+      showSuccess('Kursus berhasil diduplikasi sebagai Draft.');
     },
     onError: (err: Error) => setErrorBanner(err.message),
   });
@@ -614,13 +724,18 @@ export function TeacherStudioPage() {
                     className="p-3 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex items-start justify-between gap-2"
                   >
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <span className="text-xs font-mono-tabular font-bold text-[#71717A] dark:text-slate-400">
                           #{idx + 1}
                         </span>
                         <Badge tone="slate">{q.category_tag}</Badge>
-                        <span className="text-[11px] font-semibold text-emerald-700">
-                          Kunci: {q.correct_option}
+                        {q.question_type === 'short_answer' && (
+                          <Badge tone="blue">Isian Singkat</Badge>
+                        )}
+                        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                          {q.question_type === 'short_answer'
+                            ? `Kunci: ${(q.accepted_answers ?? []).join(' | ') || '-'}`
+                            : `Kunci: ${q.correct_option}`}
                         </span>
                       </div>
                       <p className="text-xs text-[#18181B] dark:text-white line-clamp-2">{q.question_text}</p>
@@ -631,6 +746,9 @@ export function TeacherStudioPage() {
                         onClick={() => {
                           setEditingQuestionId(q.id);
                           setQCategory(q.category_tag);
+                          setQType(q.question_type ?? 'mcq');
+                          setAcceptedAnswersText((q.accepted_answers ?? []).join(' | '));
+                          setCaseSensitive(Boolean(q.case_sensitive));
                           setQText(q.question_text);
                           setQImageUrl(q.image_url ?? '');
                           setQAudioText(q.audio_text ?? '');
@@ -695,18 +813,33 @@ export function TeacherStudioPage() {
               }}
               className="space-y-4"
             >
-              <div>
-                <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
-                  Kategori Soal
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={qCategory}
-                  onChange={(e) => setQCategory(e.target.value)}
-                  placeholder="Contoh: Verbal, Numerik, Logika, Spasial"
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
+                    Kategori Soal
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={qCategory}
+                    onChange={(e) => setQCategory(e.target.value)}
+                    placeholder="Contoh: Verbal, Numerik, Logika, Spasial"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
+                    Tipe Soal
+                  </label>
+                  <select
+                    value={qType}
+                    onChange={(e) => setQType(e.target.value as 'mcq' | 'short_answer')}
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  >
+                    <option value="mcq">Pilihan Ganda (A–E)</option>
+                    <option value="short_answer">Isian Singkat / Formula</option>
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -793,48 +926,77 @@ export function TeacherStudioPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {[
-                  { key: 'A', val: optA, set: setOptA },
-                  { key: 'B', val: optB, set: setOptB },
-                  { key: 'C', val: optC, set: setOptC },
-                  { key: 'D', val: optD, set: setOptD },
-                  { key: 'E', val: optE, set: setOptE },
-                ].map((o) => (
-                  <div key={o.key} className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 text-xs font-mono-tabular font-bold flex items-center justify-center shrink-0">
-                      {o.key}
-                    </span>
+              {qType === 'short_answer' ? (
+                <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
+                      Jawaban yang Diterima (pisahkan variasi dengan <code className="font-mono">|</code>)
+                    </label>
                     <input
                       type="text"
                       required
-                      value={o.val}
-                      onChange={(e) => o.set(e.target.value)}
-                      placeholder={`Opsi ${o.key}`}
-                      className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                      value={acceptedAnswersText}
+                      onChange={(e) => setAcceptedAnswersText(e.target.value)}
+                      placeholder="Contoh: =SUM(A1:A5) | SUM(A1:A5) | 150"
+                      className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     />
                   </div>
-                ))}
-              </div>
+                  <label className="flex items-center gap-2 text-xs text-[#52525B] dark:text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={caseSensitive}
+                      onChange={(e) => setCaseSensitive(e.target.checked)}
+                      className="accent-[#0F766E]"
+                    />
+                    Peka huruf besar/kecil (case sensitive)
+                  </label>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[
+                    { key: 'A', val: optA, set: setOptA },
+                    { key: 'B', val: optB, set: setOptB },
+                    { key: 'C', val: optC, set: setOptC },
+                    { key: 'D', val: optD, set: setOptD },
+                    { key: 'E', val: optE, set: setOptE },
+                  ].map((o) => (
+                    <div key={o.key} className="flex items-center gap-2">
+                      <span className="w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 text-xs font-mono-tabular font-bold flex items-center justify-center shrink-0">
+                        {o.key}
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={o.val}
+                        onChange={(e) => o.set(e.target.value)}
+                        placeholder={`Opsi ${o.key}`}
+                        className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
-                    Kunci Jawaban
-                  </label>
-                  <select
-                    value={correctOpt}
-                    onChange={(e) => setCorrectOpt(e.target.value as QuizOption['key'])}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-                  >
-                    {['A', 'B', 'C', 'D', 'E'].map((k) => (
-                      <option key={k} value={k}>
-                        Opsi {k}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
+                {qType === 'mcq' && (
+                  <div>
+                    <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
+                      Kunci Jawaban
+                    </label>
+                    <select
+                      value={correctOpt}
+                      onChange={(e) => setCorrectOpt(e.target.value as QuizOption['key'])}
+                      className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    >
+                      {['A', 'B', 'C', 'D', 'E'].map((k) => (
+                        <option key={k} value={k}>
+                          Opsi {k}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <div className={qType === 'mcq' ? 'sm:col-span-2' : 'sm:col-span-3'}>
                   <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
                     Penjelasan Jawaban
                   </label>
@@ -998,6 +1160,24 @@ export function TeacherStudioPage() {
                 sublabel: `${c.category} • ${c.is_published ? 'Terbit' : 'Draft'}`,
               }))}
             />
+
+            {selectedCourse && (
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                <div className="text-xs text-[#52525B] dark:text-slate-300">
+                  Kursus aktif: <strong className="text-[#18181B] dark:text-white">{selectedCourse.title}</strong>
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => cloneCourseMut.mutate(selectedCourse)}
+                  disabled={cloneCourseMut.isPending}
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  {cloneCourseMut.isPending ? 'Menduplikasi...' : 'Duplikasi Kursus (Draft)'}
+                </Button>
+              </div>
+            )}
 
             {/* Add Module */}
             <form

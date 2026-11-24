@@ -13,12 +13,19 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { isSupabaseConfigured, supabase } from '../../shared/lib/supabase';
 import { lmsApi } from '../../shared/services/lmsApi';
-import type { Course, MentorMessage, TeacherCommentItem } from '../../shared/types/lms';
+import type {
+  Course,
+  CourseAnnouncement,
+  MentorMessage,
+  TeacherCommentItem,
+} from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { SearchablePicker } from '../../shared/ui/SearchablePicker';
 import { useAuthStore } from '../auth/useAuthStore';
+import { listTeacherCohortsAsync } from '../cohort/cohortApi';
 
 type SubTab = 'qa' | 'chat' | 'live';
 
@@ -46,6 +53,8 @@ export function TeacherInteractionTab({
 
   // Announcement form
   const [annCourseId, setAnnCourseId] = useState(courses[0]?.id ?? '');
+  const [annCohortId, setAnnCohortId] = useState('');
+  const [annCohortFilter, setAnnCohortFilter] = useState('all');
   const [annTitle, setAnnTitle] = useState('');
   const [annContent, setAnnContent] = useState('');
 
@@ -74,6 +83,13 @@ export function TeacherInteractionTab({
     queryFn: () => lmsApi.listCourseAnnouncements(),
   });
 
+  const { data: cohorts = [] } = useQuery({
+    queryKey: ['teacher-cohorts', user?.id],
+    queryFn: () => (user?.id ? listTeacherCohortsAsync(user.id) : Promise.resolve([])),
+    enabled: Boolean(user?.id),
+  });
+  const cohortNameMap = new Map(cohorts.map((c) => [c.id, c.name]));
+
   const teacherCourseIds = new Set(courses.map((c) => c.id));
   const teacherLessonIds = new Set(
     courses.flatMap((c) => (c.modules ?? []).flatMap((m) => m.lessons.map((l) => l.id)))
@@ -82,6 +98,11 @@ export function TeacherInteractionTab({
   const allMentorMsgs = rawMentorMsgs.filter((m) => teacherCourseIds.has(m.course_id));
   const sessions = rawSessions.filter((s) => teacherCourseIds.has(s.course_id));
   const announcements = rawAnnouncements.filter((a) => teacherCourseIds.has(a.course_id));
+  const filteredAnnouncements = announcements.filter((a) => {
+    if (annCohortFilter === 'all') return true;
+    if (annCohortFilter === 'public') return !a.cohort_id;
+    return a.cohort_id === annCohortFilter;
+  });
 
   const createSessionMut = useMutation({
     mutationFn: () =>
@@ -115,10 +136,10 @@ export function TeacherInteractionTab({
   });
 
   const createAnnMut = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const targetCourseId = annCourseId || courses[0]?.id || '';
       const targetCourse = courses.find((c) => c.id === targetCourseId);
-      return lmsApi.createCourseAnnouncement({
+      const created = await lmsApi.createCourseAnnouncement({
         course_id: targetCourseId,
         course_slug: targetCourse?.slug,
         author_id: user?.id ?? null,
@@ -126,10 +147,37 @@ export function TeacherInteractionTab({
         title: annTitle.trim(),
         content: annContent.trim(),
       });
+      if (annCohortId) {
+        if (isSupabaseConfigured && supabase) {
+          await supabase
+            .from('course_announcements')
+            .update({ cohort_id: annCohortId })
+            .eq('id', created.id);
+        } else {
+          try {
+            const raw = localStorage.getItem('ruanglatih_course_announcements_v1');
+            if (raw) {
+              const list = JSON.parse(raw) as CourseAnnouncement[];
+              localStorage.setItem(
+                'ruanglatih_course_announcements_v1',
+                JSON.stringify(
+                  list.map((item) =>
+                    item.id === created.id ? { ...item, cohort_id: annCohortId } : item
+                  )
+                )
+              );
+            }
+          } catch {
+            // ignore storage errors
+          }
+        }
+      }
+      return created;
     },
     onSuccess: () => {
       setAnnTitle('');
       setAnnContent('');
+      setAnnCohortId('');
       queryClient.invalidateQueries({ queryKey: ['course-announcements'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       onSuccess('Pengumuman kursus berhasil dikirim ke pelajar terdaftar.');
@@ -321,6 +369,25 @@ export function TeacherInteractionTab({
                   sublabel: `${c.category} • ${c.level}`,
                 }))}
               />
+              <div>
+                <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                  Target Cohort (Opsional)
+                </label>
+                <select
+                  value={annCohortId}
+                  onChange={(e) => setAnnCohortId(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                >
+                  <option value="">Semua Peserta</option>
+                  {cohorts
+                    .filter((c) => c.is_active)
+                    .map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
               <input
                 type="text"
                 required
@@ -430,6 +497,25 @@ export function TeacherInteractionTab({
                   sublabel: `${c.category} • ${c.level}`,
                 }))}
               />
+              <div>
+                <label className="block text-xs font-semibold text-[#52525B] dark:text-slate-300 mb-1">
+                  Target Cohort (Opsional)
+                </label>
+                <select
+                  value={annCohortId}
+                  onChange={(e) => setAnnCohortId(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                >
+                  <option value="">Semua Peserta</option>
+                  {cohorts
+                    .filter((c) => c.is_active)
+                    .map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
               <input
                 type="text"
                 required
@@ -452,15 +538,42 @@ export function TeacherInteractionTab({
             </form>
 
             <div className="space-y-2 pt-2 border-t border-[#E5E3DC] dark:border-slate-800">
-              {announcements.map((a) => (
+              {cohorts.length > 0 && announcements.length > 0 && (
+                <div className="flex items-center justify-between gap-2 pb-1">
+                  <span className="text-[11px] font-semibold text-[#71717A] dark:text-slate-400">
+                    Filter Target ({filteredAnnouncements.length})
+                  </span>
+                  <select
+                    value={annCohortFilter}
+                    onChange={(e) => setAnnCohortFilter(e.target.value)}
+                    className="px-2 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  >
+                    <option value="all">Semua Target</option>
+                    <option value="public">Semua Peserta</option>
+                    {cohorts.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        Cohort: {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {filteredAnnouncements.map((a) => (
                 <div
                   key={a.id}
                   className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 flex items-start justify-between gap-2"
                 >
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#18181B] dark:text-white truncate">
-                      {a.title}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="text-xs font-bold text-[#18181B] dark:text-white truncate">
+                        {a.title}
+                      </p>
+                      {a.cohort_id && (
+                        <Badge tone="blue">
+                          {cohortNameMap.get(a.cohort_id) ?? 'Khusus Cohort'}
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-[11px] text-[#71717A] dark:text-slate-400 truncate">
                       {courseTitle(a.course_id)}
                     </p>

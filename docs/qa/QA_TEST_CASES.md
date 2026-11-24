@@ -1,8 +1,8 @@
-# Dokumen QA Test Cases — LokaTalenta (`v2.2.0`)
+# Dokumen QA Test Cases — LokaTalenta (`v2.3.0-dev`)
 
 > [!NOTE]
 > Sumber utama matriks QA tersedia dalam format Excel terstruktur: [QA_TEST_CASES_LOKATALENTA.xlsx](file:///Users/a2299/Documents/Projects/lms-psikotes/docs/qa/QA_TEST_CASES_LOKATALENTA.xlsx).
-> Total skenario terverifikasi: **97** (0 duplikasi ID).
+> Total skenario terverifikasi: **103** (0 duplikasi ID).
 
 | ID | Role | Modul | Tipe Flow | Judul Skenario | Prasyarat | Langkah Uji | Ekspektasi Hasil | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -103,3 +103,9 @@
 | ADM-08 | Admin | Admin Panel | Happy Flow | Preview Kursus, Moderasi Komunitas & Revoke Sertifikat (BL-38E) | Login sebagai Admin di `/admin` | Cek distribusi role, buka Preview Kursus, tab `Moderasi Komunitas` & `Sertifikat` | Modal preview read-only, moderasi posting & cabut sertifikat tercatat di Audit Log | **PASS** |
 | UIX-01 | Student | UI Revamp Katalog | Happy Flow | Hero Bento Hub, Syllabus Drawer & Hover Elevation (BL-38F) | Buka `/` di `1280x800` & `390x844` | Klik tombol `Silabus` pada kartu kursus lalu tutup drawer | `CourseSyllabusDrawer` terbuka/tertutup mulus dengan `overflowX = 0` | **PASS** |
 | UIX-02 | Student | UI Revamp Player & Chart | Happy Flow | Mode Fokus Zen Player & Tooltip Interaktif Radar 5D/Kraepelin (BL-38G) | Buka Course Player & `/profile` | Klik `Mode Fokus` di Player & hover/klik dimensi pada Radar 5D | Sidebar tersembunyi/kembali mulus & tooltip skor dimensi tampil interaktif | **PASS** |
+| QUZ-15 | Student | Proctoring Lite | Happy Flow | Indikator Integritas Fokus & Tab-Switch Counter (BL-39) | Mulai kuis di `QuizRunnerPage` | Pindah/blur tab lalu submit kuis dan cek `QuizResultPage` | Counter pindah tab tercatat & kartu `Indikator Integritas Fokus` tampil | **PASS** |
+| TCH-08 | Teacher/Student | Bank Soal & Quiz | Happy Flow | Soal Isian Singkat / Formula & Auto-Keyword Scoring (BL-40) | Di `/teacher` Bank Soal & `QuizRunnerPage` | Buat soal `short_answer` lalu kerjakan dengan variasi spasi/kapitalisasi | Jawaban ternormalisasi dinilai akurat otomatis | **PASS** |
+| CRS-11 | Student | Course Player | Happy Flow | Simulasi Interview Metode STAR (BL-40B) | Buka Course Player tab `Simulasi STAR` | Isi Situation, Task, Action, Result & simpan | Skor kelengkapan STAR terhitung & tersimpan | **PASS** |
+| TCH-10 | Teacher | Mentor Studio | Happy Flow | Target Cohort Tugas/Pengumuman, Rapor Siswa & Item Analysis (BL-40B) | Buka `/teacher` tab Tugas, Interaksi, & Progres Siswa | Pilih target `cohort_id` & buka `Analitik Butir Soal (Item Analysis)` | Target cohort tersaring & persentase benar per soal tampil | **PASS** |
+| TCH-11 | Teacher | Mentor Studio | Happy Flow | Duplikasi Kursus / Paket Soal ke Draft (BL-40C) | Buka `/teacher` tab `Kursus, Modul & Materi` | Klik `Duplikasi Kursus (Draft)` | Salinan kursus Draft terbentuk independen | **PASS** |
+| ADM-09 | Admin | Admin Panel | Happy Flow | Supervisi Cohort Lintas Pengajar & Pengumuman Global (BL-40C) | Login sebagai Admin di `/admin` | Cek tab `Supervisi Cohort`, buat `Pengumuman Global` aktif lalu nonaktifkan | Daftar cohort tampil & `SystemBroadcastBanner` tampil/hilang sesuai status | **PASS** |
