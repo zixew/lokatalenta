@@ -34,6 +34,22 @@ echo "==> [1/5] Menjalankan lint, unit test & build sebelum rilis..."
 npm run lint
 npm test
 npm run build
+echo "==> [1b/5] Memeriksa batas ukuran chunk bundle (< 250 kB)..."
+node -e '
+const fs = require("fs");
+const path = require("path");
+const dir = path.join(process.cwd(), "dist", "assets");
+const maxBytes = 250 * 1024;
+for (const file of fs.readdirSync(dir)) {
+  if (!file.endsWith(".js")) continue;
+  const size = fs.statSync(path.join(dir, file)).size;
+  if (size > maxBytes) {
+    console.error(`ERROR: Chunk ${file} melebihi 250 kB (${(size / 1024).toFixed(2)} kB)`);
+    process.exit(1);
+  }
+}
+console.log("Semua JS chunk < 250 kB.");
+'
 
 echo "==> [2/5] Menaikkan versi ($BUMP_TYPE) di client/package.json..."
 NEW_VERSION="$(npm version "$NPM_BUMP" --no-git-tag-version | tr -d 'v')"
@@ -78,7 +94,7 @@ if (idx !== -1) {
 '
 
 echo "==> [5/5] Membuat commit & Git Tag v$NEW_VERSION di branch $RELEASE_BRANCH..."
-git add client/package.json CHANGELOG.md
+git add client/package.json client/package-lock.json CHANGELOG.md
 git commit -m "chore(release): v$NEW_VERSION - $DESCRIPTION"
 git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION ($RELEASE_BRANCH): $DESCRIPTION"
 

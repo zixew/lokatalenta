@@ -178,11 +178,6 @@ export function CatalogPage() {
     (draftType !== 'Semua' ? 1 : 0) +
     (draftLevel !== 'Semua' ? 1 : 0);
 
-  const hasPendingFilterChanges =
-    draftCategory !== selectedCategory ||
-    draftType !== selectedType ||
-    draftLevel !== selectedLevel;
-
   const draftMatchedCount = useMemo(() => {
     return courses.filter((c) => {
       const isDirect = Boolean(getDirectQuiz(c));
@@ -314,23 +309,36 @@ export function CatalogPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Desktop Marketplace Left Filter Sidebar */}
+          {/* Desktop Marketplace Left Filter Sidebar (Auto-Apply) */}
           <aside className="hidden lg:block lg:col-span-3 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sticky top-24">
             <CatalogFilterPanel
-              activeFilterCount={draftFilterCount}
-              selectedType={draftType}
-              selectedCategory={draftCategory}
-              selectedLevel={draftLevel}
+              activeFilterCount={
+                (selectedType !== 'Semua' ? 1 : 0) +
+                (selectedCategory !== 'Semua' ? 1 : 0) +
+                (selectedLevel !== 'Semua' ? 1 : 0)
+              }
+              selectedType={selectedType}
+              selectedCategory={selectedCategory}
+              selectedLevel={selectedLevel}
               categories={categories}
               categoryCounts={categoryCounts}
               levels={levels}
-              onSelectType={(t) => setDraftType(t)}
-              onSelectCategory={(c) => setDraftCategory(c)}
-              onSelectLevel={(l) => setDraftLevel(l)}
+              onSelectType={(t) => {
+                setSelectedType(t);
+                setDraftType(t);
+                setCurrentPage(1);
+              }}
+              onSelectCategory={(c) => {
+                setSelectedCategory(c);
+                setDraftCategory(c);
+                setCurrentPage(1);
+              }}
+              onSelectLevel={(l) => {
+                setSelectedLevel(l);
+                setDraftLevel(l);
+                setCurrentPage(1);
+              }}
               onReset={resetAllFilters}
-              onApply={applyDraftFilters}
-              previewCount={draftMatchedCount}
-              hasPendingChanges={hasPendingFilterChanges}
             />
           </aside>
 

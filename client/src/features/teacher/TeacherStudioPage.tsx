@@ -190,7 +190,7 @@ export function TeacherStudioPage() {
   const activeQuestions = selectedQuizMeta?.questions ?? activeQuizObj?.questions ?? [];
 
   const addModuleMut = useMutation({
-    mutationFn: () => lmsApi.addModule(selectedCourseId, moduleTitle),
+    mutationFn: () => lmsApi.addModule(effectiveCourseId, moduleTitle),
     onSuccess: (mod) => {
       queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
       setTargetModuleId(mod.id);
@@ -200,15 +200,20 @@ export function TeacherStudioPage() {
   });
 
   const addLessonMut = useMutation({
-    mutationFn: () =>
-      lmsApi.addLesson(targetModuleId, {
+    mutationFn: () => {
+      const resolvedModuleId = targetModuleId || selectedCourse?.modules?.[0]?.id || '';
+      if (!resolvedModuleId) {
+        throw new Error('Pilih atau buat modul terlebih dahulu.');
+      }
+      return lmsApi.addLesson(resolvedModuleId, {
         title: lessonTitle,
         type: lessonType,
         content: lessonContent,
         video_url: lessonType === 'video' ? lessonVideoUrl : undefined,
         duration_minutes: lessonDuration,
         use_subtests: lessonType === 'quiz' ? lessonUseSubtests : undefined,
-      }),
+      });
+    },
     onSuccess: (createdLesson) => {
       queryClient.invalidateQueries({ queryKey: ['teacher-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
@@ -464,7 +469,7 @@ export function TeacherStudioPage() {
               className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer ${
                 active
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#E5E3DC] dark:border-slate-800 hover:bg-slate-50 dark:bg-slate-800'
+                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#E5E3DC] dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -603,6 +608,7 @@ export function TeacherStudioPage() {
                           setQText(q.question_text);
                           setQImageUrl(q.image_url ?? '');
                           setQAudioText(q.audio_text ?? '');
+                          setQAudioLang(q.audio_lang ?? 'en-US');
                           setOptA(q.options.find((o) => o.key === 'A')?.text ?? '');
                           setOptB(q.options.find((o) => o.key === 'B')?.text ?? '');
                           setOptC(q.options.find((o) => o.key === 'C')?.text ?? '');
@@ -688,13 +694,13 @@ export function TeacherStudioPage() {
               </div>
 
               {/* Image Attachment */}
-              <div className="p-4 rounded-xl border border-dashed border-slate-300 bg-[#F6F5F1] dark:bg-slate-900 space-y-3">
+              <div className="p-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-semibold text-[#18181B] dark:text-white flex items-center gap-1.5">
                     <ImagePlus className="w-4 h-4 text-[#0F766E]" />
                     Gambar Soal (Opsional)
                   </span>
-                  <label className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#18181B] dark:text-white hover:bg-slate-50 dark:bg-slate-800 cursor-pointer">
+                  <label className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#18181B] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
                     {uploadingImg ? 'Mengunggah...' : 'Pilih File Gambar'}
                     <input
                       type="file"
@@ -967,9 +973,9 @@ export function TeacherStudioPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (selectedCourseId) addModuleMut.mutate();
+                if (effectiveCourseId) addModuleMut.mutate();
               }}
-              className="flex gap-2"
+              className="flex flex-col sm:flex-row gap-2"
             >
               <input
                 type="text"
@@ -1231,42 +1237,48 @@ export function TeacherStudioPage() {
             <h3 className="text-lg font-bold text-[#18181B] dark:text-white">Edit Materi</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold mb-1">Judul Materi</label>
+                <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1">
+                  Judul Materi
+                </label>
                 <input
                   type="text"
                   value={editLessonTitle}
                   onChange={(e) => setEditLessonTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1">Durasi (Menit)</label>
+                <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1">
+                  Durasi (Menit)
+                </label>
                 <input
                   type="number"
                   min={1}
                   value={editLessonDuration}
                   onChange={(e) => setEditLessonDuration(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1">
+                <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1">
                   Tautan Embed Video (Opsional)
                 </label>
                 <input
                   type="url"
                   value={editLessonVideo}
                   onChange={(e) => setEditLessonVideo(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1">Isi Materi</label>
+                <label className="block text-xs font-semibold text-[#18181B] dark:text-slate-200 mb-1">
+                  Isi Materi
+                </label>
                 <textarea
                   rows={4}
                   value={editLessonContent}
                   onChange={(e) => setEditLessonContent(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             </div>

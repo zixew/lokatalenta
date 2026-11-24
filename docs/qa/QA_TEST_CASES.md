@@ -1,133 +1,89 @@
-# QA Comprehensive Test Cases — LokaTalenta (Post-Deployment)
+# Dokumen QA Test Cases — LokaTalenta (`v2.0.0`)
 
-> **Target Pengujian:** Production (`https://lokatalenta.vercel.app`) & Dev Preview (`https://lokatalenta-git-dev-zixew.vercel.app`)  
-> **Tanggal Audit:** 2026-11-23
+> [!NOTE]
+> Sumber utama matriks QA tersedia dalam format Excel terstruktur: [QA_TEST_CASES_LOKATALENTA.xlsx](file:///Users/a2299/Documents/Projects/lms-psikotes/docs/qa/QA_TEST_CASES_LOKATALENTA.xlsx).
+> Total skenario terverifikasi: **81** (0 duplikasi ID).
 
----
-
-## 1. Post-Deployment & Infrastruktur (`POST`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| POST-01 | Guest | Happy | Akses beranda Production & muat 123 program | Buka `https://lokatalenta.vercel.app/` | Halaman termuat `HTTP 200`, 123 program tampil, `0` console/network error | **FAIL** *(Intermittent Supabase HTTP 500 statement timeout)* |
-| POST-02 | Guest | Happy | SPA Rewrite / Direct Deep-Link & Refresh | Buka langsung & refresh `/verify/LT-INVALID-999` | Vercel mengembalikan `HTTP 200` (bukan 404), tampil `"Sertifikat Tidak Ditemukan"` | **PASS** |
-| POST-03 | Guest | Happy | Isolasi Environment Dev vs Production | Buka `https://lokatalenta-git-dev-zixew.vercel.app/` | Terhubung ke Supabase Dev (`mbhvnmtyaccjganddeyt`), terpisah dari Prod | **PASS** |
-
----
-
-## 2. Autentikasi, Validasi Email & Keamanan Sesi (`AUTH`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| AUTH-01 | Guest | Happy | Registrasi akun pelajar baru tanpa OTP | Buka `/auth` → **Gabung Sekarang** → isi Nama, Email valid baru, Password ≥ 6 → klik **Daftar Sekarang** | Akun terbuat, langsung masuk sebagai Pelajar, redirect ke `/` | **PASS** |
-| AUTH-02 | Guest | Sad | Login dengan password salah | Buka `/auth` → isi email valid + password salah → klik **Masuk** | Muncul error `"Invalid login credentials"`, tetap di `/auth` | **PASS** |
-| AUTH-03 | Guest | Sad | Registrasi dengan email duplikat | Daftar ulang memakai email yang sudah terdaftar (`nadia@pelajar.id`) | Registrasi ditolak dengan pesan `"Email sudah terdaftar. Silakan masuk."` | **PASS** |
-| AUTH-04 | All | Sad | Login akun yang dinonaktifkan Admin | Admin menonaktifkan akun → user mencoba login | Login ditolak dengan pesan `"Akun Anda sedang dinonaktifkan oleh Admin."` | **PASS** |
-| AUTH-05 | Guest | Happy | Pembersihan input password saat ganti mode | Isi password di mode Masuk → klik **Gabung Sekarang** | Input password otomatis dikosongkan | **PASS** |
-| AUTH-06 | Guest | Sad | Validasi format email & panjang password < 6 | Isi `"bukanemail"` / password `"123"` saat daftar | Form menolak submit dengan pesan validasi yang jelas | **PASS** |
-| AUTH-07 | All | Happy | Single Active Session (Login perangkat/sesi lain) | Login akun yang sama di sesi/browser kedua | Sesi lama otomatis keluar dan redirect ke `/auth` dengan notifikasi sesi berpindah | **PASS** |
-| AUTH-08 | Student | Sad | RBAC Guard akses `/admin` & `/teacher` | Login sebagai Pelajar → akses langsung `/admin` dan `/teacher` | Otomatis dialihkan ke `/` | **PASS** |
-
----
-
-## 3. Katalog, Onboarding & Misi Belajar (`CAT`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| CAT-01 | Guest/Student | Happy | Filter Kategori, Tipe Program & Kesulitan | Pilih `Latihan Soal Langsung`, kategori, & tingkat kesulitan | Jumlah & daftar kartu program sesuai filter | **PASS** *(Selama tidak kena HTTP 500)* |
-| CAT-02 | Guest/Student | Sad | Pencarian tidak ditemukan & Reset Filter | Ketik `"zzzznotfound"` → klik **Reset Filter** | Tampil empty state lalu semua 123 program kembali tampil | **PASS** |
-| CAT-03 | Student | Happy | Onboarding Goal Picker & Rekomendasi | Pilih tujuan belajar di panel **Rekomendasi Jalur Belajar** | Muncul 3 kursus rekomendasi yang sesuai | **PASS** |
-| CAT-04 | Student | Happy | Lanjutkan Belajar Anda | Login & buka `/` setelah gabung ≥ 1 kursus | Tampil kartu progres & tombol Lanjutkan | **PASS** |
-| CAT-05 | Student | Happy | Misi Belajar Aktif (*Daily Quests*) | Login & buka `/` | Tampil checklist 3 misi (`0/3`–`3/3`) + progress bar | **PASS** |
-
----
-
-## 4. Course Gate, Player, Flashcard SRS & Latihan Bicara (`CRS`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| CRS-01 | Student | Sad | Akses materi sebelum Gabung Course | Buka `/courses/:slug` sebelum bergabung | Materi terkunci; tampil Ringkasan, Silabus, Total Siswa & tombol **Gabung Course** | **PASS** *(Bug pada role Teacher/Admin)* |
-| CRS-02 | Student | Happy | Gabung Course & Akses Pelajaran | Klik **Gabung Course** → klik **Selesai & Lanjut** | Materi terbuka dan progres bertambah | **PASS** |
-| CRS-03 | Student | Happy | Flashcard SRS flip, rating & progres | Uji **Mode Flashcard** (`Balik` → `Mudah`) | `SRS Dikuasai` bertambah dan lanjut ke kartu berikutnya | **FAIL (Mobile)** *(Overflow `17px` di `390x844`)* |
-| CRS-04 | Student | Happy/Sad | Kanvas Menulis & Latihan Bicara (*Shadowing*) | Uji **Latihan Menulis** & tombol **Mulai Ucapkan** | Kanvas muat seluruh karakter panduan; Mic beri feedback/fallback jelas | **FAIL** *(Teks multi-karakter terpotong; Mic gagal tanpa pesan)* |
-
----
-
-## 5. Tugas Upload File & Penilaian Rubrik 1–5 (`ASG`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| ASG-01 | Student | Sad | Submit tugas tanpa memilih file | Buka tab **Tugas** tanpa pilih file | Tombol **Kumpulkan Tugas** berstatus `disabled` | **PASS** |
-| ASG-02 | Teacher | Sad | Tolak tugas tanpa alasan | Klik **Tolak & Minta Upload Ulang** dengan alasan kosong | Validasi menolak aksi dan meminta alasan | **PASS** |
-| ASG-03 | Student/Teacher | Happy | Upload → Tolak → Upload Ulang → Terima (★ 5) | Alur lengkap upload & penilaian rubrik 1–5 | Status & notifikasi terkirim ke siswa | **PASS** *(Pre-deploy unit/UI verified)* |
-
----
-
-## 6. Simulasi Psikotes, Navigasi & Rekomendasi (`QUZ`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| QUZ-01 | Student | Happy | Pengerjaan & Kembali ke Kursus | Mulai kuis → jawab → Selesai | Skor, `Jawaban Benar` & `Jawaban Salah` akurat; tombol kembali sesuai konteks | **PASS** |
-| QUZ-02 | Student | Happy | Bank Soal 2× Prioritas Soal Baru | Selesaikan attempt 1 → mulai attempt 2 | Paket soal attempt 2 berbeda sebelum reset acak | **PASS** |
-| QUZ-03 | Student | Sad | Mengulang sebelum cooldown 60 detik | Gagal kuis → cek tombol **Ulangi Latihan** < 60 dtk | Tombol disabled dengan countdown (`Ulangi dalam ... dtk`) | **PASS** |
-| QUZ-04 | Student | Sad | Mengulang setelah lulus (≥ 70%) | Akses ulang `/quiz/:id` setelah lulus | Diarahkan ke halaman hasil | **PASS** |
-| QUZ-05 | Student | Happy | Filter Navigasi Soal (`Semua`/`Kosong`/`Ragu`) | Klik pill `Ragu`, `Kosong`, `Semua` saat kuis | Grid nomor soal terfilter akurat | **PASS** |
-| QUZ-06 | Student | Happy | Keyboard Shortcuts (`A`–`E`, `←`/`→`, `F`) | Tekan `A`/`B`, `ArrowRight`, dan `F` saat kuis | Opsi terpilih, pindah soal, & soal ditandai Ragu-ragu | **FAIL** *(Tombol `F` tidak menandai Ragu-ragu)* |
-| QUZ-07 | Student | Happy | Rekomendasi Fokus Subtes Terlemah & Filter Subtes | Klik **Fokus Soal [Subtes]** di `QuizResultPage` | List pembahasan otomatis terfilter ke soal salah subtes terlemah | **PASS** |
-| QUZ-08 | Student | Happy | Klik **Ulangi Latihan** setelah cooldown habis | Tunggu cooldown 60 dtk → klik **Ulangi Latihan** | Layar berpindah ke Quiz Runner dan memuat soal baru | **PASS** |
-| QUZ-09 | Student | Happy | Mode Latihan (*Instant Feedback*) di Quiz Runner | Aktifkan toggle **Mode Latihan** → pilih opsi jawaban → klik **Cek Jawaban & Pembahasan** | Tampil status Benar/Kurang Tepat + kunci jawaban & penjelasan soal langsung tanpa menunggu selesai | **PASS** |
-| KRP-01 | Public/Student | Happy | Simulator Tes Kraepelin / Pauli (`/kraepelin`) | Pilih preset → klik **Mulai Simulasi Sekarang** → jawab beberapa pasangan dengan keypad/keyboard → klik **Selesai** | Tampil hasil Total Terjawab, Akurasi %, Kecepatan rata-rata, Konsistensi %, & Kurva per kolom | **PASS** |
-| KRP-02 | Public/Student | Sad/Mobile | Kraepelin Mobile `390×844` & selesai 0 jawaban | Buka `/kraepelin` di `390×844`, mulai lalu klik **Selesai** tanpa menjawab | `0px` horizontal overflow dan semua metrik tampil `0%` (tanpa `NaN`) | **PASS** |
-
----
-
-## 7. Komunitas, Interaksi Mentor & Profil (`COM`, `MNT`, `PRF`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| COM-01 | Student | Happy | Buat topik, balas, & hapus topik | Buat topik baru di `/community` lalu hapus | Post tersimpan (`201`) dan terhapus (`204`) | **PASS** |
-| COM-02 | Student | Sad | Guard `Dukung` 1× & double-click cepat | Klik cepat `Dukung` 2× berturut-turut | Hanya 1 request terkirim, `0` error `HTTP 409`, toggle +1/-1 akurat | **PASS** |
-| COM-03 | Student | Happy | Deep-link **Tanyakan Soal Ini ke Komunitas** | Klik tombol di `QuizResultPage` | Composer `/community` otomatis terbuka & terisi kutipan soal + opsi | **PASS** |
-| MNT-01 | Student/Teacher | Happy | Q&A berulir, konsultasi 1-on-1 & Sesi Live | Kirim pertanyaan/balasan & daftar sesi | Tersimpan & notifikasi terkirim | **PASS** |
-| MNT-02 | Student | Sad | Booking Sesi Live saat kuota penuh | Coba daftar sesi yang penuh | Ditolak dengan pesan `Kuota sesi sudah penuh.` | **PASS** |
-| PRF-01 | Student | Happy | Konsistensi XP, Streak, Global Leaderboard & Riwayat Kuis | Buka `/profile` setelah belajar & mengerjakan kuis | XP, materi, tes dikerjakan, dan Global Leaderboard (`get_public_leaderboard`) sinkron lintas siswa | **PASS** |
-| PRF-02 | Student/Guest | Happy/Sad | Edit Bio/Nama & akses `/profile` tanpa login | Edit bio + reload; buka `/profile` saat logout | Perubahan bio tersimpan; guest diarahkan ke `/auth` | **PARTIAL FAIL** *(Edit bio PASS; guest `/profile` blank)* |
-
----
-
-## 8. Sertifikat, Teacher Studio, Admin & UI/UX (`CRT`, `TCH`, `ADM`, `UI`)
-| ID | Role | Flow | Skenario | Langkah Uji | Ekspektasi | Status Post-Deploy |
-|---|---|---|---|---|---|---|
-| CRT-01 | Public | Happy | Verifikasi Sertifikat Valid | Buka `/verify/:certCode` terdaftar | Tampil badge **Sertifikat Asli & Terverifikasi** | **PASS** |
-| CRT-02 | Public | Sad | Verifikasi Sertifikat Tidak Ditemukan | Buka `/verify/LT-INVALID-999` | Tampil pesan **Sertifikat Tidak Ditemukan** | **PASS** |
-| TCH-01 | Teacher | Happy | Teacher Studio 5 Tab & Bank Soal | Login `rizco@pengajar.id` → buka `/teacher` | Seluruh tab & data kursus/bank soal termuat `HTTP 200` | **FAIL** *(Nested query `questions(*)` kena HTTP 500)* |
-| TCH-02 | Teacher | Sad | Validasi form kosong di Teacher Studio | Submit soal/pengumuman/tugas/sesi kosong | Validasi form menolak submit | **PASS** |
-| ADM-01 | Admin | Happy | Manajemen User, Filter & Moderasi Kursus | Login `admin@ruanglatih.id` → `/admin` | Tabel user + Moderasi Kursus (`123`) tampil normal | **FAIL** *(Moderasi Kursus `0/0` karena HTTP 500)* |
-| ADM-02 | Admin | Sad | Guard anti-nonaktifkan/turunkan role diri sendiri | Cek baris akun admin yang sedang login di `/admin` | Tombol `Nonaktifkan` & turun role pada diri sendiri dinonaktifkan/ditolak | **FAIL (CRITICAL)** *(Admin bisa menonaktifkan dirinya sendiri & langsung terkunci)* |
-| UI-01 | All | Happy | Dark/Light Mode & Responsivitas Mobile `390x844` | Uji tema & horizontal scroll di `/`, `/courses/...` | `0px` horizontal overflow & navbar tidak bertabrakan | **FAIL** *(Overflow `3px` di `/`, `17px` di Flashcard, navbar subtitle tabrakan)* |
-| CRS-05 | Student | Happy | Quick Check & Catatan Pribadi di Course Player (BL-04) | Buka materi artikel/video, jawab Quick Check, simpan catatan pribadi & reload | Feedback Quick Check tampil instan & catatan tersimpan per user/lesson | **READY FOR SIT** |
-| TCH-03 | Teacher | Happy | Bulk Import Soal CSV + Live Preview (BL-05) | Buka tab Bank Soal `/teacher`, isi contoh CSV / unggah file, cek Live Preview & klik Impor | Preview menampilkan soal valid & seluruh soal tersimpan ke bank soal | **READY FOR SIT** |
-| TCH-04 | Teacher | Happy | Analitik Kelulusan, Drop-off Funnel & Kategori Soal (BL-06) | Buka tab Progres Siswa `/teacher` | Tampil KPI Pass Rate, rata-rata skor, funnel progres kursus, & distribusi kategori | **READY FOR SIT** |
-| QUZ-05 | Student | Happy | Tantangan 1v1 & Share Skor/Sertifikat (BL-07) | Buka hasil kuis / sertifikat, salin link tantangan 1v1, buka link tantangan | Banner Tantangan 1v1 tampil di QuizRunner & link WA/LinkedIn valid | **READY FOR SIT** |
-| AUTH-04 | Public | Happy | Lupa Password / Reset Password Flow (BL-08) | Klik `Lupa Password?` di `/auth`, isi email valid & submit | Konfirmasi pengiriman tautan reset password tampil | **READY FOR SIT** |
-| TRY-01 | Public/Student | Happy | Tryout Akbar Terjadwal & Leaderboard Event (BL-09) | Buka `/tryout`, daftar event aktif, cek status & Leaderboard | Event Live/Upcoming/Ended tampil, daftar berhasil, & Top 10 tampil | **READY FOR SIT** |
-| E2E-01 | All | Happy | Regression Suite Playwright & CI (BL-10) | Jalankan `client/e2e/lms-flows.spec.ts` & unit tests | Seluruh skenario inti lulus | **READY FOR SIT** |
-| PRF-03 | System | Happy | Code-Splitting Vendor Bundle < 250 kB (BL-11) | Jalankan `npm run build` | Seluruh chunk (`index`, `react-vendor`, `supabase-vendor`, `query-vendor`) < 250 kB tanpa warning | **PASS** |
-| AUTH-05 | Public | Happy | Callback Form Buat Password Baru (`?type=recovery`) (BL-12) | Buka `/auth?type=recovery`, isi password baru & konfirmasi | Form Buat Password Baru tampil & validasi min 6 karakter bekerja | **READY FOR SIT** |
-| TRY-02 | Student | Happy | Filter Kategori & Sync Pendaftaran Tryout Akbar (BL-13) | Buka `/tryout`, filter kategori `CPNS & Kedinasan`, daftar event | Daftar event terfilter sesuai kategori & status Terdaftar persisten | **READY FOR SIT** |
-| E2E-02 | System | Happy | Suite E2E Recovery & Topbar Navigation (BL-14) | Jalankan `npm test` & verifikasi E2E | Seluruh unit test & skenario recovery lulus | **READY FOR SIT** |
-| CAT-04 | Public/Student | Happy | Target Karier (`Seleksi BUMN & CPNS`) & Target XP Harian (BL-15) | Buka `/`, pilih `100 XP Intensif` & jalur `Seleksi BUMN & CPNS` | Badge Fokus & 3 rekomendasi kursus berubah sesuai jalur | **READY FOR SIT** |
-| CRS-06 | Student | Happy | Resume Last Opened Lesson & Keyboard Shortcut Hint (BL-16) | Buka materi ke-2 di Course Player, reload; buka QuizRunner | Materi terakhir otomatis terbuka & bar Shortcut Cepat tampil | **READY FOR SIT** |
-| QUZ-06 | Student | Happy | Duel 1v1 Score Comparison di QuizResultPage (BL-17) | Kerjakan kuis dengan `?challengeScore=80&challenger=Budi` hingga submit | Tampil kartu **Hasil Duel 1v1** (MENANG/SERI/BELUM MENANG vs Budi) | **READY FOR SIT** |
-| TCH-05 | Teacher | Happy | Search, Filter Kategori & Load-to-Editor Bank Soal (BL-18) | Buka `/teacher`, cari teks soal, filter kategori, klik tombol Edit (`Pencil`) | Daftar soal terfilter & soal terpilih dimuat ke form editor | **READY FOR SIT** |
-| ADM-03 | Admin | Happy | Tab Audit Log & Rekam Jejak Aksi Admin (BL-19) | Buka `/admin`, lakukan perubahan role/publikasi, buka tab `Audit Log` | Entri audit (`ROLE_UPDATED` / `COURSE_PUBLISH_TOGGLED`) tercatat lengkap | **READY FOR SIT** |
-| PWA-01 | All | Happy | PWA Manifest, App Shortcuts & Footer Badge (BL-20) | Periksa `/manifest.webmanifest`, `/sw.js`, dan badge `PWA Ready` di footer | Manifest valid dengan shortcut `/kraepelin` & `/tryout` serta badge `PWA Ready` tampil | **READY FOR SIT** |
-| CRS-07 | Student | Happy | Cloud Sync Catatan Materi (BL-21) | Simpan catatan pribadi di Course Player saat login | Catatan tersimpan lokal + sync ke `lesson_notes` | **READY FOR SIT** |
-| CAT-05 | Student | Happy | Cloud Sync Target Karier & XP Harian (BL-22) | Pilih jalur karier & target XP di `/` saat login | Preferensi tersimpan lokal + sync ke `user_study_preferences` | **READY FOR SIT** |
-| CRS-08 | Student | Happy | Ekspor Catatan Kursus ke Markdown `.md` (BL-23) | Klik tombol **Unduh Catatan (.md)** di Course Player | File `.md` berisi modul, materi, dan catatan terunduh | **READY FOR SIT** |
-| CRS-09 | Student | Happy | Lab Spreadsheet & Rumus Excel Interaktif (BL-23B) | Buka Course Player, klik **Coba Langsung Rumus**, ketik/isi `=SUM(B2:B5)` di sel `B6` | Spreadsheet menghitung `30.000.000` & tampil badge **Misi Rumus Tepat!** | **READY FOR SIT** |
-| SEC-01 | System | Happy | Security Hardening & HTTP Security Headers (BL-23C) | Jalankan `securityAndPerf.test.ts` & cek `vercel.json` | XSS/CSV-Injection/Rate-Limit & Security Headers lulus 100% | **PASS** |
-| PERF-01 | System | Happy | Performance Benchmark (1.000 Kalkulasi < 50ms, 1.000 Filter < 15ms) (BL-23C) | Jalankan `securityAndPerf.test.ts` | Seluruh benchmark selesai di bawah batas latensi target | **PASS** |
-| QUZ-07 | Student | Happy | Riwayat Duel 1v1 Multi-User di QuizResultPage (BL-24) | Selesaikan kuis dengan `?challengeScore=75&challenger=Budi`, periksa kartu Riwayat Duel 1v1 | Skor duel tercatat (`quiz_challenges` / local) dan daftar riwayat duel terbaru tampil | **READY FOR SIT** |
-| QUZ-08 | Student | Happy | Smart Subtest Drill pada Subtest Terlemah (BL-25) | Klik tombol **Smart Drill** di hasil kuis atau buka `/quiz/:id?subtest=<Kategori>` | Banner mode latihan terfokus tampil & soal terfilter sesuai kategori subtest | **READY FOR SIT** |
-| KRP-02 | Student | Happy | Riwayat & Tren Ketahanan Kraepelin/Pauli (BL-26) | Selesaikan simulasi di `/kraepelin`, periksa bagian **Riwayat & Tren Ketahanan** | Total sesi, rata-rata akurasi, KPM, stabilitas terbaik & daftar riwayat terbaru tampil | **READY FOR SIT** |
-| TCH-06 | Teacher | Happy | Edit Soal In-Place di Teacher Studio (BL-27) | Klik ikon Edit (`Pencil`) pada soal di `/teacher`, ubah teks soal & klik **Perbarui Soal Ini** | Soal diperbarui di tempat tanpa duplikasi; tombol **Batal Edit** mengembalikan mode tambah | **READY FOR SIT** |
-| ADM-04 | Admin | Happy | Cloud Audit Log & Filter Aksi Admin (BL-28) | Buka tab `Audit Log` di `/admin`, ubah filter aksi (`Role Diubah`, `Status Akun`, `Publikasi Kursus`) | Daftar audit log tersaring sesuai aksi & tersinkronisasi ke `admin_audit_logs` | **READY FOR SIT** |
-| ADM-05 | Admin | Happy | Ekspor CSV Pengguna & Audit Log (BL-29) | Di `/admin`, klik **Unduh CSV Pengguna** dan **Unduh CSV Audit Log** | File `.csv` terunduh rapi dengan proteksi formula injection | **READY FOR SIT** |
-| PRF-04 | Student | Happy | Radar Kompetensi 5-Dimensi di ProfilePage (BL-30) | Buka `/profile`, periksa kartu **Radar Kompetensi 5-Dimensi** | Grafik SVG 5 sumbu (*Verbal*, *Numerik*, *Logika & Spasial*, *Kraepelin*, *Bahasa & Materi*) & badge readiness tampil | **READY FOR SIT** |
-| TLN-01 | Public/Recruiter | Happy | Halaman Publik Talent Readiness Passport (BL-31) | Buka `/talent/:userId`, uji toggle visibilitas di `/profile`, klik **Cetak / PDF** | Profil kesiapan, Radar 5D, sertifikat terverifikasi tampil; jika diset Privat maka akses publik ditolak | **READY FOR SIT** |
-| CRT-03 | Public/Recruiter | Happy | Portal Verifikasi 2.0 Cek Sertifikat & Passport (BL-32) | Buka `/verify`, pilih tab **Cek Talent Passport Kandidat**, masukkan ID kandidat | Navigasi langsung ke `/talent/:userId` menampilkan Talent Passport kandidat | **READY FOR SIT** |
-| ADM-06 | Admin | Happy | Isolasi UI & Rute Khusus Admin Dashboard (BL-32B) | Login sebagai `admin`, cek `TopbarNav` & coba buka `/`, `/profile`, `/teacher` | `TopbarNav` hanya tampilkan **Admin Dashboard**; seluruh rute pelajar/pengajar otomatis redirect ke `/admin` | **READY FOR SIT** |
+| ID | Role | Modul | Tipe Flow | Judul Skenario | Prasyarat | Langkah Uji | Ekspektasi Hasil | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| POST-01 | Guest | Post-Deployment | Happy Flow | Beranda Production & muat 123 program | Deploy live di Vercel | Buka https://lokatalenta.vercel.app/ | Halaman termuat HTTP 200 dengan 123 program dan 0 error | **PASS** |
+| POST-02 | Guest | Post-Deployment | Happy Flow | SPA Rewrite / Direct Deep-Link & Refresh | Deploy live di Vercel | Buka langsung dan refresh /verify/LT-INVALID-999 | Vercel mengembalikan HTTP 200 (bukan 404) dan tampil pesan Sertifikat Tidak Ditemukan | **PASS** |
+| POST-03 | Guest | Post-Deployment | Happy Flow | Isolasi Environment Dev vs Production | Dev & Prod terdeploy | Buka https://lokatalenta-git-dev-zixew.vercel.app/ | Terhubung ke Supabase Dev (mbhvnmtyaccjganddeyt) terpisah dari Prod | **PASS** |
+| AUTH-01 | Guest | Autentikasi | Happy Flow | Registrasi akun pelajar baru tanpa OTP | Berada di /auth | Klik Gabung Sekarang -> isi Nama Email valid baru Password >= 6 -> klik Daftar Sekarang | Akun terbuat dan langsung masuk sebagai Pelajar redirect ke / | **PASS** |
+| AUTH-02 | Guest | Autentikasi | Sad Flow | Login dengan password salah | Akun terdaftar | Masukkan email valid dan password salah -> klik Masuk | Muncul error Invalid login credentials dan tetap di /auth | **PASS** |
+| AUTH-03 | Guest | Autentikasi | Sad Flow | Registrasi dengan email duplikat | Email sudah terdaftar | Daftar ulang memakai email yang sudah terdaftar | Registrasi ditolak dengan pesan Email sudah terdaftar. Silakan masuk. | **PASS** |
+| AUTH-04 | All | Autentikasi | Sad Flow | Login akun nonaktif | Akun dinonaktifkan Admin | Coba login dengan akun nonaktif | Login ditolak dengan pesan Akun Anda sedang dinonaktifkan oleh Admin | **PASS** |
+| AUTH-05 | Guest | Autentikasi | Happy Flow | Pembersihan input password saat ganti mode | Berada di /auth | Isi password di mode Masuk -> klik Gabung Sekarang | Input password otomatis dikosongkan | **PASS** |
+| AUTH-06 | Guest | Autentikasi | Sad Flow | Validasi email tidak valid & password < 6 | Berada di /auth | Isi email bukanemail dan password 123 lalu submit | Form menolak submit dengan pesan validasi yang jelas | **PASS** |
+| AUTH-07 | All | Autentikasi | Happy Flow | Single Active Session antar sesi/perangkat | Akun login di sesi 1 | Login akun yang sama di sesi/perangkat ke-2 | Sesi lama otomatis keluar dan redirect ke /auth | **PASS** |
+| AUTH-08 | Student | RBAC | Sad Flow | Pelajar mencoba akses /admin & /teacher | Login sebagai Pelajar | Navigasi langsung ke /admin dan /teacher | Otomatis dialihkan ke / | **PASS** |
+| CAT-01 | Guest/Student | Katalog & Filter | Happy Flow | Filter kategori tipe program & kesulitan | Berada di / | Pilih Latihan Soal Langsung kategori dan tingkat kesulitan | Kartu dan jumlah hasil sesuai filter | **PASS** |
+| CAT-02 | Guest/Student | Katalog & Filter | Sad Flow | Pencarian tidak ditemukan & Reset Filter | Berada di / | Ketik zzzznotfound -> klik Reset Filter | Tampil empty state lalu semua 123 program kembali tampil | **PASS** |
+| CAT-03 | Student | Onboarding | Happy Flow | Goal Picker & rekomendasi kursus | Berada di / | Pilih tujuan belajar di panel Rekomendasi Jalur Belajar | Muncul 3 kursus rekomendasi yang sesuai | **PASS** |
+| CAT-04 | Student | Onboarding | Happy Flow | Blok Lanjutkan Belajar Anda | User login & sudah join kursus | Buka / setelah bergabung di minimal 1 kursus | Blok Lanjutkan Belajar tampil dengan progress bar | **PASS** |
+| CAT-05 | Student | Misi Belajar | Happy Flow | Widget Misi Belajar Aktif (Daily Quests) | User login di / | Buka / dan cek panel Misi Belajar Aktif | Tampil 3 misi belajar beserta progress bar sinkron | **PASS** |
+| CRS-01 | Student | Course Gate | Sad Flow | Akses materi sebelum gabung course | User belum gabung kursus | Buka /courses/:slug | Materi terkunci dan tampil tombol Gabung Course | **PASS (Bug pada Teacher/Admin)** |
+| CRS-02 | Student | Course Player | Happy Flow | Gabung Course & Selesai Lanjut | User login di /courses/:slug | Klik Gabung Course lalu Selesai & Lanjut | Materi terbuka dan progres bertambah | **PASS** |
+| CRS-03 | Student | Flashcard SRS | Happy Flow | Flip kartu & rating SRS | Materi memiliki voice_lines | Uji Mode Flashcard Balik -> Mudah | SRS Dikuasai bertambah dan lanjut ke kartu berikutnya | **PASS** |
+| CRS-04 | Student | Player Interaktif | Happy/Sad Flow | Kanvas Menulis & Latihan Bicara | Materi memiliki voice_lines | Uji Latihan Menulis dan tombol Mulai Ucapkan | Teks panduan muat utuh; Mic beri feedback jelas jika tidak didukung | **PASS** |
+| ASG-01 | Student | Tugas | Sad Flow | Kirim tugas tanpa upload file | Buka tab Tugas | Biarkan file kosong dan cek tombol Kumpulkan Tugas | Tombol Kumpulkan Tugas berstatus disabled | **PASS** |
+| ASG-02 | Teacher | Tugas | Sad Flow | Tolak tugas tanpa alasan | Buka Tugas Siswa di /teacher | Klik Tolak & Minta Upload Ulang dengan alasan kosong | Validasi menolak aksi dan meminta alasan | **PASS** |
+| ASG-03 | Student/Teacher | Tugas | Happy Flow | Upload -> Tolak -> Upload Ulang -> Terima 5 | Kursus aktif | Siswa upload -> Mentor tolak -> Siswa upload ulang -> Mentor terima | Status dan notifikasi terkirim ke siswa | **PASS (Pre-deploy)** |
+| QUZ-01 | Student | Quiz Runner & Result | Happy Flow | Pengerjaan skor breakdown & kembali | Mulai kuis dari kursus | Pilih jawaban -> Kumpulkan -> cek halaman hasil | Skor Jawaban Benar/Salah akurat dan link kembali sesuai | **PASS** |
+| QUZ-02 | Student | Bank Soal 2x | Happy Flow | Prioritas soal baru antar attempt | Quiz memiliki bank soal 2x | Selesaikan attempt 1 -> mulai attempt 2 | Attempt 2 mendapat paket soal berbeda sebelum reset | **PASS** |
+| QUZ-03 | Student | Quiz Result | Sad Flow | Mengulang sebelum cooldown 60 detik | Gagal kuis < 60 detik | Cek tombol Ulangi Latihan pada QuizResultPage | Tombol disabled dengan countdown Ulangi dalam ... dtk | **PASS** |
+| QUZ-04 | Student | Quiz Runner | Sad Flow | Mengulang kuis setelah lulus | Sudah lulus >= 70% | Akses ulang /quiz/:id | Diarahkan ke halaman hasil | **PASS** |
+| QUZ-05 | Student | Quiz Runner | Happy Flow | Filter Navigasi Soal (Semua/Kosong/Ragu) | Berada di QuizRunnerPage | Klik pill Kosong Ragu dan Semua | Grid nomor soal terfilter akurat | **PASS** |
+| QUZ-06 | Student | Quiz Runner | Happy Flow | Keyboard shortcuts (A-E panah F) | Berada di QuizRunnerPage | Tekan A/B ArrowRight dan F | Opsi terpilih pindah soal dan soal ditandai Ragu-ragu | **PASS** |
+| QUZ-07 | Student | Quiz Result | Happy Flow | Rekomendasi Fokus Subtes & Filter Subtes | Ada jawaban salah di QuizResultPage | Klik Fokus Soal [Subtes] | List pembahasan terfilter ke soal salah subtes terlemah | **PASS** |
+| QUZ-08 | Student | Quiz Result | Happy Flow | Ulangi Latihan setelah cooldown selesai | Cooldown 60 detik selesai | Klik tombol Ulangi Latihan | Layar berpindah ke Quiz Runner dan memuat soal baru | **PASS** |
+| QUZ-09 | Student | Quiz Runner | Happy Flow | Mode Latihan Instant Feedback per soal | Berada di QuizRunnerPage | Aktifkan toggle Mode Latihan -> pilih jawaban -> klik Cek Jawaban & Pembahasan | Tampil status Benar/Kurang Tepat dan penjelasan langsung | **PASS** |
+| KRP-01 | Public/Student | Kraepelin Simulator | Happy Flow | Simulasi Kraepelin & Kurva Kecepatan (/kraepelin) | Berada di /kraepelin | Pilih preset -> Mulai Simulasi -> jawab beberapa pasangan via keypad/keyboard -> Selesai | Tampil Total Terjawab Akurasi Kecepatan Konsistensi dan Kurva per Kolom | **PASS** |
+| KRP-02 | Public/Student | Kraepelin Simulator | Sad Flow | Kraepelin Mobile 390x844 & selesai 0 jawaban | Berada di /kraepelin | Buka di 390x844 -> Mulai -> Selesai tanpa menjawab | 0px horizontal overflow dan semua metrik 0% tanpa NaN | **PASS** |
+| COM-01 | Student | Komunitas | Happy Flow | Buat topik dan hapus topik | Login di /community | Buat topik baru lalu hapus | Post tersimpan (201) dan terhapus (204) | **PASS** |
+| COM-02 | Student | Komunitas | Sad Flow | Guard Dukung 1x & double-click cepat | Ada topik di /community | Klik cepat tombol Dukung 2x berturut-turut | Hanya 1 request terkirim 0 HTTP 409 toggle +1/-1 akurat | **PASS** |
+| COM-03 | Student | Komunitas | Happy Flow | Deep-link Tanyakan Soal Ini ke Komunitas | Berada di QuizResultPage | Klik Tanyakan Soal Ini ke Komunitas | Composer /community otomatis terbuka terisi kutipan soal | **PASS** |
+| MNT-01 | Student/Teacher | Interaksi Mentor | Happy Flow | Q&A berulir pesan privat & Sesi Live | Sudah gabung kursus | Kirim pertanyaan/balasan & daftar sesi | Tersimpan & notifikasi terkirim | **PASS** |
+| MNT-02 | Student | Sesi Live | Sad Flow | Booking Sesi Live kuota penuh | Sesi mencapai max_participants | Coba daftar sesi penuh | Ditolak dengan pesan Kuota sesi sudah penuh | **PASS** |
+| PRF-01 | Student | Profil & Gamifikasi | Happy Flow | Konsistensi XP Streak Global Leaderboard & Riwayat | Sudah belajar & ikut kuis | Buka /profile dan bandingkan header Leaderboard & Tes Dikerjakan | XP materi dan tes dikerjakan konsisten lintas siswa via get_public_leaderboard | **PASS** |
+| PRF-02 | Student/Guest | Profil | Happy/Sad Flow | Edit bio & akses /profile saat logout | Login / Logout | Edit bio + reload; buka /profile saat logout | Perubahan bio tersimpan; guest diarahkan ke /auth | **PASS** |
+| CRT-01 | Public | Sertifikat | Happy Flow | Verifikasi Sertifikat Valid | Kode sertifikat terdaftar | Buka /verify/:certCode | Tampil badge Sertifikat Asli & Terverifikasi | **PASS** |
+| CRT-02 | Public | Sertifikat | Sad Flow | Verifikasi Sertifikat Tidak Ditemukan | Kode tidak terdaftar | Buka /verify/LT-INVALID-999 | Tampil pesan Sertifikat Tidak Ditemukan | **PASS** |
+| TCH-01 | Teacher | Teacher Studio | Happy Flow | Muat 5 tab & Bank Soal di /teacher | Login sebagai Pengajar | Buka /teacher dan periksa daftar kursus + bank soal | Seluruh tab & data termuat HTTP 200 | **PASS** |
+| TCH-02 | Teacher | Teacher Studio | Sad Flow | Validasi form kosong di Teacher Studio | Berada di /teacher | Submit soal pengumuman tugas atau sesi live kosong | Validasi form menolak submit | **PASS** |
+| ADM-01 | Admin | Admin Panel | Happy Flow | Manajemen user filter & Moderasi Kursus | Login sebagai Admin | Buka /admin uji filter user dan tab Moderasi Kursus | Tabel user dan 123 kursus tampil normal | **PASS** |
+| ADM-02 | Admin | Admin Panel | Sad Flow | Guard anti-nonaktifkan/turunkan role diri sendiri | Login sebagai Admin di /admin | Periksa baris akun admin aktif sendiri dan coba Nonaktifkan | Tombol Nonaktifkan & turun role diri sendiri disabled/ditolak | **PASS** |
+| UI-01 | All | Tema & Responsif | Happy Flow | Dark/Light mode & Mobile 390x844 0 overflow | Di semua halaman utama | Uji toggle tema dan scroll horizontal di 390x844 | Tema kontras dan 0px horizontal overflow | **PASS** |
+| CRS-05 | Student | Course Player | Happy Flow | Quick Check & Catatan Pribadi per materi (BL-04) | Materi artikel/video terbuka | Jawab Quick Check dan simpan catatan pribadi lalu reload | Feedback Quick Check tampil & catatan persisten per user dan materi | **PASS** |
+| TCH-03 | Teacher | Teacher Studio | Happy Flow | Bulk Import Soal CSV + Live Preview (BL-05) | Login sebagai Pengajar di /teacher | Isi contoh CSV atau unggah .csv lihat Live Preview lalu Impor | Soal tervalidasi di preview dan tersimpan ke bank soal | **PASS** |
+| TCH-04 | Teacher | Teacher Studio | Happy Flow | Analitik Kelulusan Drop-off Funnel & Kategori Soal (BL-06) | Login sebagai Pengajar di /teacher tab Progres Siswa | Lihat panel Analitik Kelulusan & Funnel Progres | KPI Pass Rate rata-rata skor funnel kursus & kategori soal tampil akurat | **PASS** |
+| QUZ-10 | Student | Kuis & Sertifikat | Happy Flow | Tantangan 1v1 & Share Skor/Sertifikat (BL-07) | Selesai kuis atau buka sertifikat | Salin Link Tantangan 1v1 lalu buka URL tantangan | Banner Tantangan 1v1 tampil dan tombol share WA/LinkedIn valid | **PASS** |
+| AUTH-09 | Public | Autentikasi | Happy Flow | Lupa Password / Reset Password (BL-08) | Di halaman /auth | Klik Lupa Password masukkan email valid dan submit | Tampil konfirmasi tautan reset password terkirim | **PASS** |
+| TRY-01 | Public/Student | Tryout Akbar | Happy Flow | Tryout Akbar Terjadwal & Leaderboard (BL-09) | Buka /tryout | Lihat jadwal event klik Daftar Event dan cek Leaderboard | Event Live/Upcoming/Ended tampil status Terdaftar tersimpan & Top 10 tampil | **PASS** |
+| E2E-01 | All | Automated E2E | Happy Flow | Playwright E2E Regression Suite (BL-10) | CI / Local | Jalankan suite E2E lms-flows.spec.ts | Seluruh alur regresi inti lulus | **PASS** |
+| PRF-03 | System | Performance | Happy Flow | Code-Splitting Vendor Bundle < 250 kB (BL-11) | Build produksi | Jalankan npm run build | Seluruh chunk di bawah 250 kB dengan 0 chunk warning | **PASS** |
+| AUTH-10 | Public | Autentikasi | Happy Flow | Callback Form Buat Password Baru (?type=recovery) (BL-12) | Buka /auth?type=recovery | Isi Password Baru dan Konfirmasi Password Baru | Form Buat Password Baru tampil dan validasi cocok bekerja | **PASS** |
+| TRY-02 | Student | Tryout Akbar | Happy Flow | Filter Kategori & Sync Pendaftaran Tryout (BL-13) | Buka /tryout | Klik filter kategori dan Daftar Event | Event terfilter akurat dan pendaftaran tersimpan | **PASS** |
+| E2E-02 | System | Automated E2E | Happy Flow | Suite E2E Recovery & Topbar (BL-14) | CI / Local | Jalankan unit test & E2E | Seluruh test lulus 100% | **PASS** |
+| CAT-06 | Public/Student | Katalog | Happy Flow | Target Karier & Target XP Harian (BL-15) | Di halaman utama / | Pilih 100 XP Intensif dan jalur Seleksi BUMN & CPNS | Fokus & 3 rekomendasi kursus otomatis terbarui | **PASS** |
+| CRS-06 | Student | Course Player & Quiz | Happy Flow | Resume Last Lesson & Shortcut Hint (BL-16) | Di Course Player & QuizRunner | Pindah materi lalu reload dan buka QuizRunner | Materi terakhir tersimpan & bar Shortcut Cepat tampil | **PASS** |
+| QUZ-11 | Student | Quiz Result | Happy Flow | Duel 1v1 Score Comparison (BL-17) | Mulai kuis dengan ?challengeScore=80&challenger=Budi | Submit kuis dan lihat halaman hasil | Kartu Hasil Duel 1v1 vs Budi tampil akurat | **PASS** |
+| TCH-05 | Teacher | Teacher Studio | Happy Flow | Search Filter Kategori & Load-to-Editor Bank Soal (BL-18) | Di tab Bank Soal /teacher | Cari soal filter kategori dan klik ikon Pencil | Daftar soal terfilter dan data soal termuat ke form editor | **PASS** |
+| ADM-03 | Admin | Admin Panel | Happy Flow | Tab Audit Log & Rekam Jejak Aksi Admin (BL-19) | Di /admin | Ubah status atau buka tab Audit Log | Tab Audit Log menampilkan riwayat aksi admin secara kronologis | **PASS** |
+| PWA-01 | All | PWA & Offline | Happy Flow | PWA Manifest Shortcuts & Badge PWA Ready (BL-20) | Di seluruh halaman | Periksa manifest.webmanifest dan footer aplikasi | Manifest standalone valid dengan shortcuts dan badge PWA Ready tampil | **PASS** |
+| CRS-07 | Student | Course Player | Happy Flow | Cloud Sync Catatan Materi (BL-21) | Login di Course Player | Simpan catatan pribadi pada materi | Catatan tersimpan lokal dan tersinkron ke lesson_notes | **PASS** |
+| CAT-07 | Student | Katalog | Happy Flow | Cloud Sync Target Karier & XP Harian (BL-22) | Login di / | Pilih target XP dan jalur karier | Preferensi tersimpan ke user_study_preferences | **PASS** |
+| CRS-08 | Student | Course Player | Happy Flow | Ekspor Catatan Kursus ke Markdown (BL-23) | Di Course Player dengan catatan tersimpan | Klik Unduh Catatan (.md) | File .md berisi ringkasan catatan terunduh | **PASS** |
+| CRS-09 | Student | Course Player | Happy Flow | Lab Spreadsheet & Rumus Excel Interaktif (BL-23B) | Di Course Player | Buka Lab Excel lalu isi rumus =SUM(B2:B5) di sel B6 | Hasil 30.000.000 terhitung real-time dan Misi Rumus Tepat tampil | **PASS** |
+| SEC-01 | System | Security | Happy Flow | Security Hardening & HTTP Headers (BL-23C) | Automated Test & vercel.json | Jalankan securityAndPerf.test.ts | XSS/CSV-Injection/Rate-limit dan HTTP headers lulus | **PASS** |
+| PERF-01 | System | Performance | Happy Flow | Performance Benchmark 1000 ops (BL-23C) | Automated Benchmark | Jalankan securityAndPerf.test.ts | 1000 kalkulasi < 50ms dan 1000 filter < 15ms lulus | **PASS** |
+| QUZ-12 | Student | Quiz Runner | Happy Flow | Riwayat Duel 1v1 Multi-User (BL-24) | Buka kuis via link ?challengeScore=75&challenger=Budi | Selesaikan kuis dan periksa halaman hasil | Hasil duel tersimpan dan Riwayat Duel 1v1 tampil di QuizResultPage | **PASS** |
+| QUZ-13 | Student | Quiz Runner | Happy Flow | Smart Subtest Drill pada Subtest Terlemah (BL-25) | Di QuizResultPage atau URL ?subtest=... | Klik Smart Drill subtest terlemah | QuizRunner memfilter soal subtest terkait dengan banner Smart Drill | **PASS** |
+| KRP-03 | Student | Kraepelin | Happy Flow | Riwayat & Tren Ketahanan Kraepelin (BL-26) | Buka /kraepelin | Selesaikan 1 sesi simulasi kraepelin | Panel Riwayat & Tren Ketahanan menampilkan total sesi KPM akurasi dan stabilitas | **PASS** |
+| TCH-06 | Teacher | Teacher Studio | Happy Flow | Edit Soal In-Place (BL-27) | Buka tab Bank Soal di /teacher | Klik ikon Pencil lalu ubah teks soal dan klik Perbarui Soal Ini | Soal diperbarui tanpa duplikat dan Batal Edit tersedia | **PASS** |
+| ADM-04 | Admin | Admin Panel | Happy Flow | Cloud Audit Log & Filter Aksi (BL-28) | Buka tab Audit Log di /admin | Pilih filter aksi seperti Role Diubah atau Publikasi Kursus | Daftar audit log terfilter sesuai aksi dan tersinkron ke cloud | **PASS** |
+| ADM-05 | Admin | Admin Panel | Happy Flow | Ekspor CSV Governance Admin (BL-29) | Di /admin tab Pengguna & Audit Log | Klik Unduh CSV Pengguna dan Unduh CSV Audit Log | File CSV terunduh dengan sanitasi formula injection | **PASS** |
+| PRF-04 | Student | Profil | Happy Flow | Radar Kompetensi 5-Dimensi (BL-30) | Login sebagai Pelajar di /profile | Periksa panel Radar Kompetensi 5-Dimensi | Grafik SVG 5 dimensi dan badge readiness tampil tanpa overflow | **PASS** |
+| TLN-01 | Public/Recruiter | Talent Passport | Happy Flow | Halaman Publik Talent Passport (BL-31) | Buka /talent/:userId atau klik Buka Talent Passport di /profile | Verifikasi tampilan & toggle visibilitas publik/privat | Talent Passport publik tampil lengkap; jika diset Privat tampil pesan tidak tersedia | **PASS** |
+| CRT-03 | Public/Recruiter | Verifikasi 2.0 | Happy Flow | Cek Talent Passport Kandidat di /verify (BL-32) | Buka /verify | Pilih tab Cek Talent Passport Kandidat dan masukkan UUID kandidat | Mengarah ke /talent/:userId dan menampilkan profil kandidat | **PASS** |
+| ADM-06 | Admin | Admin Panel | Happy Flow | Isolasi UI & Rute Khusus Admin Dashboard (BL-32B) | Login sebagai Admin | Cek TopbarNav dan coba buka / atau /teacher atau /profile | TopbarNav hanya tampilkan Admin Dashboard dan akses rute non-admin di-redirect ke /admin | **PASS** |
