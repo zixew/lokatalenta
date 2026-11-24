@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, BookOpen, CheckCircle2, Circle, Compass, Flame, PlayCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Course } from '../../shared/types/lms';
+import type { Course, QuizAttempt } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
@@ -35,6 +35,7 @@ export function CatalogPersonalizationSection({
   enrolledIds,
   completedIds,
   attemptsCount = 0,
+  attempts = [],
   isLoggedIn,
   userId,
   onOpenTarget,
@@ -43,6 +44,7 @@ export function CatalogPersonalizationSection({
   enrolledIds: string[];
   completedIds: string[];
   attemptsCount?: number;
+  attempts?: QuizAttempt[];
   isLoggedIn: boolean;
   userId?: string;
   onOpenTarget: (e: React.MouseEvent, path: string) => void;
@@ -166,7 +168,17 @@ export function CatalogPersonalizationSection({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {enrolledCourses.map((c) => {
               const allLessons = (c.modules ?? []).flatMap((m) => m.lessons);
-              const done = allLessons.filter((l) => completedIds.includes(l.id)).length;
+              const done = allLessons.filter(
+                (l) =>
+                  completedIds.includes(l.id) ||
+                  (l.type === 'quiz' &&
+                    l.quiz != null &&
+                    attempts.some(
+                      (a) =>
+                        a.quiz_id === l.quiz!.id &&
+                        (a.score ?? 0) >= (l.quiz!.passing_score ?? 70)
+                    ))
+              ).length;
               const pct = allLessons.length > 0 ? Math.round((done / allLessons.length) * 100) : 0;
               return (
                 <div

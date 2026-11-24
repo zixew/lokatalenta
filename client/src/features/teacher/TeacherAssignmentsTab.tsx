@@ -44,14 +44,22 @@ export function TeacherAssignmentsTab({
   const [subSearch, setSubSearch] = useState('');
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'submitted' | 'approved' | 'rejected'>('all');
 
-  const { data: assignments = [] } = useQuery({
+  const { data: rawAssignments = [] } = useQuery({
     queryKey: ['all-assignments'],
     queryFn: () => lmsApi.listAllAssignments(),
   });
 
-  const { data: submissions = [] } = useQuery({
+  const { data: rawSubmissions = [] } = useQuery({
     queryKey: ['teacher-submissions'],
     queryFn: () => lmsApi.listAllSubmissionsForTeacher(),
+  });
+
+  const teacherCourseIds = new Set(courses.map((c) => c.id));
+  const assignments = rawAssignments.filter((a) => teacherCourseIds.has(a.course_id));
+  const submissions = rawSubmissions.filter((sub) => {
+    const asg = rawAssignments.find((a) => a.id === sub.assignment_id);
+    const cid = asg?.course_id ?? sub.assignment_id.replace('asg-default-', '');
+    return teacherCourseIds.has(cid);
   });
 
   const createMut = useMutation({
@@ -231,7 +239,11 @@ export function TeacherAssignmentsTab({
                   </div>
                   <button
                     type="button"
-                    onClick={() => deleteMut.mutate(a.id)}
+                    onClick={() => {
+                      if (window.confirm(`Hapus tugas "${a.title}"?`)) {
+                        deleteMut.mutate(a.id);
+                      }
+                    }}
                     className="p-1.5 rounded-lg text-[#71717A] hover:text-rose-600 cursor-pointer"
                     title="Hapus tugas"
                   >
