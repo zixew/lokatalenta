@@ -91,6 +91,8 @@
 | **BL-38C** | `task/bl-38c-student-pov-xp-tryout` | `US-38C` | Pelacak XP Harian real-time (`earnedToday / xpTarget`), tautan aksi Radar 5D, Leaderboard per event Tryout, & search/sort forum Komunitas. | `CAT-08`, `TRY-03` |
 | **BL-38D** | `task/bl-38d-mentor-preview-cohort-mgmt` | `US-38D` | Mode Pratinjau Mentor (`/courses/:slug?preview=true`), manajemen anggota cohort (lihat/keluarkan/arsip), edit metadata kursus/modul, & Ringkasan Mengajar di `/profile`. | `TCH-09` |
 | **BL-38E** | `task/bl-38e-admin-moderation-cert-revoke` | `US-38E` | Modal Preview Kursus read-only di `/admin`, tab Moderasi Komunitas (`deleteCommunityPost`), metrik distribusi role/status, & tab Cabut (*Revoke*) Sertifikat dengan audit log. | `ADM-08` |
+| **BL-38F** | `task/bl-38f-ui-revamp-catalog-bento` | `US-38F` | Revamp UI Katalog & Beranda: Hero Bento Hub (ring XP + quick-launch), *hover elevation*, *quick preview syllabus drawer*, badge fitur, & *skeleton shimmer* loading. | `UIX-01` |
+| **BL-38G** | `task/bl-38g-ui-revamp-player-quiz-charts` | `US-38G` | Revamp UI Course Player & Asesmen: sidebar progress ring per modul, **Zen/Focus Mode**, animasi milestone toast lulus, serta *interactive hover tooltip* pada Kraepelin & Radar 5D. | `UIX-02` |
 
 ---
 
@@ -103,6 +105,7 @@
 | **BL-40** | `task/bl-40-short-answer-questions` | `US-40` | Dukungan tipe soal `short_answer` (isian singkat/rumus) + evaluator case-insensitive di `QuizRunnerPage` & `TeacherStudioPage`. | `TCH-08` |
 | **BL-40B** | `task/bl-40b-star-interview-cohort-item-analysis` | `US-40B` | Latihan Simulasi Interview metode STAR, penugasan/pengumuman bertarget `cohort_id`, drill-down rapor individual siswa, & Analitik Butir Soal (*Item Analysis*). | `CRS-11`, `TCH-10` |
 | **BL-40C** | `task/bl-40c-clone-supervision-broadcast` | `US-40C` | Duplikasi Kursus/Paket Soal di Mentor Studio, Supervisi Cohort lintas pengajar di `/admin`, & Pengumuman Global Platform (*System-Wide Banner*). | `TCH-11`, `ADM-09` |
+| **BL-40D** | `task/bl-40d-ui-revamp-studio-admin-interactive` | `US-40D` | Revamp UI `/teacher` & `/admin`: *drag-and-drop* modul/lesson, *live split preview* soal, *slide-over drawer* detail admin, grafik distribusi interaktif, & modal konfirmasi/toast modern. | `UIX-03` |
 | **BL-41** | `task/bl-41-stress-and-security-v2` | `US-41` | Suite stress test 5.000 operasi (Excel + SQL + Filter + Sanitasi XSS/CSV) sebelum masuk ke v3.0.0. | `PERF-02`, `SEC-02` |
 
 ---
