@@ -277,20 +277,31 @@ export function QuizResultPage() {
                     ({weakestSubtest.total - weakestSubtest.correct} soal perlu diperbaiki).
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="shrink-0"
-                  onClick={() => {
-                    setFilterMode('wrong');
-                    setSelectedSubtest(weakestSubtest.name);
-                    document
-                      .getElementById('quiz-review-section')
-                      ?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Fokus Soal {weakestSubtest.name}
-                </Button>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  {quizId && (
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        navigate(`/quiz/${quizId}?subtest=${encodeURIComponent(weakestSubtest.name)}`)
+                      }
+                    >
+                      Smart Drill {weakestSubtest.name}
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      setFilterMode('wrong');
+                      setSelectedSubtest(weakestSubtest.name);
+                      document
+                        .getElementById('quiz-review-section')
+                        ?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    Fokus Soal {weakestSubtest.name}
+                  </Button>
+                </div>
               </div>
             )}
           </div>
