@@ -161,7 +161,7 @@ export function CoursePlayerPage() {
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        <div className="h-96 bg-white border border-[#E5E3DC] rounded-xl animate-pulse" />
+        <div className="h-96 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -169,7 +169,7 @@ export function CoursePlayerPage() {
   if (!course) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-4">
-        <h1 className="text-2xl font-bold">Kursus tidak ditemukan</h1>
+        <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">Kursus tidak ditemukan</h1>
         <Link to="/">
           <Button variant="secondary">Kembali ke Katalog</Button>
         </Link>
@@ -419,8 +419,8 @@ export function CoursePlayerPage() {
 
               {/* Recent Attempts for this Quiz */}
               {attempts.filter((a) => a.quiz_id === activeLesson.quiz!.id).length > 0 && (
-                <div className="pt-6 border-t border-[#E5E3DC] space-y-3">
-                  <h3 className="text-sm font-bold text-[#18181B] flex items-center gap-2">
+                <div className="pt-6 border-t border-[#E5E3DC] dark:border-slate-800 space-y-3">
+                  <h3 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                     <Trophy className="w-4 h-4 text-[#D97706]" />
                     Riwayat Pengerjaan Anda
                   </h3>
@@ -430,13 +430,13 @@ export function CoursePlayerPage() {
                       .map((att) => (
                         <div
                           key={att.id}
-                          className="flex items-center justify-between p-3.5 rounded-lg border border-[#E5E3DC] bg-[#F6F5F1] text-sm"
+                          className="flex items-center justify-between p-3.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-sm"
                         >
                           <div>
-                            <span className="font-semibold text-[#18181B]">
+                            <span className="font-semibold text-[#18181B] dark:text-white">
                               Skor: {att.score ?? 0}%
                             </span>
-                            <span className="text-xs text-[#71717A] ml-3">
+                            <span className="text-xs text-[#71717A] dark:text-slate-400 ml-3">
                               {att.submitted_at
                                 ? new Date(att.submitted_at).toLocaleString('id-ID')
                                 : ''}
