@@ -25,6 +25,8 @@ import {
   buildWhatsAppShareUrl,
   evaluateChallengeOutcome,
   getActiveChallengeForQuiz,
+  listQuizChallengesAsync,
+  recordQuizChallengeAsync,
 } from './shareAndChallenge';
 
 export function QuizResultPage() {
@@ -57,6 +59,29 @@ export function QuizResultPage() {
     queryKey: ['attempt-result', attemptId],
     queryFn: () => lmsApi.getAttemptResult(attemptId!),
     enabled: Boolean(attemptId),
+  });
+
+  const { data: duelHistory = [] } = useQuery({
+    queryKey: ['quiz-challenges-history', quizId, attemptId, data?.attempt.score],
+    queryFn: async () => {
+      if (!quizId) return [];
+      const activeChallenge = getActiveChallengeForQuiz(quizId);
+      if (activeChallenge && data?.attempt && attemptId) {
+        const res = evaluateChallengeOutcome(data.attempt.score ?? 0, activeChallenge);
+        await recordQuizChallengeAsync({
+          attemptKey: attemptId,
+          quizId,
+          challengerName: activeChallenge.challenger,
+          targetScore: activeChallenge.targetScore,
+          opponentUserId: user?.id,
+          opponentName: user?.full_name || 'Peserta',
+          opponentScore: data.attempt.score ?? 0,
+          outcome: res.outcome,
+        });
+      }
+      return listQuizChallengesAsync(quizId);
+    },
+    enabled: Boolean(quizId && data),
   });
 
   if (isLoading) {
@@ -370,6 +395,45 @@ export function QuizResultPage() {
             </a>
           </div>
         </div>
+
+            {duelHistory.length > 0 && (
+              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-[#71717A] dark:text-slate-400">
+                    Riwayat Duel 1v1 Terbaru
+                  </h3>
+                  <Badge tone="slate">{duelHistory.length} Duel</Badge>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {duelHistory.slice(0, 4).map((d) => (
+                    <div
+                      key={d.id}
+                      className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2 text-xs"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-semibold text-[#18181B] dark:text-white truncate">
+                          {d.opponent_name} vs {d.challenger_name}
+                        </p>
+                        <p className="text-[11px] font-mono-tabular text-[#71717A] dark:text-slate-400">
+                          {d.opponent_score}/100 vs {d.target_score}/100
+                        </p>
+                      </div>
+                      <Badge
+                        tone={
+                          d.outcome === 'win'
+                            ? 'emerald'
+                            : d.outcome === 'draw'
+                              ? 'blue'
+                              : 'amber'
+                        }
+                      >
+                        {d.outcome === 'win' ? 'Menang' : d.outcome === 'draw' ? 'Seri' : 'Kalah'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
       })()}
