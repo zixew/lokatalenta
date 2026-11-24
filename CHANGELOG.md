@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [2.0.1] - 2026-11-24
+
+### Hotfix
+- Stabilization v2.0.1: bug TeacherStudio, single Catatan Pribadi, dark mode, mobile Admin cards, desktop auto-filter & security hardening
+
+---
+
 ## [2.0.0] - 2026-11-24
 
 ### Major
