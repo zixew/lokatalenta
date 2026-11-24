@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  Briefcase,
   ChevronDown,
   GraduationCap,
   Keyboard,
@@ -36,6 +37,35 @@ function buildTopbarNavItems(
         to: '/admin',
         label: 'Admin Dashboard',
         icon: <ShieldCheck className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+      {
+        to: '/recruiter',
+        label: 'Portal Rekruter',
+        icon: <Briefcase className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+    ];
+  }
+
+  if (role === 'recruiter') {
+    return [
+      {
+        to: '/recruiter',
+        label: 'Portal Rekruter',
+        icon: <Briefcase className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+      {
+        to: '/community',
+        label: 'Komunitas',
+        icon: <Users className="w-4 h-4 shrink-0" />,
+        priority: 'primary',
+      },
+      {
+        to: '/profile',
+        label: 'Profil Rekruter',
+        icon: <User className="w-4 h-4 shrink-0" />,
         priority: 'primary',
       },
     ];
