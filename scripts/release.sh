@@ -3,7 +3,7 @@ set -euo pipefail
 
 # LokaTalenta Semantic Versioning, Release Branch & Changelog CLI
 # Usage:
-#   ./scripts/release.sh <patch|minor|major> "<deskripsi perubahan>"
+#   ./scripts/release.sh <hotfix|patch|minor|major> "<deskripsi perubahan>"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLIENT_DIR="$ROOT_DIR/client"
@@ -12,10 +12,15 @@ CHANGELOG_FILE="$ROOT_DIR/CHANGELOG.md"
 BUMP_TYPE="${1:-}"
 DESCRIPTION="${2:-}"
 
-if [[ "$BUMP_TYPE" != "patch" && "$BUMP_TYPE" != "minor" && "$BUMP_TYPE" != "major" ]]; then
-  echo "Error: Tipe versi harus salah satu dari: patch | minor | major"
-  echo "Usage: $0 <patch|minor|major> \"<deskripsi perubahan>\""
+if [[ "$BUMP_TYPE" != "hotfix" && "$BUMP_TYPE" != "patch" && "$BUMP_TYPE" != "minor" && "$BUMP_TYPE" != "major" ]]; then
+  echo "Error: Tipe versi harus salah satu dari: hotfix | patch | minor | major"
+  echo "Usage: $0 <hotfix|patch|minor|major> \"<deskripsi perubahan>\""
   exit 1
+fi
+
+NPM_BUMP="$BUMP_TYPE"
+if [[ "$BUMP_TYPE" == "hotfix" ]]; then
+  NPM_BUMP="patch"
 fi
 
 if [[ -z "${DESCRIPTION// /}" ]]; then
@@ -31,12 +36,14 @@ npm test
 npm run build
 
 echo "==> [2/5] Menaikkan versi ($BUMP_TYPE) di client/package.json..."
-NEW_VERSION="$(npm version "$BUMP_TYPE" --no-git-tag-version | tr -d 'v')"
+NEW_VERSION="$(npm version "$NPM_BUMP" --no-git-tag-version | tr -d 'v')"
 RELEASE_DATE="$(date +%Y-%m-%d)"
 RELEASE_BRANCH="release/$NEW_VERSION"
 
 SECTION_LABEL="Patch"
-if [[ "$BUMP_TYPE" == "minor" ]]; then
+if [[ "$BUMP_TYPE" == "hotfix" ]]; then
+  SECTION_LABEL="Hotfix"
+elif [[ "$BUMP_TYPE" == "minor" ]]; then
   SECTION_LABEL="Minor"
 elif [[ "$BUMP_TYPE" == "major" ]]; then
   SECTION_LABEL="Major"

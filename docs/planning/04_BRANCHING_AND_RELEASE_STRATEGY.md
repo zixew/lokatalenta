@@ -29,7 +29,21 @@ flowchart LR
 | **`dev`** | `main` (sync) | `release/<versi>` | **UAT** (`https://lokatalenta-git-dev-zixew.vercel.app`) | Branch integrasi harian dan **UAT**. Semua branch `feature/*` yang lulus SIT di-merge ke sini. |
 | **`feature/<nama>`** | `dev` | `dev` | **SIT Lokal** (`http://localhost:4179`) | Branch per Epik/Sprint (mis. `feature/sprint7-cloud-notes-and-prefs`). Tempat menggabungkan seluruh `task/*` sebelum SIT. |
 | **`task/<nama>`** | `feature/<nama>` | `feature/<nama>` | Lokal Dev | Branch untuk satu backlog item (mis. `task/bl-21-cloud-lesson-notes`). |
-| **`hotfix/<nama>`** | `main` | `main` & `dev` | **Production** | Perbaikan darurat bug kritis di production. Setelah lolos uji, rilis sebagai patch (`release/1.9.2` → `main` & `dev`). |
+| **`hotfix/<nama>`** | `main` | `release/<X.Y.Z>` → `main` & `dev` | **Production** | Perbaikan darurat bug/issue yang ditemukan di **production** setelah development selesai. Masuk ke versioning **Hotfix (`X.Y.Z`, digit ke-3)**, mis. `1.9.1` → `1.9.2`. |
+
+---
+
+## 2A. Alur & Versioning Hotfix Production (`X.Y.Z`)
+
+Jika terdapat issue di **Production (`main`)** setelah development selesai:
+1. Buat branch `hotfix/<nama-issue>` langsung dari **`main`** (bukan dari `dev` yang mungkin sudah berisi fitur sprint berikutnya).
+2. Perbaiki issue dan verifikasi (`npm run lint`, `npm test`, `npm run build`, serta uji lokal).
+3. Jalankan script rilis dengan tipe **`hotfix`**:
+   ```bash
+   ./scripts/release.sh hotfix "Fix issue production: <deskripsi perbaikan>"
+   ```
+   Script akan menaikkan **digit ke-3 (`X.Y.Z`)**, membuat branch `release/<X.Y.Z>`, dan mencatat bagian `### Hotfix` di `CHANGELOG.md`.
+4. Push `release/<X.Y.Z>` untuk verifikasi, lalu merge ke **`main`** (Production Deploy) dan sync ke **`dev`** agar perbaikan ikut masuk ke development berikutnya.
 
 ---
 
