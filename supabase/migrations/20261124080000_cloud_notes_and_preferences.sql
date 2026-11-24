@@ -1,20 +1,4 @@
--- Migration: BL-21 & BL-22 Cloud Lesson Notes and Study Preferences
-create table if not exists public.lesson_notes (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  lesson_id text not null,
-  note_text text not null default '',
-  updated_at timestamptz not null default now(),
-  unique (user_id, lesson_id)
-);
-
-alter table public.lesson_notes enable row level security;
-
-create policy "Users manage own lesson notes"
-  on public.lesson_notes for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
-
+-- Migration: BL-22 Cloud Study Preferences (lesson_notes already exists in 202611230003_prioritas2_schema.sql)
 create table if not exists public.user_study_preferences (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   learning_goal text not null default 'psikotes',
