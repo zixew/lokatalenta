@@ -66,8 +66,8 @@ export function CompetencyRadarCard({
         {/* Pure SVG 5D Radar */}
         <div className="md:col-span-5 flex justify-center">
           <svg
-            viewBox="-48 -24 316 248"
-            className="w-full max-w-[280px] h-auto select-none"
+            viewBox="-75 -24 370 248"
+            className="w-full max-w-[300px] h-auto select-none"
             role="img"
             aria-label="Grafik Radar Kompetensi 5-Dimensi"
           >
