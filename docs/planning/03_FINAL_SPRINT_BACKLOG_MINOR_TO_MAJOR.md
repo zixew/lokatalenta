@@ -116,6 +116,7 @@ Setiap memulai dan mengakhiri sprint, tim multi-agent (`product-owner`, `solutio
 | **BL-40B** | `task/bl-40b-star-interview-cohort-item-analysis` | `US-40B` | Latihan Simulasi Interview metode STAR, penugasan/pengumuman bertarget `cohort_id`, drill-down rapor individual siswa, & Analitik Butir Soal (*Item Analysis*). | `CRS-11`, `TCH-10` |
 | **BL-40C** | `task/bl-40c-clone-supervision-broadcast` | `US-40C` | Duplikasi Kursus/Paket Soal di Mentor Studio, Supervisi Cohort lintas pengajar di `/admin`, & Pengumuman Global Platform (*System-Wide Banner*). | `TCH-11`, `ADM-09` |
 | **BL-40D** | `task/bl-40d-ui-revamp-studio-admin-interactive` | `US-40D` | Revamp UI `/teacher` & `/admin`: *drag-and-drop* modul/lesson, *live split preview* soal, *slide-over drawer* detail admin, grafik distribusi interaktif, & modal konfirmasi/toast modern. | `UIX-03` |
+| **BL-40E** | `task/bl-40e-ui-layout-usability-research` | `US-40E` | Riset tata letak & keterpahaman UI lintas 3 peran menggunakan subagent `student-pov`, `teacher-pov`, dan `admin-pov` (audit *cognitive load*, kejelasan label/CTA, hierarki visual desktop & mobile) beserta perbaikan tata letak. | `UIX-04` |
 | **BL-41** | `task/bl-41-stress-and-security-v2` | `US-41` | Suite stress test 5.000 operasi (Excel + SQL + Filter + Sanitasi XSS/CSV) sebelum masuk ke v3.0.0. | `PERF-02`, `SEC-02` |
 
 ---
