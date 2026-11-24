@@ -95,7 +95,7 @@ function buildTopbarNavItems(
       to: '/profile',
       label: 'Profil & Progres',
       icon: <User className="w-4 h-4 shrink-0" />,
-      priority: 'overflow',
+      priority: 'primary',
     });
   }
 

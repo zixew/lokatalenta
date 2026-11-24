@@ -49,17 +49,17 @@ export function TeacherInteractionTab({
   const [annTitle, setAnnTitle] = useState('');
   const [annContent, setAnnContent] = useState('');
 
-  const { data: allComments = [] } = useQuery({
+  const { data: rawComments = [] } = useQuery({
     queryKey: ['teacher-all-comments'],
     queryFn: () => lmsApi.listAllCommentsForTeacher(),
   });
 
-  const { data: allMentorMsgs = [] } = useQuery({
+  const { data: rawMentorMsgs = [] } = useQuery({
     queryKey: ['teacher-mentor-messages'],
     queryFn: () => lmsApi.listAllMentorMessagesForTeacher(),
   });
 
-  const { data: sessions = [] } = useQuery({
+  const { data: rawSessions = [] } = useQuery({
     queryKey: ['mentoring-sessions'],
     queryFn: () => lmsApi.listMentoringSessions(),
   });
@@ -69,10 +69,19 @@ export function TeacherInteractionTab({
     queryFn: () => lmsApi.listAllMentoringBookings(),
   });
 
-  const { data: announcements = [] } = useQuery({
+  const { data: rawAnnouncements = [] } = useQuery({
     queryKey: ['course-announcements'],
     queryFn: () => lmsApi.listCourseAnnouncements(),
   });
+
+  const teacherCourseIds = new Set(courses.map((c) => c.id));
+  const teacherLessonIds = new Set(
+    courses.flatMap((c) => (c.modules ?? []).flatMap((m) => m.lessons.map((l) => l.id)))
+  );
+  const allComments = rawComments.filter((c) => teacherLessonIds.has(c.lesson_id));
+  const allMentorMsgs = rawMentorMsgs.filter((m) => teacherCourseIds.has(m.course_id));
+  const sessions = rawSessions.filter((s) => teacherCourseIds.has(s.course_id));
+  const announcements = rawAnnouncements.filter((a) => teacherCourseIds.has(a.course_id));
 
   const createSessionMut = useMutation({
     mutationFn: () =>
@@ -382,7 +391,11 @@ export function TeacherInteractionTab({
                     </div>
                     <button
                       type="button"
-                      onClick={() => deleteSessionMut.mutate(s.id)}
+                      onClick={() => {
+                        if (window.confirm(`Hapus sesi mentoring "${s.title}"?`)) {
+                          deleteSessionMut.mutate(s.id);
+                        }
+                      }}
                       className="text-slate-400 hover:text-rose-600 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -454,7 +467,11 @@ export function TeacherInteractionTab({
                   </div>
                   <button
                     type="button"
-                    onClick={() => deleteAnnMut.mutate(a.id)}
+                    onClick={() => {
+                      if (window.confirm(`Hapus pengumuman "${a.title}"?`)) {
+                        deleteAnnMut.mutate(a.id);
+                      }
+                    }}
                     className="text-slate-400 hover:text-rose-600 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

@@ -34,6 +34,14 @@ export function AdminPanelPage() {
   const { user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
+  const [feedback, setFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
+
+  const showFeedback = (tone: 'success' | 'error', message: string) => {
+    setFeedback({ tone, message });
+    window.setTimeout(() => {
+      setFeedback((prev) => (prev?.message === message ? null : prev));
+    }, 4500);
+  };
 
   const { data: auditLogs = [] } = useQuery({
     queryKey: ['admin-audit-logs'],
@@ -76,6 +84,10 @@ export function AdminPanelPage() {
         detail: `Mengubah role menjadi ${vars.role}`,
       });
       queryClient.setQueryData(['admin-audit-logs'], updated);
+      showFeedback('success', `Role ${targetUser?.full_name || targetUser?.email || 'pengguna'} diubah menjadi ${vars.role}.`);
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal memperbarui role pengguna.');
     },
   });
 
@@ -94,6 +106,10 @@ export function AdminPanelPage() {
         detail: vars.isPublished ? 'Menerbitkan kursus ke katalog' : 'Menarik kursus ke draft',
       });
       queryClient.setQueryData(['admin-audit-logs'], updated);
+      showFeedback('success', vars.isPublished ? 'Kursus berhasil diterbitkan.' : 'Kursus ditarik ke Draft.');
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal memperbarui status publikasi kursus.');
     },
   });
 
@@ -111,8 +127,46 @@ export function AdminPanelPage() {
         detail: vars.isActive ? 'Mengaktifkan kembali akun' : 'Menonaktifkan akun',
       });
       queryClient.setQueryData(['admin-audit-logs'], updated);
+      showFeedback('success', vars.isActive ? 'Akun berhasil diaktifkan.' : 'Akun berhasil dinonaktifkan.');
+    },
+    onError: (err: Error) => {
+      showFeedback('error', err.message || 'Gagal memperbarui status akun.');
     },
   });
+
+  const handleRoleChange = (userId: string, role: UserRole) => {
+    const target = profiles.find((p) => p.id === userId);
+    if (target?.role === role) return;
+    if (
+      role === 'admin' &&
+      !window.confirm(`Promosikan ${target?.full_name || target?.email || 'pengguna'} menjadi Admin?`)
+    ) {
+      return;
+    }
+    updateRoleMut.mutate({ userId, role });
+  };
+
+  const handleToggleActive = (userId: string, isActive: boolean) => {
+    const target = profiles.find((p) => p.id === userId);
+    if (
+      !isActive &&
+      !window.confirm(`Nonaktifkan akun ${target?.full_name || target?.email || 'pengguna'}?`)
+    ) {
+      return;
+    }
+    toggleActiveMut.mutate({ userId, isActive });
+  };
+
+  const handleTogglePublish = (courseId: string, isPublished: boolean) => {
+    const target = courses.find((c) => c.id === courseId);
+    if (
+      !isPublished &&
+      !window.confirm(`Tarik kursus "${target?.title || ''}" dari katalog ke Draft?`)
+    ) {
+      return;
+    }
+    togglePublishMut.mutate({ courseId, isPublished });
+  };
 
   const filteredProfiles = useMemo(() => {
     const q = userSearch.trim().toLowerCase();
@@ -205,6 +259,20 @@ export function AdminPanelPage() {
           </div>
         </div>
       </div>
+
+      {/* Feedback Banner */}
+      {feedback && (
+        <div
+          role="status"
+          className={`px-4 py-3 rounded-xl border text-sm font-medium ${
+            feedback.tone === 'error'
+              ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
+              : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
 
       {/* Section Switcher Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
@@ -358,7 +426,7 @@ export function AdminPanelPage() {
                           key={role}
                           type="button"
                           disabled={updateRoleMut.isPending || isSelf}
-                          onClick={() => updateRoleMut.mutate({ userId: p.id, role })}
+                          onClick={() => handleRoleChange(p.id, role)}
                           className={`py-1.5 rounded-md text-xs font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                             p.role === role
                               ? 'bg-[#0F766E] text-white'
@@ -375,7 +443,7 @@ export function AdminPanelPage() {
                       className="w-full"
                       disabled={toggleActiveMut.isPending || isSelf}
                       onClick={() =>
-                        toggleActiveMut.mutate({ userId: p.id, isActive: p.is_active === false })
+                        handleToggleActive(p.id, p.is_active === false)
                       }
                     >
                       {isSelf
@@ -442,7 +510,7 @@ export function AdminPanelPage() {
                                     : undefined
                                 }
                                 onClick={() =>
-                                  updateRoleMut.mutate({ userId: p.id, role: roleOpt })
+                                  handleRoleChange(p.id, roleOpt)
                                 }
                                 className={`px-2.5 py-1 text-xs font-semibold transition-colors ${
                                   isSelf ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
@@ -476,10 +544,7 @@ export function AdminPanelPage() {
                                   : undefined
                               }
                               onClick={() =>
-                                toggleActiveMut.mutate({
-                                  userId: p.id,
-                                  isActive: p.is_active === false,
-                                })
+                                handleToggleActive(p.id, p.is_active === false)
                               }
                             >
                               {isSelf
@@ -617,7 +682,7 @@ export function AdminPanelPage() {
                     className="w-full"
                     disabled={togglePublishMut.isPending}
                     onClick={() =>
-                      togglePublishMut.mutate({ courseId: c.id, isPublished: !c.is_published })
+                      handleTogglePublish(c.id, !c.is_published)
                     }
                   >
                     {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}
@@ -657,10 +722,7 @@ export function AdminPanelPage() {
                         variant={c.is_published ? 'secondary' : 'primary'}
                         size="sm"
                         onClick={() =>
-                          togglePublishMut.mutate({
-                            courseId: c.id,
-                            isPublished: !c.is_published,
-                          })
+                          handleTogglePublish(c.id, !c.is_published)
                         }
                       >
                         {c.is_published ? 'Tarik ke Draft' : 'Terbitkan'}

@@ -347,12 +347,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false;
     }
 
+    const demoUser = getStoredProfiles().find((p) => p.id === currentUser.id);
+    const isDemoDeactivated = demoUser?.is_active === false;
     const remoteDemoToken = localStorage.getItem(`${DEMO_ACTIVE_SESSION_PREFIX}${currentUser.id}`);
-    if (localToken && remoteDemoToken && remoteDemoToken !== localToken) {
+    const isDemoDisplaced = Boolean(localToken && remoteDemoToken && remoteDemoToken !== localToken);
+    if (isDemoDeactivated || isDemoDisplaced) {
       localStorage.removeItem(LAST_ACTIVITY_KEY);
       localStorage.removeItem(SESSION_USER_ID_KEY);
       localStorage.removeItem(ACTIVE_SESSION_TOKEN_KEY);
-      set({ user: null, sessionDisplaced: true });
+      set({ user: null, sessionDisplaced: isDemoDisplaced });
       return true;
     }
     return false;

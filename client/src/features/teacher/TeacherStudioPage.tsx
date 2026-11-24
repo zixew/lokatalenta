@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { lmsApi } from '../../shared/services/lmsApi';
+import { sanitizeCsvCell } from '../../shared/lib/securityGuards';
 import type { Course, Lesson, QuizOption } from '../../shared/types/lms';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
@@ -128,6 +129,12 @@ export function TeacherStudioPage() {
     enabled: Boolean(user),
   });
 
+  const { data: allAssignments = [] } = useQuery({
+    queryKey: ['all-assignments'],
+    queryFn: () => lmsApi.listAllAssignments(),
+    enabled: Boolean(user),
+  });
+
   const { data: allSubmissions = [] } = useQuery({
     queryKey: ['teacher-submissions'],
     queryFn: () => lmsApi.listAllSubmissionsForTeacher(),
@@ -140,8 +147,19 @@ export function TeacherStudioPage() {
     enabled: Boolean(user),
   });
 
-  const pendingSubmissionsCount = allSubmissions.filter((s) => s.status === 'submitted').length;
-  const unansweredQaCount = allComments.filter((c) => !c.has_mentor_reply).length;
+  const teacherCourseIds = new Set(courses.map((c) => c.id));
+  const teacherLessonIds = new Set(
+    courses.flatMap((c) => (c.modules ?? []).flatMap((m) => m.lessons.map((l) => l.id)))
+  );
+  const pendingSubmissionsCount = allSubmissions.filter((s) => {
+    if (s.status !== 'submitted') return false;
+    const asg = allAssignments.find((a) => a.id === s.assignment_id);
+    const cid = asg?.course_id ?? s.assignment_id.replace('asg-default-', '');
+    return teacherCourseIds.has(cid);
+  }).length;
+  const unansweredQaCount = allComments.filter(
+    (c) => !c.has_mentor_reply && teacherLessonIds.has(c.lesson_id)
+  ).length;
 
   const quizzes = courses.flatMap((c) =>
     (c.modules ?? []).flatMap((m) =>
@@ -265,6 +283,7 @@ export function TeacherStudioPage() {
       resetQuestionForm();
       showSuccess('Soal baru berhasil ditambahkan.');
     },
+    onError: (err: Error) => setErrorBanner(err.message),
   });
 
   const updateQuestionMut = useMutation({
@@ -314,6 +333,7 @@ export function TeacherStudioPage() {
       resetQuestionForm();
       showSuccess('Soal berhasil diperbarui secara in-place.');
     },
+    onError: (err: Error) => setErrorBanner(err.message),
   });
 
   const deleteModuleMut = useMutation({
@@ -323,6 +343,7 @@ export function TeacherStudioPage() {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       showSuccess('Modul berhasil dihapus.');
     },
+    onError: (err: Error) => setErrorBanner(err.message),
   });
 
   const deleteLessonMut = useMutation({
@@ -332,6 +353,7 @@ export function TeacherStudioPage() {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       showSuccess('Materi berhasil dihapus.');
     },
+    onError: (err: Error) => setErrorBanner(err.message),
   });
 
   const updateLessonMut = useMutation({
@@ -375,6 +397,7 @@ export function TeacherStudioPage() {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       showSuccess('Soal berhasil dihapus.');
     },
+    onError: (err: Error) => setErrorBanner(err.message),
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -399,7 +422,7 @@ export function TeacherStudioPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">Teacher Studio</h1>
+          <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">Mentor Studio</h1>
           <p className="text-sm text-[#52525B] dark:text-slate-300 mt-0.5">
             Susun kursus, kelola bank soal dengan gambar, atur waktu tes, dan pantau progres siswa.
           </p>
@@ -628,7 +651,11 @@ export function TeacherStudioPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => deleteQuestionMut.mutate(q.id)}
+                        onClick={() => {
+                          if (window.confirm('Hapus soal ini secara permanen?')) {
+                            deleteQuestionMut.mutate(q.id);
+                          }
+                        }}
                         className="p-1.5 text-slate-400 hover:text-rose-600 cursor-pointer"
                         title="Hapus soal"
                       >
@@ -1153,7 +1180,11 @@ export function TeacherStudioPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => deleteModuleMut.mutate(mod.id)}
+                            onClick={() => {
+                              if (window.confirm(`Hapus modul "${mod.title}" beserta seluruh materinya?`)) {
+                                deleteModuleMut.mutate(mod.id);
+                              }
+                            }}
                             className="p-1 rounded text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
                             title="Hapus modul"
                           >
@@ -1214,7 +1245,11 @@ export function TeacherStudioPage() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => deleteLessonMut.mutate(les.id)}
+                                onClick={() => {
+                                  if (window.confirm(`Hapus materi "${les.title}"?`)) {
+                                    deleteLessonMut.mutate(les.id);
+                                  }
+                                }}
                                 className="p-1 rounded text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
                                 title="Hapus materi"
                               >
@@ -1325,7 +1360,15 @@ export function TeacherStudioPage() {
                         r.total_lessons > 0
                           ? Math.round((r.completed_lessons / r.total_lessons) * 100)
                           : 0;
-                      return `"${r.student_name}","${r.student_email}","${r.course_title}",${r.completed_lessons},${r.total_lessons},${pct}%,${r.latest_quiz_score ?? '-'}`;
+                      return [
+                        sanitizeCsvCell(r.student_name),
+                        sanitizeCsvCell(r.student_email),
+                        sanitizeCsvCell(r.course_title),
+                        String(r.completed_lessons),
+                        String(r.total_lessons),
+                        `${pct}%`,
+                        sanitizeCsvCell(String(r.latest_quiz_score ?? '-')),
+                      ].join(',');
                     })
                     .join('\n');
                   const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });

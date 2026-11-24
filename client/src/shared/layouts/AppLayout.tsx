@@ -6,6 +6,8 @@ import {
   Moon,
   ShieldCheck,
   Sun,
+  Timer,
+  Trophy,
   User,
   UserCheck,
   Users,
@@ -64,8 +66,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Notifications */}
-            <NotificationBell />
+            {/* Notifications (non-admin) */}
+            {user?.role !== 'admin' && <NotificationBell />}
 
             {/* Theme Toggle */}
             <button
@@ -217,6 +219,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                         : 'text-[#52525B] dark:text-slate-300'
                     }`}
                   >
+                    <Timer className="w-4 h-4" />
                     Tes Kraepelin
                   </Link>
 
@@ -229,6 +232,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                         : 'text-[#52525B] dark:text-slate-300'
                     }`}
                   >
+                    <Trophy className="w-4 h-4" />
                     Tryout Akbar
                   </Link>
 

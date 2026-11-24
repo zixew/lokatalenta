@@ -174,7 +174,7 @@ export function ProfilePage() {
                   {user.role === 'student'
                     ? 'Pelajar'
                     : user.role === 'teacher'
-                    ? 'Pengajar'
+                    ? 'Mentor'
                     : 'Admin'}
                 </Badge>
               </div>
@@ -347,8 +347,16 @@ export function ProfilePage() {
                   <div className="space-y-4">
                     {enrolledCourses.map((course) => {
                       const lessons = (course.modules ?? []).flatMap((m) => m.lessons);
-                      const done = lessons.filter((l) =>
-                        completedLessonIds.includes(l.id)
+                      const done = lessons.filter(
+                        (l) =>
+                          completedLessonIds.includes(l.id) ||
+                          (l.type === 'quiz' &&
+                            l.quiz != null &&
+                            attempts.some(
+                              (a) =>
+                                a.quiz_id === l.quiz!.id &&
+                                (a.score ?? 0) >= (l.quiz!.passing_score ?? 70)
+                            ))
                       ).length;
                       const pct =
                         lessons.length > 0 ? Math.round((done / lessons.length) * 100) : 0;
