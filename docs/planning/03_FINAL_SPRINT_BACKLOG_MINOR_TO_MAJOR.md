@@ -64,6 +64,7 @@
 | **BL-30** | `task/bl-30-competency-radar` | `US-30` | Kalkulator `computeTalentRadarMetrics` (5 dimensi: *Verbal*, *Numerik*, *Logika & Spasial*, *Ketahanan Kraepelin*, *Bahasa & Materi*) + komponen visual `CompetencyRadarCard.tsx` di `ProfilePage.tsx`. | `PRF-04` |
 | **BL-31** | `task/bl-31-talent-passport-page` | `US-31` | Halaman publik baru `TalentPassportPage.tsx` (`/talent/:userId`), tombol **Buka & Bagikan Talent Passport** di `ProfilePage.tsx`, serta registrasi rute di `AppRouter.tsx`. | `TLN-01` |
 | **BL-32** | `task/bl-32-recruiter-verify-2-0` | `US-32` | Upgrade `VerifyCertificatePage.tsx` (`/verify`) dengan tab/pencarian **Cek Talent Passport Kandidat** + unit test `sprint10Features.test.ts` + rilis major `./scripts/release.sh major`. | `CRT-03` |
+| **BL-32B** | `task/bl-32b-admin-only-ui-isolation` | `US-32B` | Isolasi penuh UI & rute khusus Admin: `TopbarNav` hanya menampilkan navigasi **Admin Dashboard** saat login sebagai `admin`, dan `AppRouter.tsx` me-redirect akses admin ke rute Pelajar (`/`, `/courses/*`, `/quiz/*`, `/kraepelin`, `/tryout`, `/community`, `/profile`, `/certificate`) maupun Pengajar (`/teacher`) menuju `/admin`. | `ADM-06` |
 
 ---
 
