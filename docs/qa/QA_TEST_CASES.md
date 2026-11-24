@@ -1,8 +1,8 @@
-# Dokumen QA Test Cases — LokaTalenta (`v2.3.0`)
+# Dokumen QA Test Cases — LokaTalenta (`v3.0.0`)
 
 > [!NOTE]
 > Sumber utama matriks QA tersedia dalam format Excel terstruktur: [QA_TEST_CASES_LOKATALENTA.xlsx](file:///Users/a2299/Documents/Projects/lms-psikotes/docs/qa/QA_TEST_CASES_LOKATALENTA.xlsx).
-> Total skenario terverifikasi: **107** (0 duplikasi ID).
+> Total skenario terverifikasi: **112** (0 duplikasi ID).
 
 | ID | Role | Modul | Tipe Flow | Judul Skenario | Prasyarat | Langkah Uji | Ekspektasi Hasil | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -113,3 +113,8 @@
 | UIX-04 | All | Multi-POV UI Layout | Happy Flow | Multi-POV UI Layout & Navigasi Terpadu (BL-40E) | Buka `/profile`, Course Player mobile, `/tryout`, `/teacher`, & `/admin` | Periksa 4-tab Profile, mobile drawer kurikulum, single CTA Tryout, CTA Pratinjau Siswa, & URL sync `?tab=` | Layout responsif terpadu di ketiga role dengan 0 horizontal overflow dan navigasi intuitif | **PASS** |
 | PERF-02 | System | Performance & Stress | Happy Flow | Automated Stress Benchmark 5.000 Operasi (BL-41) | Jalankan suite vitest sprint13StressAndSecurity.test.ts | Eksekusi 5.000 operasi formula, SQL, katalog, isian singkat, dan sanitasi | Seluruh benchmark tereksekusi di bawah latency budget (Formula < 60ms, SQL < 100ms, Filter < 30ms, Short Answer < 50ms) | **PASS** |
 | SEC-02 | System | Security Hardening | Happy Flow | Sandbox SQL Injection, DDL Blocking & XSS Neutralization (BL-41) | Jalankan suite vitest sprint13StressAndSecurity.test.ts | Uji payload DROP/DELETE/TRUNCATE/UNION SQL, XSS script injection, dan formula injection CSV | Seluruh query destruktif DDL/DML terblokir 100%, XSS ternetralisir, dan CSV formula prefix di-escape aman | **PASS** |
+| REC-01 | Recruiter/Admin | Portal Rekruter | Happy Flow | Radar 5D & Kraepelin Search Filter & Shortlist (BL-42) | Login sebagai Recruiter atau Admin di `/recruiter` | Filter skor minimum Radar 5D, Kraepelin KPM, dan tambah ke Shortlist | Hasil talent terfilter presisi real-time, badge skor akurat, dan kandidat masuk drawer shortlist | **PASS** |
+| REC-02 | Recruiter/Student | Asesmen Kustom | Happy Flow | Custom Assessment Invite Generator & Co-Branding Badge (BL-43) | Buka modal Buat Undangan di `/recruiter` lalu buka tautan `/quiz/:quizId?org=...&invite=...` | Salin tautan undangan asesmen kustom dan kerjakan kuis sebagai kandidat | Tautan memuat token unik dan header kuis menampilkan co-branding badge resmi organisasi | **PASS** |
+| ADM-10 | Admin | Admin Panel | Happy Flow | Multi-Tenant Organization & Role Recruiter RBAC (BL-44) | Login sebagai Admin di `/admin` tab Pengguna | Ubah role akun ke `Rekruter`, filter role, dan periksa akses rute `/recruiter` | Badge rose `Rekruter` tampil, tersimpan di database, dan pengguna mendapatkan akses resmi Portal Rekruter | **PASS** |
+| UIX-05 | All | Visual System | Happy Flow | Anti-AI-Slop High-Craft UI Polish & 3D AI Office Integration (BL-45) | Buka `/recruiter`, `/tryout`, `/profile`, `/admin`, dan artefak `kantor_ai_3d.html` | Inspeksi tipografi editorial, ketiadaan neon blur murahan, batas 1px kontras, densitas kartu, dan canvas 3D 15 agen | Desain bersih berdensitas tinggi, nuansa profesional enterprise, dan 15 pod agen 3D interaktif | **PASS** |
+| E2E-03 | System | Regression E2E | Happy Flow | Suite E2E Sprint 14 & Verifikasi Major v3.0.0 (BL-44) | CI / Local test suite `sprint14RecruiterFeatures.test.ts` | Jalankan 27 suite vitest (163 test), linter oxlint, dan typecheck build | Seluruh 163 unit/integration test lulus 100%, 0 lint error/warning, dan bundle JS chunk < 250 kB | **PASS** |

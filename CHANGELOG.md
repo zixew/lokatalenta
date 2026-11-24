@@ -19,6 +19,13 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [3.0.0] - 2026-11-24
+
+### Major
+- LokaTalenta 3.0 (v3.0.0): Recruiter Portal, Custom Assessment Invites, Multi-Tenant Role & Anti-AI-Slop Visual Revamp
+
+---
+
 ## [2.3.0] - 2026-11-24
 
 ### Minor

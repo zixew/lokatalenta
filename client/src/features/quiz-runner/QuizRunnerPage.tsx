@@ -36,6 +36,8 @@ export function QuizRunnerPage() {
   const [searchParams] = useSearchParams();
   const challengeInfo = parseChallengeParams(searchParams.toString());
   const subtestFilter = searchParams.get('subtest')?.trim() ?? '';
+  const inviteToken = searchParams.get('invite')?.trim() ?? '';
+  const orgParam = searchParams.get('org')?.trim() ?? '';
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -324,6 +326,13 @@ export function QuizRunnerPage() {
     return (
       <div className="min-h-screen bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-2xl rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] p-6 sm:p-8 shadow-sm space-y-6">
+          {inviteToken && (
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F766E]/10 text-[#0F766E] dark:text-teal-300 border border-[#0F766E]/30">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F766E] dark:text-teal-400" />
+              <span>Undangan Asesmen Rekrutmen: <strong>{orgParam || 'Perusahaan Mitra'}</strong> (Token: <code className="font-mono">{inviteToken}</code>)</span>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0F766E] dark:text-teal-400">
               <Lock className="w-3.5 h-3.5" />
@@ -414,9 +423,16 @@ export function QuizRunnerPage() {
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0">
-              <p className="text-[11px] sm:text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase tracking-wider">
-                Latihan Soal
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] sm:text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase tracking-wider">
+                  Latihan Soal
+                </p>
+                {inviteToken && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#0F766E]/15 text-[#0F766E] dark:text-teal-300 border border-[#0F766E]/30 uppercase">
+                    {orgParam || 'Asesmen Mitra'}
+                  </span>
+                )}
+              </div>
               <h1 className="text-sm sm:text-base font-bold text-[#18181B] dark:text-white truncate">
                 {quizTitle}
               </h1>

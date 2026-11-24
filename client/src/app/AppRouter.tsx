@@ -55,6 +55,11 @@ const TalentPassportPage = lazy(() =>
     default: m.TalentPassportPage,
   }))
 );
+const RecruiterPortalPage = lazy(() =>
+  import('../features/recruiter/RecruiterPortalPage').then((m) => ({
+    default: m.RecruiterPortalPage,
+  }))
+);
 const TeacherStudioPage = lazy(() =>
   import('../features/teacher/TeacherStudioPage').then((m) => ({
     default: m.TeacherStudioPage,
@@ -82,7 +87,13 @@ function RequireRole({ roles, children }: { roles: UserRole[]; children: ReactNo
   if (!user) return <Navigate to="/auth" replace />;
   if (!roles.includes(user.role)) {
     const home =
-      user.role === 'admin' ? '/admin' : user.role === 'teacher' ? '/teacher' : '/';
+      user.role === 'admin'
+        ? '/admin'
+        : user.role === 'teacher'
+        ? '/teacher'
+        : user.role === 'recruiter'
+        ? '/recruiter'
+        : '/';
     return <Navigate to={home} replace />;
   }
   return <>{children}</>;
@@ -93,6 +104,7 @@ function RedirectNonStudentHome({ children }: { children: ReactNode }) {
   if (!initialized) return <PageLoader />;
   if (user?.role === 'admin') return <Navigate to="/admin" replace />;
   if (user?.role === 'teacher') return <Navigate to="/teacher" replace />;
+  if (user?.role === 'recruiter') return <Navigate to="/recruiter" replace />;
   return <>{children}</>;
 }
 
@@ -101,6 +113,7 @@ function RedirectAuthenticatedFromAuth({ children }: { children: ReactNode }) {
   if (!initialized) return <PageLoader />;
   if (user?.role === 'admin') return <Navigate to="/admin" replace />;
   if (user?.role === 'teacher') return <Navigate to="/teacher" replace />;
+  if (user?.role === 'recruiter') return <Navigate to="/recruiter" replace />;
   return <>{children}</>;
 }
 
@@ -176,6 +189,14 @@ export function AppRouter() {
                   <Route path="/verify" element={<VerifyCertificatePage />} />
                   <Route path="/verify/:certCode" element={<VerifyCertificatePage />} />
                   <Route path="/talent/:userId" element={<TalentPassportPage />} />
+                  <Route
+                    path="/recruiter"
+                    element={
+                      <RequireRole roles={['recruiter', 'admin']}>
+                        <RecruiterPortalPage />
+                      </RequireRole>
+                    }
+                  />
                   <Route
                     path="/courses/:slug"
                     element={

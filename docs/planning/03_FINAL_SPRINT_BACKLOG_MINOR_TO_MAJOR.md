@@ -121,7 +121,7 @@ Setiap memulai dan mengakhiri sprint, tim multi-agent (`product-owner`, `solutio
 
 ---
 
-### Sprint 14 — LokaTalenta 3.0: Recruiter Portal & Multi-Tenant Assessment (`v3.0.0` • MAJOR)
+### Sprint 14 — LokaTalenta 3.0: Recruiter Portal, Multi-Tenant & Anti-AI-Slop UI Revamp (`v3.0.0` • MAJOR)
 - **Branch Feature:** `feature/sprint14-lokatalenta-3-0-recruiter`
 
 | ID | Branch Task | User Story | Scope Implementasi | Test Case QA |
@@ -129,3 +129,4 @@ Setiap memulai dan mengakhiri sprint, tim multi-agent (`product-owner`, `solutio
 | **BL-42** | `task/bl-42-recruiter-portal` | `US-42` | Halaman baru `RecruiterPortalPage.tsx` (`/recruiter`) dengan filter Radar 5D, skor Kraepelin, & Shortlist Kandidat. | `REC-01` |
 | **BL-43** | `task/bl-43-custom-assessment-invite` | `US-43` | Generator tautan undangan asesmen perusahaan (`/quiz/:quizId?org=...&invite=...`) + badge organisasi di `QuizRunnerPage`. | `REC-02` |
 | **BL-44** | `task/bl-44-multitenant-role-v3` | `US-44` | Penambahan role `recruiter` di `UserRole`, `AdminPanelPage`, `TopbarNav`, E2E regression, & rilis major **`v3.0.0`**. | `ADM-10`, `E2E-03` |
+| **BL-45** | `task/bl-45-anti-ai-slop-ui-revamp` | `US-45` | **Anti-AI-Slop Visual System & High-Craft UI Revamp**: Menghapus efek pastel/neon blur murahan, beralih ke tipografi tajam editorial berhierarki tegas, batas 1px kontras (`border-zinc-200/800`), kartu berdensitas informasi tinggi, micro-interaction taktil, dan visualisasi Kantor AI 3D interaktif. | `UIX-05` |
