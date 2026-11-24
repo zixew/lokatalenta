@@ -16,6 +16,17 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
+import { syncKraepelinHistoryFromServer } from '../kraepelin/kraepelinHistory';
+import { CompetencyRadarCard } from '../talent/CompetencyRadarCard';
+import {
+  getPassportVisibilityLocal,
+  listUserCertificatesAsync,
+  setPassportVisibilityAsync,
+} from '../talent/talentApi';
+import {
+  computeTalentRadarMetrics,
+  extractCategoryScoresFromAttempts,
+} from '../talent/talentRadar';
 import { GamificationAnalyticsSection } from './GamificationAnalyticsSection';
 
 export function ProfilePage() {
@@ -23,6 +34,9 @@ export function ProfilePage() {
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [savedMsg, setSavedMsg] = useState('');
+  const [passportPublic, setPassportPublic] = useState(() =>
+    user ? getPassportVisibilityLocal(user.id) : true
+  );
 
   const { data: courses = [] } = useQuery({
     queryKey: ['courses', 'published'],
@@ -44,6 +58,18 @@ export function ProfilePage() {
   const { data: attempts = [] } = useQuery({
     queryKey: ['quiz-attempts', user?.id],
     queryFn: () => (user ? lmsApi.listUserAttempts(user.id) : Promise.resolve([])),
+    enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const { data: kraepelinHistory = [] } = useQuery({
+    queryKey: ['kraepelin-history', user?.id ?? 'guest'],
+    queryFn: () => syncKraepelinHistoryFromServer(user?.id),
+    enabled: Boolean(user && user.role === 'student'),
+  });
+
+  const { data: userCertificates = [] } = useQuery({
+    queryKey: ['user-certificates', user?.id],
+    queryFn: () => (user ? listUserCertificatesAsync(user.id) : Promise.resolve([])),
     enabled: Boolean(user && user.role === 'student'),
   });
 
@@ -221,6 +247,53 @@ export function ProfilePage() {
                 enrolledCount={enrolledCourses.length}
                 quizTitleMap={quizTitleMap}
               />
+
+              {/* BL-30 & BL-31: 5D Competency Radar & Talent Passport */}
+              <CompetencyRadarCard
+                metrics={computeTalentRadarMetrics({
+                  categoryScores: extractCategoryScoresFromAttempts(attempts),
+                  avgQuizScore: avgScore,
+                  kraepelinHistory,
+                  completedLessonsCount: completedLessonIds.length,
+                  certificatesCount: userCertificates.length,
+                })}
+              />
+
+              <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-[#18181B] dark:text-white">
+                      Talent Readiness Passport 2.0
+                    </h3>
+                    <Badge tone={passportPublic ? 'emerald' : 'slate'}>
+                      {passportPublic ? 'Publik' : 'Privat'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-[#71717A] dark:text-slate-400">
+                    Bagikan profil kesiapan karier &amp; sertifikat terverifikasi kepada perekrut.
+                  </p>
+                  <label className="inline-flex items-center gap-2 pt-1 text-xs font-medium text-[#52525B] dark:text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={passportPublic}
+                      onChange={async (e) => {
+                        const next = e.target.checked;
+                        setPassportPublic(next);
+                        await setPassportVisibilityAsync(user.id, next);
+                      }}
+                      className="rounded border-slate-300 text-[#0F766E] focus:ring-[#0F766E]"
+                    />
+                    Izinkan perekrut melihat Talent Passport saya secara publik
+                  </label>
+                </div>
+
+                <Link to={`/talent/${encodeURIComponent(user.id)}`} className="shrink-0">
+                  <Button variant="primary" size="sm">
+                    <ShieldCheck className="w-4 h-4" />
+                    Buka &amp; Bagikan Talent Passport
+                  </Button>
+                </Link>
+              </section>
 
               {/* Enrolled Courses Progress */}
               <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">

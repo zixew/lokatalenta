@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Award, CheckCircle2, Search, ShieldAlert } from 'lucide-react';
+import { Award, CheckCircle2, Compass, Search, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { lmsApi } from '../../shared/services/lmsApi';
@@ -10,7 +10,9 @@ import { Button } from '../../shared/ui/Button';
 export function VerifyCertificatePage() {
   const { certCode = '' } = useParams<{ certCode?: string }>();
   const navigate = useNavigate();
+  const [verifyTab, setVerifyTab] = useState<'certificate' | 'passport'>('certificate');
   const [inputCode, setInputCode] = useState(certCode);
+  const [passportIdInput, setPassportIdInput] = useState('');
 
   const { data: cert, isLoading } = useQuery({
     queryKey: ['verify-certificate', certCode],
@@ -20,8 +22,14 @@ export function VerifyCertificatePage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputCode.trim()) {
-      navigate(`/verify/${encodeURIComponent(inputCode.trim().toUpperCase())}`);
+    if (verifyTab === 'certificate') {
+      if (inputCode.trim()) {
+        navigate(`/verify/${encodeURIComponent(inputCode.trim().toUpperCase())}`);
+      }
+      return;
+    }
+    if (passportIdInput.trim()) {
+      navigate(`/talent/${encodeURIComponent(passportIdInput.trim())}`);
     }
   };
 
@@ -32,26 +40,65 @@ export function VerifyCertificatePage() {
           <BrandLogo className="w-10 h-10 shrink-0" />
           <div>
             <h1 className="text-xl font-bold text-[#18181B] dark:text-white">
-              Verifikasi Sertifikat LokaTalenta
+              Portal Verifikasi LokaTalenta 2.0
             </h1>
             <p className="text-xs text-[#71717A] dark:text-slate-400">
-              Periksa keaslian nomor sertifikat kelulusan peserta secara publik.
+              Verifikasi keaslian sertifikat kelulusan atau periksa Talent Readiness Passport kandidat.
             </p>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setVerifyTab('certificate')}
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
+              verifyTab === 'certificate'
+                ? 'bg-[#0F766E] text-white'
+                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            Verifikasi Sertifikat
+          </button>
+          <button
+            type="button"
+            onClick={() => setVerifyTab('passport')}
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
+              verifyTab === 'passport'
+                ? 'bg-[#0F766E] text-white'
+                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            Cek Talent Passport Kandidat
+          </button>
         </div>
 
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={inputCode}
-              onChange={(e) => setInputCode(e.target.value)}
-              placeholder="Masukkan nomor sertifikat (contoh: LT-XXXX-XXXX-2026)"
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-            />
+            {verifyTab === 'certificate' ? (
+              <input
+                type="text"
+                value={inputCode}
+                onChange={(e) => setInputCode(e.target.value)}
+                placeholder="Masukkan nomor sertifikat (contoh: LT-XXXX-XXXX-2026)"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              />
+            ) : (
+              <input
+                type="text"
+                value={passportIdInput}
+                onChange={(e) => setPassportIdInput(e.target.value)}
+                placeholder="Masukkan ID Talent Passport kandidat (UUID)"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              />
+            )}
           </div>
-          <Button type="submit">Verifikasi</Button>
+          <Button type="submit">
+            {verifyTab === 'certificate' ? 'Verifikasi' : 'Buka Passport'}
+          </Button>
         </form>
 
         {certCode.trim() && (
