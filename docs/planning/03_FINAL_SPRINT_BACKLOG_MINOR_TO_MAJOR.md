@@ -1,7 +1,7 @@
 # Final Product & Sprint Backlog (`BL-21` s.d. `BL-32`) — Minor ke Major (`v1.10.0` → `v2.0.0`)
 
 **Baseline Saat Ini:** `v1.9.1`  
-**Alur GitFlow Wajib:** `feature/<sprint>` → `task/<bl-id>` → merge ke `feature/*` → **SIT** → merge ke `dev` (**UAT**) → merge ke `prod` (**Staging**) → merge ke `main` (**Full Release + Tag**)
+**Alur GitFlow Wajib:** `task/<bl-id>` → `feature/<sprint>` → **SIT** → `dev` (**UAT**) → `release/<versi>` (**Staging & Release Notes**) → `main` (**Production Deploy**) → sync `main` → `dev`
 
 ---
 

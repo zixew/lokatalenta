@@ -4,17 +4,18 @@ on:
   push:
     branches:
       - dev
-      - prod
+      - 'release/**'
+      - main
   workflow_dispatch:
     inputs:
       target:
-        description: 'Target environment (dev or prod)'
+        description: 'Target environment (dev or main)'
         required: true
         default: 'dev'
         type: choice
         options:
           - dev
-          - prod
+          - main
 
 jobs:
   backend-check:
@@ -45,7 +46,7 @@ jobs:
           done
 
       - name: Apply Supabase Migrations (Prod) when SUPABASE_DB_URL_PROD secret is set
-        if: (github.ref == 'refs/heads/prod' || inputs.target == 'prod') && env.HAS_DB_URL == 'true'
+        if: (github.ref == 'refs/heads/main' || inputs.target == 'main') && env.HAS_DB_URL == 'true'
         env:
           HAS_DB_URL: ${{ secrets.SUPABASE_DB_URL_PROD != '' }}
           SUPABASE_DB_URL_PROD: ${{ secrets.SUPABASE_DB_URL_PROD }}

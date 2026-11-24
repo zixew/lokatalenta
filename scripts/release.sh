@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# LokaTalenta Semantic Versioning & Changelog CLI
+# LokaTalenta Semantic Versioning, Release Branch & Changelog CLI
 # Usage:
 #   ./scripts/release.sh <patch|minor|major> "<deskripsi perubahan>"
 
@@ -19,20 +19,21 @@ if [[ "$BUMP_TYPE" != "patch" && "$BUMP_TYPE" != "minor" && "$BUMP_TYPE" != "maj
 fi
 
 if [[ -z "${DESCRIPTION// /}" ]]; then
-  echo "Error: Deskripsi perubahan WAJIB diisi agar terdokumentasi di CHANGELOG.md."
+  echo "Error: Deskripsi perubahan WAJIB diisi agar terdokumentasi di CHANGELOG.md dan branch release/<versi>."
   echo "Usage: $0 $BUMP_TYPE \"<deskripsi perubahan>\""
   exit 1
 fi
 
 cd "$CLIENT_DIR"
-echo "==> [1/4] Menjalankan lint, unit test & build sebelum rilis..."
+echo "==> [1/5] Menjalankan lint, unit test & build sebelum rilis..."
 npm run lint
 npm test
 npm run build
 
-echo "==> [2/4] Menaikkan versi ($BUMP_TYPE) di client/package.json..."
+echo "==> [2/5] Menaikkan versi ($BUMP_TYPE) di client/package.json..."
 NEW_VERSION="$(npm version "$BUMP_TYPE" --no-git-tag-version | tr -d 'v')"
 RELEASE_DATE="$(date +%Y-%m-%d)"
+RELEASE_BRANCH="release/$NEW_VERSION"
 
 SECTION_LABEL="Patch"
 if [[ "$BUMP_TYPE" == "minor" ]]; then
@@ -41,7 +42,14 @@ elif [[ "$BUMP_TYPE" == "major" ]]; then
   SECTION_LABEL="Major"
 fi
 
-echo "==> [3/4] Menambahkan entri v$NEW_VERSION ke CHANGELOG.md..."
+echo "==> [3/5] Menyiapkan branch $RELEASE_BRANCH..."
+cd "$ROOT_DIR"
+CURRENT_BRANCH="$(git branch --show-current)"
+if [[ "$CURRENT_BRANCH" != "$RELEASE_BRANCH" ]]; then
+  git checkout -b "$RELEASE_BRANCH"
+fi
+
+echo "==> [4/5] Menambahkan entri v$NEW_VERSION ke CHANGELOG.md..."
 NEW_VERSION="$NEW_VERSION" \
 RELEASE_DATE="$RELEASE_DATE" \
 SECTION_LABEL="$SECTION_LABEL" \
@@ -62,10 +70,16 @@ if (idx !== -1) {
 }
 '
 
-echo "==> [4/4] Membuat commit & Git Tag v$NEW_VERSION..."
-cd "$ROOT_DIR"
+echo "==> [5/5] Membuat commit & Git Tag v$NEW_VERSION di branch $RELEASE_BRANCH..."
 git add client/package.json CHANGELOG.md
 git commit -m "chore(release): v$NEW_VERSION - $DESCRIPTION"
-git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION: $DESCRIPTION"
+git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION ($RELEASE_BRANCH): $DESCRIPTION"
 
-echo "Selesai! Versi baru: v$NEW_VERSION (tag v$NEW_VERSION siap di-push beserta branch)."
+echo ""
+echo "Selesai! Branch rilis $RELEASE_BRANCH dan tag v$NEW_VERSION siap."
+echo "Langkah berikutnya:"
+echo "  1. Push $RELEASE_BRANCH untuk Staging:  git push origin $RELEASE_BRANCH"
+echo "  2. Setelah Staging OK, merge ke main (Production Deploy) & sync ke dev:"
+echo "     git checkout main && git merge --no-ff $RELEASE_BRANCH -m \"Release v$NEW_VERSION to Production: $DESCRIPTION\""
+echo "     git push origin main v$NEW_VERSION"
+echo "     git checkout dev && git merge --ff-only main && git push origin dev"
