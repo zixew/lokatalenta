@@ -307,3 +307,10 @@ Tahap pengembangan berikutnya (**Sprint 7 s.d. Sprint 10**) berfokus pada:
   - **Given** admin menetapkan role `recruiter` pada pengguna di `/admin`,
   - **When** perekrut login,
   - **Then** navbar (`TopbarNav`) menampilkan akses **Portal Perekrut (`/recruiter`)**, aplikasi berjalan pada rilis **`v3.0.0`**, dan seluruh regresi QA v1–v3 lulus 100%.
+
+#### `US-45` (BL-45): Anti-AI-Slop Visual System & High-Craft UI Revamp
+- **User Story:** *Sebagai **Seluruh Pengguna Platform (Student, Teacher, Admin, Recruiter)**, saya ingin antarmuka LokaTalenta memiliki identitas visual berkelas tinggi (anti "AI slop"), tipografi editorial tajam, batas 1px yang tegas, densitas informasi tinggi yang fungsional, dan visualisasi virtual office 3D yang interaktif, sehingga platform terasa seperti produk enterprise profesional, otentik, dan berstandar industri tinggi.*
+- **Acceptance Criteria:**
+  - **Given** pengguna membuka aplikasi di mode terang maupun gelap pada desktop & mobile,
+  - **When** melihat tata letak, komponen kartu, tabel data, formulir, dan navigasi,
+  - **Then** antarmuka bersih dari gradien neon/pastel kabur ("AI slop"), radius kartu proporsional (`rounded-lg`/`rounded-xl`), garis batas kontras tajam 1px (`border-zinc-200/800`), hierarki tipografi tegas berdensitas tinggi, dan terdapat integrasi visualisasi **Kantor AI 3D** yang memetakan kolaborasi 15 peran agen kerja.
