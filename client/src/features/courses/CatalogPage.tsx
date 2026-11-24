@@ -298,6 +298,7 @@ export function CatalogPage() {
         completedIds={completedLessonIds}
         attemptsCount={userAttempts.length}
         isLoggedIn={Boolean(user)}
+        userId={user?.id}
         onOpenTarget={handleOpenTarget}
       />
 
