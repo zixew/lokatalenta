@@ -105,7 +105,7 @@ function exportShortlistCsv(candidates: RecruiterCandidate[]): void {
 
 function MetricCard({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
   return (
-    <div className="border border-[#E5E3DC] dark:border-slate-800 rounded-lg p-4 bg-white dark:bg-[#161B22] flex flex-col gap-1">
+    <div className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-4 bg-white dark:bg-[#161B22] flex flex-col gap-1">
       <span className="text-[11px] uppercase tracking-widest text-[#71717A] dark:text-slate-500 font-medium">
         {label}
       </span>
@@ -166,7 +166,7 @@ function CandidateCardItem({
   const avg = radarAvg(candidate.radar_scores);
 
   return (
-    <article className="border border-[#E5E3DC] dark:border-slate-800 rounded-lg bg-white dark:bg-[#161B22] overflow-hidden">
+    <article className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg bg-white dark:bg-[#161B22] overflow-hidden">
       {/* Header row */}
       <div className="flex items-start gap-3 p-4">
         <AvatarCircle initials={getInitials(candidate.full_name)} />
@@ -207,12 +207,12 @@ function CandidateCardItem({
 
       {/* Radar mini-bars (collapsible) */}
       {expanded && (
-        <div className="px-4 pb-3 space-y-1.5 border-t border-[#F4F4F5] dark:border-slate-800 pt-3">
+        <div className="px-4 pb-3 space-y-1.5 border-t border-[#F4F4F5] dark:border-[#282E3D] pt-3">
           {Object.entries(candidate.radar_scores).map(([key, score]) => (
             <RadarMiniBar key={key} label={key} score={score} />
           ))}
           {candidate.kraepelin_summary && (
-            <div className="pt-1.5 border-t border-[#F4F4F5] dark:border-slate-800 mt-1.5 text-[11px] text-[#71717A] dark:text-slate-400">
+            <div className="pt-1.5 border-t border-[#F4F4F5] dark:border-[#282E3D] mt-1.5 text-[11px] text-[#71717A] dark:text-slate-400">
               Kraepelin: <strong className="text-[#18181B] dark:text-slate-200">{candidate.kraepelin_summary.stability_grade}</strong>
             </div>
           )}
@@ -221,7 +221,7 @@ function CandidateCardItem({
               {candidate.top_certificates.map((cert) => (
                 <span
                   key={cert}
-                  className="text-[10px] px-2 py-0.5 rounded bg-[#F6F5F1] dark:bg-slate-800 border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-400 font-mono"
+                  className="text-[10px] px-2 py-0.5 rounded bg-[#F4F4F1] dark:bg-slate-800 border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-400 font-mono"
                 >
                   {cert}
                 </span>
@@ -232,7 +232,7 @@ function CandidateCardItem({
       )}
 
       {/* Action row */}
-      <div className="flex items-center gap-2 px-4 py-3 border-t border-[#F4F4F5] dark:border-slate-800 bg-[#FAFAF9] dark:bg-[#0D1117]">
+      <div className="flex items-center gap-2 px-4 py-3 border-t border-[#F4F4F5] dark:border-[#282E3D] bg-[#FAFAF9] dark:bg-[#0D1117]">
         <Link
           to={`/talent/${candidate.user_id}`}
           className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#0F766E] dark:text-teal-400 hover:underline"
@@ -279,7 +279,7 @@ function ShortlistRow({
   onSendInvite: (c: RecruiterCandidate) => void;
 }) {
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-[#F4F4F5] dark:border-slate-800 last:border-0">
+    <div className="flex items-center gap-3 py-3 border-b border-[#F4F4F5] dark:border-[#282E3D] last:border-0">
       <AvatarCircle initials={getInitials(candidate.full_name)} size="sm" />
       <div className="flex-1 min-w-0">
         <span className="text-sm font-semibold text-[#18181B] dark:text-white truncate block">
@@ -352,9 +352,9 @@ function InviteModal({ targetCandidate, quizList, onClose, onCreated }: InviteMo
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-md bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl shadow-xl overflow-hidden">
         {/* Modal header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D]">
           <div>
             <h3 className="text-base font-bold text-[#18181B] dark:text-white">
               Buat Undangan Asesmen
@@ -381,7 +381,7 @@ function InviteModal({ targetCandidate, quizList, onClose, onCreated }: InviteMo
               <select
                 value={quizId}
                 onChange={(e) => setQuizId(e.target.value)}
-                className="w-full border border-[#E5E3DC] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 appearance-none pr-8 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 appearance-none pr-8 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               >
                 {quizList.length === 0 && (
                   <option value="">— Belum ada kuis tersedia —</option>
@@ -404,7 +404,7 @@ function InviteModal({ targetCandidate, quizList, onClose, onCreated }: InviteMo
               value={positionName}
               onChange={(e) => setPositionName(e.target.value)}
               placeholder="cth. Data Analyst"
-              className="w-full border border-[#E5E3DC] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
 
@@ -418,13 +418,13 @@ function InviteModal({ targetCandidate, quizList, onClose, onCreated }: InviteMo
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="cth. PT Maju Bersama"
-              className="w-full border border-[#E5E3DC] dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
 
           {/* Generated link */}
           {generatedInvite && (
-            <div className="bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 rounded-lg p-3 space-y-2">
+            <div className="bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0F766E] dark:text-teal-400">
                 <Link2 className="w-3.5 h-3.5" />
                 Tautan Undangan
@@ -444,7 +444,7 @@ function InviteModal({ targetCandidate, quizList, onClose, onCreated }: InviteMo
         </div>
 
         {/* Modal footer */}
-        <div className="flex justify-end gap-2 px-5 py-4 border-t border-[#E5E3DC] dark:border-slate-800 bg-[#FAFAF9] dark:bg-[#0D1117]">
+        <div className="flex justify-end gap-2 px-5 py-4 border-t border-[#D4D4CE] dark:border-[#282E3D] bg-[#FAFAF9] dark:bg-[#0D1117]">
           <Button variant="secondary" size="sm" onClick={onClose}>Tutup</Button>
           {!generatedInvite ? (
             <Button
@@ -569,7 +569,7 @@ export function RecruiterPortalPage() {
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex gap-0 border-b border-[#E5E3DC] dark:border-slate-800">
+        <div className="flex gap-0 border-b border-[#D4D4CE] dark:border-[#282E3D]">
           {(
             [
               { id: 'kandidat' as const, icon: Users, label: 'Semua Kandidat' },
@@ -607,7 +607,7 @@ export function RecruiterPortalPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Cari nama kandidat..."
-                  className="w-full pl-9 pr-4 py-2 text-sm border border-[#E5E3DC] dark:border-slate-700 rounded-lg bg-white dark:bg-[#161B22] text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full pl-9 pr-4 py-2 text-sm border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg bg-white dark:bg-[#161B22] text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <button
@@ -615,7 +615,7 @@ export function RecruiterPortalPage() {
                 className={`inline-flex items-center gap-2 text-sm font-medium px-3 py-2 border rounded-lg transition-colors ${
                   filterOpen
                     ? 'border-[#0F766E] text-[#0F766E] dark:text-teal-400 bg-[#F0FDFA] dark:bg-teal-950/40'
-                    : 'border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-400 hover:border-[#0F766E] hover:text-[#0F766E]'
+                    : 'border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-400 hover:border-[#0F766E] hover:text-[#0F766E]'
                 }`}
               >
                 <Filter className="w-4 h-4" />
@@ -625,7 +625,7 @@ export function RecruiterPortalPage() {
 
             {/* Collapsible filter panel */}
             {filterOpen && (
-              <div className="border border-[#E5E3DC] dark:border-slate-800 rounded-lg p-4 bg-[#FAFAF9] dark:bg-[#0D1117] space-y-4">
+              <div className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-4 bg-[#FAFAF9] dark:bg-[#0D1117] space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
                   {/* Category */}
@@ -641,7 +641,7 @@ export function RecruiterPortalPage() {
                           className={`text-xs px-3 py-1 rounded-full border font-medium transition-colors ${
                             categoryFilter === cat
                               ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                              : 'border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-400 hover:border-[#0F766E] hover:text-[#0F766E]'
+                              : 'border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-400 hover:border-[#0F766E] hover:text-[#0F766E]'
                           }`}
                         >
                           {cat}
@@ -663,7 +663,7 @@ export function RecruiterPortalPage() {
                           className={`text-xs px-3 py-1 rounded-full border font-medium transition-colors ${
                             readinessFilter === value
                               ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                              : 'border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-400 hover:border-[#0F766E] hover:text-[#0F766E]'
+                              : 'border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-400 hover:border-[#0F766E] hover:text-[#0F766E]'
                           }`}
                         >
                           {label}
@@ -799,7 +799,7 @@ export function RecruiterPortalPage() {
             </div>
 
             {/* Shortlist rows */}
-            <div className="border border-[#E5E3DC] dark:border-slate-800 rounded-lg bg-white dark:bg-[#161B22]">
+            <div className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg bg-white dark:bg-[#161B22]">
               {shortlistedCandidates.length === 0 ? (
                 <div className="text-sm text-center py-16 text-[#71717A] dark:text-slate-400">
                   Belum ada kandidat di shortlist. Klik{' '}
@@ -827,7 +827,7 @@ export function RecruiterPortalPage() {
                   <Link2 className="w-4 h-4 text-[#0F766E]" />
                   Riwayat Undangan ({invites.length})
                 </h3>
-                <div className="border border-[#E5E3DC] dark:border-slate-800 rounded-lg bg-white dark:bg-[#161B22] divide-y divide-[#F4F4F5] dark:divide-slate-800 overflow-hidden">
+                <div className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg bg-white dark:bg-[#161B22] divide-y divide-[#F4F4F5] dark:divide-slate-800 overflow-hidden">
                   {invites.map((inv) => {
                     const isExpired = inv.expires_at ? new Date(inv.expires_at) < new Date() : false;
                     return (

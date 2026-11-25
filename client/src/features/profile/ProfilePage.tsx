@@ -185,8 +185,8 @@ export function ProfilePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Edit Profile Card */}
-        <section className="lg:col-span-4 order-last lg:order-first bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
-          <div className="flex items-center gap-3.5 pb-4 border-b border-[#E5E3DC] dark:border-slate-800">
+        <section className="lg:col-span-4 order-last lg:order-first bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5">
+          <div className="flex items-center gap-3.5 pb-4 border-b border-[#D4D4CE] dark:border-[#282E3D]">
             <div className="w-12 h-12 rounded-full bg-teal-50 text-[#0F766E] flex items-center justify-center font-bold text-lg">
               {user.full_name.charAt(0).toUpperCase()}
             </div>
@@ -229,7 +229,7 @@ export function ProfilePage() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             </div>
 
@@ -239,7 +239,7 @@ export function ProfilePage() {
                 type="email"
                 disabled
                 value={user.email}
-                className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-slate-50 dark:bg-slate-800 text-[#71717A] dark:text-slate-400"
+                className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-slate-50 dark:bg-slate-800 text-[#71717A] dark:text-slate-400"
               />
             </div>
 
@@ -252,7 +252,7 @@ export function ProfilePage() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Tuliskan target belajar atau latar belakang Anda..."
-                className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             </div>
 
@@ -271,7 +271,7 @@ export function ProfilePage() {
               <div
                 role="tablist"
                 aria-label="Bagian profil pelajar"
-                className="flex items-center gap-1.5 p-1.5 rounded-xl bg-[#F6F5F1] dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 overflow-x-auto"
+                className="flex items-center gap-1.5 p-1.5 rounded-xl bg-[#F4F4F1] dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] overflow-x-auto"
               >
                 {(
                   [
@@ -291,7 +291,7 @@ export function ProfilePage() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                         selected
-                          ? 'bg-white dark:bg-slate-800 text-[#0F766E] dark:text-teal-300 shadow-xs border border-[#E5E3DC] dark:border-slate-700'
+                          ? 'bg-white dark:bg-slate-800 text-[#0F766E] dark:text-teal-300 shadow-xs border border-[#D4D4CE] dark:border-[#282E3D]'
                           : 'text-[#52525B] dark:text-slate-400 hover:text-[#18181B] dark:hover:text-white'
                       }`}
                     >
@@ -304,25 +304,25 @@ export function ProfilePage() {
               {activeTab === 'overview' && (
                 <>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
                       <span className="text-xs text-[#71717A] dark:text-slate-400 block">Kursus Diikuti</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
                         {enrolledCourses.length}
                       </span>
                     </div>
-                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
                       <span className="text-xs text-[#71717A] dark:text-slate-400 block">Materi Selesai</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#059669] mt-1 block">
                         {completedLessonIds.length}
                       </span>
                     </div>
-                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
                       <span className="text-xs text-[#71717A] dark:text-slate-400 block">Tes Dikerjakan</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#0F766E] mt-1 block">
                         {attempts.length}
                       </span>
                     </div>
-                    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
                       <span className="text-xs text-[#71717A] dark:text-slate-400 block">Rata-rata Skor</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
                         {avgScore}%
@@ -348,7 +348,7 @@ export function ProfilePage() {
                     })}
                   />
 
-                  <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h3 className="text-base font-bold text-[#18181B] dark:text-white">
@@ -407,7 +407,7 @@ export function ProfilePage() {
                   <DiagnosticStudyPlanCard attempts={attempts} courses={courses} />
 
                   {/* Enrolled Courses Progress */}
-                  <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                  <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
                     <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                       <BookOpen className="w-4 h-4 text-[#0F766E]" />
                       Progres Kursus Terstruktur
@@ -440,7 +440,7 @@ export function ProfilePage() {
                           return (
                             <div
                               key={course.id}
-                              className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                              className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                             >
                               <div className="flex-1 space-y-2">
                                 <div className="flex items-center gap-2">
@@ -489,7 +489,7 @@ export function ProfilePage() {
               {activeTab === 'history' && (
                 <>
                   {/* BL-37: Soal Tersimpan (Bookmark) */}
-                  <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                  <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
                     <div className="flex items-center justify-between gap-2">
                       <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                         <Bookmark className="w-4 h-4 text-[#0F766E]" />
@@ -505,7 +505,7 @@ export function ProfilePage() {
                         {bookmarkedQuestions.map((bm) => (
                           <div
                             key={bm.id}
-                            className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-2"
+                            className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 space-y-2"
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="space-y-1 min-w-0">
@@ -529,7 +529,7 @@ export function ProfilePage() {
                               </button>
                             </div>
                             {bm.explanation && (
-                              <p className="text-xs text-[#52525B] dark:text-slate-300 border-t border-[#E5E3DC] dark:border-slate-800 pt-2">
+                              <p className="text-xs text-[#52525B] dark:text-slate-300 border-t border-[#D4D4CE] dark:border-[#282E3D] pt-2">
                                 <span className="font-semibold text-[#0F766E] dark:text-teal-400">
                                   Pembahasan:{' '}
                                 </span>
@@ -543,7 +543,7 @@ export function ProfilePage() {
                   </section>
 
                   {/* Quiz / Practice History */}
-                  <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+                  <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
                     <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                       <ClipboardCheck className="w-4 h-4 text-[#0F766E]" />
                       Riwayat Latihan Soal &amp; Evaluasi
@@ -557,7 +557,7 @@ export function ProfilePage() {
                         {attempts.map((att) => (
                           <div
                             key={att.id}
-                            className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                            className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                           >
                             <div>
                               <p className="font-semibold text-sm text-[#18181B] dark:text-white">
@@ -598,7 +598,7 @@ export function ProfilePage() {
             const totalCohortMembers = teacherCohorts.reduce((sum, c) => sum + c.member_count, 0);
 
             return (
-              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
+              <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400 flex items-center justify-center">
@@ -619,7 +619,7 @@ export function ProfilePage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                  <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
                     <span className="text-xs text-[#71717A] dark:text-slate-400 block">
                       Kursus Diampu
                     </span>
@@ -627,7 +627,7 @@ export function ProfilePage() {
                       {mentorCoursesCount}
                     </strong>
                   </div>
-                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                  <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
                     <span className="text-xs text-[#71717A] dark:text-slate-400 block">
                       Cohort Aktif
                     </span>
@@ -635,7 +635,7 @@ export function ProfilePage() {
                       {activeCohortsCount}
                     </strong>
                   </div>
-                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+                  <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
                     <span className="text-xs text-[#71717A] dark:text-slate-400 block">
                       Peserta Terdaftar di Cohort
                     </span>
@@ -650,7 +650,7 @@ export function ProfilePage() {
 
           {/* ADMIN OVERVIEW */}
           {user.role === 'admin' && (
-            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+            <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#D97706] flex items-center justify-center">
                   <ShieldCheck className="w-5 h-5" />
