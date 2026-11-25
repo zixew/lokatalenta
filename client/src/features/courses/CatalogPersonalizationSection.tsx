@@ -112,7 +112,7 @@ export function CatalogPersonalizationSection({
     <div className="space-y-6">
       {/* Interactive Daily Quests / Learning Checklist (Logged-in Students) */}
       {isLoggedIn && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 sm:p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-[#D97706]" />
@@ -135,7 +135,7 @@ export function CatalogPersonalizationSection({
                 className={`p-3 rounded-xl border text-xs flex items-center gap-2.5 ${
                   q.done
                     ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
-                    : 'bg-[#F6F5F1] dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+                    : 'bg-[#F4F4F1] dark:bg-slate-900 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                 }`}
               >
                 {q.done ? (
@@ -152,7 +152,7 @@ export function CatalogPersonalizationSection({
 
       {/* Continue Learning Bar (Logged-in Students) */}
       {isLoggedIn && enrolledCourses.length > 0 && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <PlayCircle className="w-4 h-4 text-[#0F766E]" />
@@ -183,7 +183,7 @@ export function CatalogPersonalizationSection({
               return (
                 <div
                   key={c.id}
-                  className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 flex flex-col justify-between gap-3"
+                  className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] flex flex-col justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <span className="text-[11px] font-semibold text-[#0F766E] dark:text-teal-400">
@@ -218,7 +218,7 @@ export function CatalogPersonalizationSection({
       )}
 
       {/* Onboarding Goal Picker + Recommendations */}
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Compass className="w-4 h-4 text-[#0F766E]" />
@@ -227,7 +227,7 @@ export function CatalogPersonalizationSection({
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 bg-[#F6F5F1] dark:bg-slate-800 p-1 rounded-lg border border-[#E5E3DC] dark:border-slate-700">
+            <div className="flex items-center gap-1 bg-[#F4F4F1] dark:bg-slate-800 p-1 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D]">
               {XP_TARGETS.map((item) => (
                 <button
                   key={item.value}
@@ -262,7 +262,7 @@ export function CatalogPersonalizationSection({
                 className={`p-3.5 rounded-xl border text-left transition-colors cursor-pointer ${
                   active
                     ? 'bg-teal-50 dark:bg-teal-950/40 border-[#0F766E]'
-                    : 'bg-[#F6F5F1] dark:bg-slate-800/50 border-[#E5E3DC] dark:border-slate-700 hover:border-[#0F766E]/50'
+                    : 'bg-[#F4F4F1] dark:bg-slate-800/50 border-[#D4D4CE] dark:border-[#282E3D] hover:border-[#0F766E]/50'
                 }`}
               >
                 <p className="text-xs font-bold text-[#18181B] dark:text-white">{g.label}</p>
@@ -279,7 +279,7 @@ export function CatalogPersonalizationSection({
                 key={c.id}
                 to={`/courses/${c.slug}`}
                 onClick={(e) => onOpenTarget(e, `/courses/${c.slug}`)}
-                className="p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800/40 hover:border-[#0F766E] transition-colors flex items-center justify-between gap-3"
+                className="p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-800/40 hover:border-[#0F766E] transition-colors flex items-center justify-between gap-3"
               >
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold text-[#0F766E] dark:text-teal-400 truncate">

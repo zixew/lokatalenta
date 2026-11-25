@@ -272,7 +272,7 @@ export function CatalogPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Desktop Marketplace Left Filter Sidebar (Auto-Apply) */}
-          <aside className="hidden lg:block lg:col-span-3 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sticky top-24">
+          <aside className="hidden lg:block lg:col-span-3 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 sticky top-24">
             <CatalogFilterPanel
               activeFilterCount={
                 (selectedType !== 'Semua' ? 1 : 0) +
@@ -307,17 +307,17 @@ export function CatalogPage() {
           {/* Right Marketplace Content Area */}
           <div className="lg:col-span-9 space-y-5">
             {/* Top Marketplace Toolbar */}
-            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-1">
                 <button
                   type="button"
                   onClick={openMobileFilter}
-                  className="lg:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800 text-xs font-semibold text-[#18181B] dark:text-white shrink-0 cursor-pointer"
+                  className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-[#1A202C] text-xs font-semibold text-[#18181B] dark:text-white shrink-0 cursor-pointer"
                 >
                   <Filter className="w-3.5 h-3.5" />
                   Filter
                   {activeFilterCount > 0 && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-[#0F766E] text-white text-[10px] font-mono-tabular">
+                    <span className="px-1.5 py-0.2 rounded-sm bg-[#0F766E] text-white text-[10px] font-mono">
                       {activeFilterCount}
                     </span>
                   )}
@@ -333,7 +333,7 @@ export function CatalogPage() {
                       setCurrentPage(1);
                     }}
                     placeholder="Cari kursus atau latihan..."
-                    className="w-full pl-10 pr-4 py-2 bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 rounded-lg text-sm text-[#18181B] dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full pl-10 pr-4 py-1.5 bg-[#F4F4F1] dark:bg-[#11141B] border border-[#D4D4CE] dark:border-[#282E3D] rounded text-sm text-[#18181B] dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export function CatalogPage() {
                     'Memuat program...'
                   ) : (
                     <>
-                      <strong className="text-[#18181B] dark:text-white font-mono-tabular">
+                      <strong className="text-[#18181B] dark:text-white font-mono">
                         {filteredCourses.length}
                       </strong>{' '}
                       program
@@ -357,7 +357,7 @@ export function CatalogPage() {
                     aria-label="Urutkan program"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="appearance-none pl-3 pr-8 py-2 bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 rounded-lg text-xs font-medium text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E] cursor-pointer"
+                    className="appearance-none pl-3 pr-8 py-1.5 bg-[#F4F4F1] dark:bg-[#11141B] border border-[#D4D4CE] dark:border-[#282E3D] rounded text-xs font-medium text-[#18181B] dark:text-slate-100 focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] cursor-pointer"
                   >
                     <option value="default">Urutkan: Rekomendasi</option>
                     <option value="title_asc">Urutkan: Judul A–Z</option>
@@ -371,7 +371,7 @@ export function CatalogPage() {
 
             {/* Active Filter Chips */}
             {(activeFilterCount > 0 || search.trim() !== '') && (
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {selectedType !== 'Semua' && (
                   <button
                     type="button"
@@ -379,7 +379,7 @@ export function CatalogPage() {
                       setSelectedType('Semua');
                       setDraftType('Semua');
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs font-medium text-[#0F766E] dark:text-teal-300 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/60 border border-[#0F766E]/40 text-[11px] font-mono text-[#0F766E] dark:text-teal-300 cursor-pointer"
                   >
                     Tipe: {selectedType === 'Kursus' ? 'Kursus Terstruktur' : 'Latihan Langsung'}
                     <X className="w-3 h-3" />
@@ -392,7 +392,7 @@ export function CatalogPage() {
                       setSelectedCategory('Semua');
                       setDraftCategory('Semua');
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs font-medium text-[#0F766E] dark:text-teal-300 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/60 border border-[#0F766E]/40 text-[11px] font-mono text-[#0F766E] dark:text-teal-300 cursor-pointer"
                   >
                     Kategori: {selectedCategory}
                     <X className="w-3 h-3" />
@@ -405,7 +405,7 @@ export function CatalogPage() {
                       setSelectedLevel('Semua');
                       setDraftLevel('Semua');
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs font-medium text-[#0F766E] dark:text-teal-300 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/60 border border-[#0F766E]/40 text-[11px] font-mono text-[#0F766E] dark:text-teal-300 cursor-pointer"
                   >
                     Level: {selectedLevel}
                     <X className="w-3 h-3" />
@@ -415,7 +415,7 @@ export function CatalogPage() {
                   <button
                     type="button"
                     onClick={() => setSearch('')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-[#E5E3DC] dark:border-slate-700 text-xs font-medium text-[#18181B] dark:text-slate-200 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-[#D4D4CE] dark:border-[#282E3D] text-[11px] font-mono text-[#18181B] dark:text-slate-200 cursor-pointer"
                   >
                     Cari: "{search}"
                     <X className="w-3 h-3" />
@@ -424,7 +424,7 @@ export function CatalogPage() {
                 <button
                   type="button"
                   onClick={resetAllFilters}
-                  className="text-xs font-semibold text-[#71717A] dark:text-slate-400 hover:text-[#18181B] dark:hover:text-white underline ml-1 cursor-pointer"
+                  className="text-xs font-mono font-medium text-[#71717A] dark:text-slate-400 hover:text-[#18181B] dark:hover:text-white underline ml-1 cursor-pointer"
                 >
                   Hapus semua
                 </button>
@@ -437,7 +437,7 @@ export function CatalogPage() {
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="h-64 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between overflow-hidden"
+                    className="h-64 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 flex flex-col justify-between overflow-hidden"
                   >
                     <div className="space-y-3 animate-pulse">
                       <div className="flex items-center justify-between">
@@ -451,7 +451,7 @@ export function CatalogPage() {
                         <div className="h-3 w-2/3 rounded bg-slate-100 dark:bg-slate-800/70" />
                       </div>
                     </div>
-                    <div className="pt-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between animate-pulse">
+                    <div className="pt-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between animate-pulse">
                       <div className="h-3.5 w-28 rounded bg-slate-200 dark:bg-slate-800" />
                       <div className="h-3.5 w-16 rounded bg-slate-200 dark:bg-slate-800" />
                     </div>
@@ -468,7 +468,7 @@ export function CatalogPage() {
                 </Button>
               </div>
             ) : filteredCourses.length === 0 ? (
-              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-12 text-center space-y-3">
+              <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-12 text-center space-y-3">
                 <p className="text-sm font-medium text-[#52525B] dark:text-slate-300">
                   Tidak ada kursus atau latihan yang cocok dengan filter Anda.
                 </p>
@@ -509,13 +509,13 @@ export function CatalogPage() {
                     return (
                       <div
                         key={course.id}
-                        className="group relative pointer-events-none bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:-translate-y-1 hover:border-[#0F766E]/60 dark:hover:border-teal-500/60 hover:shadow-md transition-all duration-200"
+                        className="group relative pointer-events-none bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 flex flex-col justify-between hover:border-[#0F766E] dark:hover:border-[#14B8A6] active:scale-[0.995] transition-[border-color,background-color] duration-150"
                       >
                         <Link
                           to={targetUrl}
                           onClick={(e) => handleOpenTarget(e, targetUrl)}
                           aria-label={course.title}
-                          className="pointer-events-auto absolute inset-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]"
+                          className="pointer-events-auto absolute inset-0 rounded-lg focus:outline-none focus-visible:ring-1 focus-visible:ring-[#0F766E]"
                         />
                         <div className="space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -556,7 +556,7 @@ export function CatalogPage() {
                           </p>
                         </div>
 
-                        <div className="mt-5 pt-3.5 border-t border-[#E5E3DC] dark:border-slate-800 space-y-2.5">
+                        <div className="mt-5 pt-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] space-y-2.5">
                           {!directQuiz && isEnrolled && allLessons.length > 0 && (
                             <div className="space-y-1.5">
                               <div className="flex items-center justify-between text-xs">
@@ -613,7 +613,7 @@ export function CatalogPage() {
                                   <button
                                     type="button"
                                     onClick={() => setPreviewCourse({ course, targetUrl })}
-                                    className="pointer-events-auto relative z-10 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:text-[#0F766E] dark:hover:text-teal-400 font-semibold transition-colors cursor-pointer"
+                                    className="pointer-events-auto relative z-10 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:text-[#0F766E] dark:hover:text-teal-400 font-semibold transition-colors cursor-pointer"
                                     title="Pratinjau silabus kursus"
                                   >
                                     <Eye className="w-3.5 h-3.5" />
@@ -635,7 +635,7 @@ export function CatalogPage() {
 
                 {/* Pagination Bar */}
                 {totalPages > 1 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#E5E3DC] dark:border-slate-800">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D]">
                     <p className="text-xs text-[#71717A] dark:text-slate-400">
                       Halaman{' '}
                       <span className="font-semibold text-[#18181B] dark:text-white">
@@ -673,7 +673,7 @@ export function CatalogPage() {
                             className={`w-8 h-8 rounded-lg text-xs font-mono-tabular font-semibold border transition-colors cursor-pointer ${
                               currentPage === item
                                 ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                                : 'bg-white dark:bg-[#161B22] border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                : 'bg-white dark:bg-[#161B22] border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                             }`}
                           >
                             {item}
@@ -711,7 +711,7 @@ export function CatalogPage() {
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-xs bg-white dark:bg-[#161B22] h-full flex flex-col shadow-xl"
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] shrink-0">
               <span className="font-bold text-base text-[#18181B] dark:text-white">
                 Filter Marketplace
               </span>
@@ -719,7 +719,7 @@ export function CatalogPage() {
                 type="button"
                 aria-label="Tutup filter"
                 onClick={closeMobileFilterWithoutApplying}
-                className="p-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 cursor-pointer"
+                className="p-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -739,7 +739,7 @@ export function CatalogPage() {
                 onReset={resetDraftFilters}
               />
             </div>
-            <div className="p-4 border-t border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] shrink-0">
+            <div className="p-4 border-t border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] shrink-0">
               <Button type="button" className="w-full" onClick={applyDraftFilters}>
                 Terapkan ({draftMatchedCount} Program)
               </Button>
@@ -751,7 +751,7 @@ export function CatalogPage() {
       {/* Login Required Dialog */}
       {showAuthDialog && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-lg">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg max-w-md w-full p-6 space-y-5 shadow-lg">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400 flex items-center justify-center shrink-0">
                 <Lock className="w-5 h-5" />
