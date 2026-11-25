@@ -7,23 +7,53 @@
     --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    /* Industrial Precision Workbench Tokens (Light) */
+    --bg-canvas: #F3F3F0;
+    --surface-panel: #FFFFFF;
+    --surface-docked: #E8E8E3;
+    --border-industrial: #D4D4CE;
+    --border-focus: #0F1216;
+    --ink-primary: #0F1216;
+    --ink-muted: #545C6E;
+
+    /* Functional Solids (Never Gradients) */
+    --status-emerald: #059669;
+    --status-amber: #D97706;
+    --status-crimson: #E11D48;
+    --status-cobalt: #2563EB;
+    --status-teal: #0F766E;
+  }
+
+  html.dark {
+    /* Industrial Precision Workbench Tokens (Dark) */
+    --bg-canvas: #0E1015;
+    --surface-panel: #151821;
+    --surface-docked: #1B1F2B;
+    --border-industrial: #282E3D;
+    --border-focus: #F1F5F9;
+    --ink-primary: #F1F5F9;
+    --ink-muted: #8892A6;
+
+    /* Functional Solids (Dark) */
+    --status-emerald: #10B981;
+    --status-amber: #F59E0B;
+    --status-crimson: #FB7185;
+    --status-cobalt: #3B82F6;
+    --status-teal: #14B8A6;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: #F6F5F1;
-    color: #18181B;
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
     transition: background-color 150ms ease, color 150ms ease;
-  }
-
-  html.dark body {
-    background-color: #0D1117;
-    color: #F1F5F9;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-weight: 700;
   }
 
   html.dark input,
@@ -31,6 +61,7 @@
   html.dark select {
     background-color: #18181B;
     color: #F1F5F9;
+    border-color: #282E3D;
   }
 
   html.dark input::placeholder,
@@ -42,4 +73,14 @@
 .font-mono-tabular {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* Micro-interaction Spring & Motion Guardrails */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,4 +1,4 @@
-import { ArrowRight, Flame, Keyboard, Play, Sparkles, Trophy, Zap } from 'lucide-react';
+import { ArrowRight, Keyboard, Play, Shield, Trophy, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../shared/ui/Button';
 
@@ -13,24 +13,24 @@ export interface CatalogHeroBentoProps {
   onOpenTarget: (e: React.MouseEvent, targetUrl: string) => void;
 }
 
-const QUICK_LAUNCH_PILLS = [
+const QUICK_LAUNCH_INSTRUMENTS = [
   {
     to: '/kraepelin',
-    label: 'Kraepelin / Pauli',
+    label: 'Tes Kraepelin / Pauli',
+    tag: 'Fokus & Kecepatan',
     icon: Zap,
-    accent: 'text-amber-600 dark:text-amber-400',
   },
   {
     to: '/typing',
-    label: 'Tes Mengetik',
+    label: 'Uji Kecepatan Mengetik',
+    tag: 'WPM & Akurasi',
     icon: Keyboard,
-    accent: 'text-[#0F766E] dark:text-teal-400',
   },
   {
     to: '/tryout',
-    label: 'Tryout Akbar',
+    label: 'Tryout Seleksi Akbar',
+    tag: 'Simulasi Nasional',
     icon: Trophy,
-    accent: 'text-indigo-600 dark:text-indigo-400',
   },
 ] as const;
 
@@ -49,69 +49,74 @@ export function CatalogHeroBento({
   const progressPct = Math.round(progressRatio * 100);
   const remainingXp = Math.max(0, safeTarget - earnedToday);
 
-  const radius = 42;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progressRatio);
-
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center shadow-xs">
-      {/* Left Column: Editorial Headline + Quick-Launch Pills */}
-      <div className="lg:col-span-7 space-y-5">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F6F5F1] dark:bg-slate-800 border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#0F766E] dark:text-teal-400">
-          <Sparkles className="w-3.5 h-3.5" />
+    <section className="bg-white dark:bg-[#151821] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center shadow-xs">
+      {/* Left Column: Editorial Headline + Action Bar */}
+      <div className="lg:col-span-7 space-y-4">
+        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#E8E8E3] dark:bg-[#1B1F2B] border border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#0F766E] dark:text-[#14B8A6]">
+          <Shield className="w-3.5 h-3.5" />
           {isLoggedIn && userName
-            ? `Selamat datang kembali, ${userName.split(' ')[0]}`
-            : 'LokaTalenta • Akademi Bahasa, Karier & Komunitas'}
+            ? `Personel Aktif: ${userName.split(' ')[0]}`
+            : 'LokaTalenta LMS • Industrial Learning Workbench'}
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#18181B] dark:text-white leading-tight tracking-tight">
-          Bangun Kompetensi Bahasa Asing &amp; Kesiapan Seleksi Kerja secara Terstruktur.
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0F1216] dark:text-[#F1F5F9] leading-tight tracking-tight">
+          Pusat Pembelajaran Kompetensi Bahasa &amp; Asesmen Kesiapan Karier.
         </h1>
 
-        <p className="text-sm sm:text-base text-[#52525B] dark:text-slate-300 leading-relaxed max-w-2xl">
-          Pelajari kurikulum bertahap dari nol hingga mahir dengan{' '}
-          <strong className="text-[#18181B] dark:text-white">20+ modul bahasa</strong>, latihan
-          aksara &amp; pelafalan,{' '}
-          <strong className="text-[#18181B] dark:text-white">simulasi psikotes</strong>, serta
-          bimbingan langsung bersama mentor.
+        <p className="text-sm text-[#545C6E] dark:text-[#8892A6] leading-relaxed max-w-2xl">
+          Kurikulum terstruktur berbasis kompetensi industri dengan{' '}
+          <strong className="text-[#0F1216] dark:text-[#F1F5F9]">20+ modul bahasa aktif</strong>, latihan
+          aksara interaktif,{' '}
+          <strong className="text-[#0F1216] dark:text-[#F1F5F9]">simulasi psikotes objektif</strong>, serta
+          100% bebas biaya tanpa paywall.
         </p>
 
-        <div className="flex flex-wrap items-center gap-3 pt-1">
+        <div className="flex flex-wrap items-center gap-3 pt-2">
           {primaryCourseSlug && (
             <Link
               to={`/courses/${primaryCourseSlug}`}
               onClick={(e) => onOpenTarget(e, `/courses/${primaryCourseSlug}`)}
             >
-              <Button size="lg">
+              <Button size="lg" className="rounded-md">
                 <Play className="w-4 h-4" />
-                {isLoggedIn ? 'Lanjutkan Belajar' : 'Gabung & Mulai Belajar'}
+                {isLoggedIn ? 'Lanjutkan Modul' : 'Mulai Belajar Sekarang'}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           )}
           <a href="#katalog">
-            <Button variant="secondary" size="lg">
-              {isLoading ? 'Jelajahi Program' : `Jelajahi ${totalCourses}+ Program`}
+            <Button variant="secondary" size="lg" className="rounded-md">
+              {isLoading ? 'Memuat Program...' : `Katalog (${totalCourses} Program)`}
             </Button>
           </a>
         </div>
 
-        {/* Quick-Launch Pills */}
-        <div className="pt-2 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
-            Akses Cepat Simulasi &amp; Event
+        {/* Quick-Launch Instruments */}
+        <div className="pt-3 border-t border-[#D4D4CE] dark:border-[#282E3D] space-y-2">
+          <p className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#545C6E] dark:text-[#8892A6]">
+            Instrumen Simulasi Cepat
           </p>
-          <div className="flex flex-wrap gap-2">
-            {QUICK_LAUNCH_PILLS.map((pill) => {
-              const Icon = pill.icon;
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {QUICK_LAUNCH_INSTRUMENTS.map((inst) => {
+              const Icon = inst.icon;
               return (
                 <Link
-                  key={pill.to}
-                  to={pill.to}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#18181B] dark:text-slate-200 hover:border-[#0F766E]/60 dark:hover:border-teal-500/60 hover:-translate-y-0.5 transition-all"
+                  key={inst.to}
+                  to={inst.to}
+                  className="flex items-center gap-2.5 p-2 rounded-md bg-[#F3F3F0] dark:bg-[#1B1F2B] border border-[#D4D4CE] dark:border-[#282E3D] hover:border-[#0F766E] dark:hover:border-[#14B8A6] transition-colors"
                 >
-                  <Icon className={`w-3.5 h-3.5 ${pill.accent}`} />
-                  {pill.label}
+                  <div className="w-7 h-7 shrink-0 rounded bg-white dark:bg-[#151821] border border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-center text-[#0F766E] dark:text-[#14B8A6]">
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-[#0F1216] dark:text-[#F1F5F9] truncate">
+                      {inst.label}
+                    </p>
+                    <p className="text-[10px] text-[#545C6E] dark:text-[#8892A6] font-mono">
+                      {inst.tag}
+                    </p>
+                  </div>
                 </Link>
               );
             })}
@@ -119,83 +124,61 @@ export function CatalogHeroBento({
         </div>
       </div>
 
-      {/* Right Column: Bento XP Ring + Pillars */}
+      {/* Right Column: Tactical KPI Metric Cards */}
       <div className="lg:col-span-5 space-y-3">
-        {/* Daily XP Progress Ring Card */}
-        <div className="bg-[#F6F5F1] dark:bg-slate-900/80 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-5">
-          <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-            <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-              <circle
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-[#E5E3DC] dark:text-slate-800"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                className="text-[#0F766E] dark:text-teal-400 transition-all duration-500"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-lg font-extrabold font-mono-tabular text-[#18181B] dark:text-white leading-none">
-                {progressPct}%
-              </span>
-              <span className="text-[10px] font-semibold text-[#71717A] dark:text-slate-400 mt-0.5">
-                XP Hari Ini
-              </span>
-            </div>
+        {/* Daily XP Target Meter */}
+        <div className="bg-[#F3F3F0] dark:bg-[#1B1F2B] border border-[#D4D4CE] dark:border-[#282E3D] rounded-md p-4">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#545C6E] dark:text-[#8892A6]">
+              Target Pembelajaran Harian
+            </span>
+            <span className="font-mono-tabular text-sm font-bold text-[#0F766E] dark:text-[#14B8A6]">
+              {progressPct}%
+            </span>
           </div>
 
-          <div className="min-w-0 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0F766E] dark:text-teal-400">
-              <Flame className="w-3.5 h-3.5 text-amber-500" />
-              Target Belajar Harian
-            </div>
-            <p className="text-xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white">
-              {earnedToday}{' '}
-              <span className="text-xs font-semibold text-[#71717A] dark:text-slate-400">
-                / {xpTarget} XP
-              </span>
-            </p>
-            <p className="text-xs text-[#52525B] dark:text-slate-400">
-              {earnedToday >= xpTarget
-                ? 'Target harian tercapai! Pertahankan konsistensi Anda.'
-                : isLoggedIn
-                  ? `Butuh ${remainingXp} XP lagi untuk mencapai target hari ini.`
-                  : 'Masuk untuk melacak XP harian & progres modul Anda.'}
-            </p>
+          {/* Progress bar */}
+          <div className="w-full h-2 rounded bg-[#D4D4CE] dark:bg-[#282E3D] overflow-hidden">
+            <div
+              className="h-full bg-[#0F766E] dark:bg-[#14B8A6] transition-all duration-300"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2 mt-2.5 text-xs text-[#545C6E] dark:text-[#8892A6]">
+            <span className="font-mono-tabular">
+              {earnedToday} / {safeTarget} XP
+            </span>
+            <span className="text-[11px]">
+              {remainingXp === 0 ? '✓ Target tercapai hari ini' : `Sisa ${remainingXp} XP lagi`}
+            </span>
           </div>
         </div>
 
-        {/* 4 Learning Pillars Mini-Grid */}
-        <div className="grid grid-cols-2 gap-2.5">
-          {[
-            { label: 'Bahasa Jepang & Korea', desc: 'Aksara & Percakapan' },
-            { label: 'Bahasa Inggris Karier', desc: 'Grammar & Bisnis' },
-            { label: 'Simulasi Psikotes', desc: 'Numerik, Deret & Logika' },
-            { label: 'Mentoring & Tugas', desc: 'Sesi Live & Rubrik' },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="bg-[#F6F5F1] dark:bg-slate-900/60 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-3 space-y-0.5"
-            >
-              <p className="text-xs font-bold text-[#18181B] dark:text-white leading-snug">
-                {item.label}
-              </p>
-              <p className="text-[11px] text-[#71717A] dark:text-slate-400">{item.desc}</p>
-            </div>
-          ))}
+        {/* Telemetry Stat Strip */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="p-3 rounded-md bg-[#F3F3F0] dark:bg-[#1B1F2B] border border-[#D4D4CE] dark:border-[#282E3D]">
+            <span className="text-[10px] font-mono uppercase text-[#545C6E] dark:text-[#8892A6] block">
+              Kurikulum Aktif
+            </span>
+            <span className="font-mono-tabular text-lg font-bold text-[#0F1216] dark:text-[#F1F5F9]">
+              {totalCourses} Modul
+            </span>
+            <span className="text-[10px] text-[#059669] dark:text-[#10B981] font-mono block mt-0.5">
+              ● Siap Ditempuh
+            </span>
+          </div>
+          <div className="p-3 rounded-md bg-[#F3F3F0] dark:bg-[#1B1F2B] border border-[#D4D4CE] dark:border-[#282E3D]">
+            <span className="text-[10px] font-mono uppercase text-[#545C6E] dark:text-[#8892A6] block">
+              Standar Integritas
+            </span>
+            <span className="font-mono-tabular text-lg font-bold text-[#0F1216] dark:text-[#F1F5F9]">
+              100% Free
+            </span>
+            <span className="text-[10px] text-[#0F766E] dark:text-[#14B8A6] font-mono block mt-0.5">
+              ● Tanpa Paywall
+            </span>
+          </div>
         </div>
       </div>
     </section>

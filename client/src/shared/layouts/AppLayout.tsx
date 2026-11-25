@@ -37,10 +37,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
-    <div className="min-h-screen overflow-x-hidden flex flex-col bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 transition-colors">
+    <div className="min-h-screen overflow-x-hidden flex flex-col bg-[#F3F3F0] dark:bg-[#0E1015] text-[#0F1216] dark:text-[#F1F5F9] transition-colors">
       <SystemBroadcastBanner role={user?.role} />
-      <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#161B22]/95 backdrop-blur border-b border-[#E5E3DC] dark:border-slate-800 print:hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 bg-white dark:bg-[#151821] border-b border-[#D4D4CE] dark:border-[#282E3D] print:hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           {/* Brand + Desktop Nav */}
           <div className="flex items-center gap-4 xl:gap-7 min-w-0 flex-1">
             <Link
@@ -53,13 +53,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
               }
               className="flex items-center gap-2.5 shrink-0"
             >
-              <BrandLogo className="w-9 h-9 shrink-0" />
+              <BrandLogo className="w-8 h-8 shrink-0" />
               <div className="leading-tight">
-                <span className="font-bold text-base tracking-tight text-[#18181B] dark:text-white block">
-                  LokaTalenta
-                </span>
-                <span className="text-[11px] text-[#71717A] dark:text-slate-400 font-medium hidden xl:block">
-                  Akademi Bahasa &amp; Karier
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-base tracking-tight text-[#0F1216] dark:text-[#F1F5F9] block">
+                    LokaTalenta
+                  </span>
+                  <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/30">
+                    v{pkg.version}
+                  </span>
+                </div>
+                <span className="text-[10px] text-[#545C6E] dark:text-[#8892A6] font-medium hidden xl:block">
+                  Industrial Precision Workbench
                 </span>
               </div>
             </Link>
@@ -287,14 +292,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
       <main className="flex-1">{children}</main>
 
-      <footer className="border-t border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] py-6 mt-12 print:hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#71717A] dark:text-slate-400">
+      <footer className="border-t border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#151821] py-5 mt-12 print:hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#545C6E] dark:text-[#8892A6]">
           <p>
-            LokaTalenta <span className="font-mono-tabular">v{pkg.version}</span> — Akademi Bahasa, Asesmen &amp; Kesiapan Karier
+            LokaTalenta <span className="font-mono-tabular font-semibold">v{pkg.version}</span> — Industrial Precision Learning Workbench
           </p>
           <div className="flex items-center gap-2">
             <Badge tone="emerald">PWA Ready</Badge>
-            <span>Belajar terstruktur dan ukur kesiapan Anda secara objektif.</span>
+            <span className="font-mono text-[11px] text-[#059669] dark:text-[#10B981]">100% Zero-Paywall Access</span>
           </div>
         </div>
       </footer>

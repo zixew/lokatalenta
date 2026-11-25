@@ -19,6 +19,18 @@ Gunakan CLI rilis berikut agar versi `client/package.json`, `CHANGELOG.md`, dan 
 
 ---
 
+## [4.0.0] - 2026-11-25
+
+### Major
+- Sprint 21 (v4.0.0 Major Release): Perombakan UI Anti-Slop Besar-Besaran (Major Anti-Slop UI Revamp).
+  - Mengadopsi standar *Industrial Precision Workbench* dengan token tema semantik (`index.css` OKLCH/Hex).
+  - Menghapus generic AI slop: bento grid dekoratif, kartu bertingkat (*nested cards*), dan efek glow/floating yang squander vertical space.
+  - Implementasi Hero Workbench dengan instrumentasi KPI tabular monospace (`font-mono-tabular`), meter target harian terkalibrasi, dan navigasi asesmen cepat.
+  - Penyelarasan kontras aksesibilitas WCAG 2.1 AA dan penegakan prinsip 100% Zero-Paywall.
+  - Sinkronisasi telemetri dua arah ke Kantor 3D (Sprint 21 Live).
+
+---
+
 ## [3.0.0] - 2026-11-24
 
 ### Major
