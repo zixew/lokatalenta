@@ -105,14 +105,16 @@ function exportShortlistCsv(candidates: RecruiterCandidate[]): void {
 
 function MetricCard({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
   return (
-    <div className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-4 bg-white dark:bg-[#161B22] flex flex-col gap-1">
-      <span className="text-[11px] uppercase tracking-widest text-[#71717A] dark:text-slate-500 font-medium">
+    <div className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-4 bg-white dark:bg-[#161B22] min-h-[92px] flex flex-col justify-between shadow-xs">
+      <span className="text-[11px] uppercase tracking-widest text-[#71717A] dark:text-slate-400 font-medium font-mono">
         {label}
       </span>
       <span className="text-2xl font-extrabold tabular-nums text-[#18181B] dark:text-white leading-tight">
         {value}
       </span>
-      {sub && <span className="text-[11px] text-[#A1A1AA] dark:text-slate-500">{sub}</span>}
+      <span className="text-[11px] text-[#A1A1AA] dark:text-slate-500 font-mono h-4">
+        {sub ?? ''}
+      </span>
     </div>
   );
 }

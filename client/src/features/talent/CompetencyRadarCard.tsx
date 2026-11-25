@@ -46,7 +46,7 @@ export function CompetencyRadarCard({
         : 'amber';
 
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-5">
+    <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -67,14 +67,15 @@ export function CompetencyRadarCard({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-        {/* Pure SVG 5D Radar */}
+        {/* Pure SVG 5D Radar with Zero-CLS aspect ratio reservation */}
         <div className="md:col-span-5 flex flex-col items-center gap-3">
-          <svg
-            viewBox="-75 -24 370 248"
-            className="w-full max-w-[300px] h-auto select-none"
-            role="img"
-            aria-label="Grafik Radar Kompetensi 5-Dimensi"
-          >
+          <div className="relative w-full max-w-[300px] aspect-[370/248] flex items-center justify-center">
+            <svg
+              viewBox="-75 -24 370 248"
+              className="w-full h-full select-none"
+              role="img"
+              aria-label="Grafik Radar Kompetensi 5-Dimensi"
+            >
             {/* Concentric polygon rings */}
             {RINGS.map((pct) => {
               const pts = metrics.dimensions
@@ -175,9 +176,10 @@ export function CompetencyRadarCard({
               );
             })}
           </svg>
+          </div>
 
-          {/* Interactive Dimension Tooltip */}
-          <div className="w-full max-w-[300px] min-h-[52px] rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900/70 px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs">
+          {/* Interactive Dimension Tooltip with Zero Layout Shift */}
+          <div className="w-full max-w-[300px] h-[58px] rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-[#11141B] px-3.5 py-2 flex items-center justify-between gap-2 text-xs overflow-hidden">
             {activeDimension ? (
               <>
                 <div className="min-w-0">
@@ -199,7 +201,7 @@ export function CompetencyRadarCard({
                 )}
               </>
             ) : (
-              <p className="text-[11px] text-[#71717A] dark:text-slate-400 mx-auto text-center">
+              <p className="text-[11px] text-[#71717A] dark:text-slate-400 mx-auto text-center leading-relaxed">
                 Arahkan kursor atau klik titik dimensi pada radar untuk detail &amp; latihan.
               </p>
             )}

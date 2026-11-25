@@ -304,26 +304,26 @@ export function ProfilePage() {
               {activeTab === 'overview' && (
                 <>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
-                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Kursus Diikuti</span>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 min-h-[92px] flex flex-col justify-between shadow-xs">
+                      <span className="text-xs font-medium text-[#71717A] dark:text-slate-400 block">Kursus Diikuti</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
                         {enrolledCourses.length}
                       </span>
                     </div>
-                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
-                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Materi Selesai</span>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 min-h-[92px] flex flex-col justify-between shadow-xs">
+                      <span className="text-xs font-medium text-[#71717A] dark:text-slate-400 block">Materi Selesai</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#059669] mt-1 block">
                         {completedLessonIds.length}
                       </span>
                     </div>
-                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
-                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Tes Dikerjakan</span>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 min-h-[92px] flex flex-col justify-between shadow-xs">
+                      <span className="text-xs font-medium text-[#71717A] dark:text-slate-400 block">Tes Dikerjakan</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#0F766E] mt-1 block">
                         {attempts.length}
                       </span>
                     </div>
-                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
-                      <span className="text-xs text-[#71717A] dark:text-slate-400 block">Rata-rata Skor</span>
+                    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 min-h-[92px] flex flex-col justify-between shadow-xs">
+                      <span className="text-xs font-medium text-[#71717A] dark:text-slate-400 block">Rata-rata Skor</span>
                       <span className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1 block">
                         {avgScore}%
                       </span>

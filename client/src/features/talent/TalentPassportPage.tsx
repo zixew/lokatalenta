@@ -95,7 +95,7 @@ export function TalentPassportPage() {
       </div>
 
       {/* Candidate Identity Header */}
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F766E] dark:text-teal-400">
@@ -133,27 +133,27 @@ export function TalentPassportPage() {
         </div>
 
         {/* Summary KPI Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#E5E3DC] dark:border-slate-800">
-          <div className="rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 p-3">
-            <p className="text-[11px] text-[#71717A] dark:text-slate-400">Rata-rata Psikotes</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#D4D4CE] dark:border-[#282E3D]">
+          <div className="rounded-xl bg-[#F4F4F1] dark:bg-[#11141B] border border-[#D4D4CE] dark:border-[#282E3D] p-3 min-h-[76px] flex flex-col justify-between">
+            <p className="text-[11px] font-medium text-[#71717A] dark:text-slate-400">Rata-rata Psikotes</p>
             <p className="text-lg font-bold font-mono-tabular text-[#18181B] dark:text-white">
               {passport.avg_quiz_score}/100
             </p>
           </div>
-          <div className="rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 p-3">
-            <p className="text-[11px] text-[#71717A] dark:text-slate-400">Stabilitas Kraepelin</p>
+          <div className="rounded-xl bg-[#F4F4F1] dark:bg-[#11141B] border border-[#D4D4CE] dark:border-[#282E3D] p-3 min-h-[76px] flex flex-col justify-between">
+            <p className="text-[11px] font-medium text-[#71717A] dark:text-slate-400">Stabilitas Kraepelin</p>
             <p className="text-lg font-bold font-mono-tabular text-emerald-600 dark:text-emerald-400">
               {passport.kraepelin.best_stability}%
             </p>
           </div>
-          <div className="rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 p-3">
-            <p className="text-[11px] text-[#71717A] dark:text-slate-400">Kecepatan Kraepelin</p>
+          <div className="rounded-xl bg-[#F4F4F1] dark:bg-[#11141B] border border-[#D4D4CE] dark:border-[#282E3D] p-3 min-h-[76px] flex flex-col justify-between">
+            <p className="text-[11px] font-medium text-[#71717A] dark:text-slate-400">Kecepatan Kraepelin</p>
             <p className="text-lg font-bold font-mono-tabular text-[#18181B] dark:text-white">
               {passport.kraepelin.avg_speed_kpm} KPM
             </p>
           </div>
-          <div className="rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 p-3">
-            <p className="text-[11px] text-[#71717A] dark:text-slate-400">Materi Selesai</p>
+          <div className="rounded-xl bg-[#F4F4F1] dark:bg-[#11141B] border border-[#D4D4CE] dark:border-[#282E3D] p-3 min-h-[76px] flex flex-col justify-between">
+            <p className="text-[11px] font-medium text-[#71717A] dark:text-slate-400">Materi Selesai</p>
             <p className="text-lg font-bold font-mono-tabular text-[#18181B] dark:text-white">
               {passport.completed_lessons} Materi
             </p>
@@ -165,7 +165,7 @@ export function TalentPassportPage() {
       <CompetencyRadarCard metrics={radar} interactive={false} />
 
       {/* Verified Certificates */}
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white flex items-center gap-2">
             <Award className="w-5 h-5 text-[#0F766E] dark:text-teal-400" />
@@ -179,7 +179,7 @@ export function TalentPassportPage() {
             Kandidat belum memiliki sertifikat kelulusan resmi.
           </p>
         ) : (
-          <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+          <div className="divide-y divide-[#D4D4CE] dark:divide-[#282E3D]">
             {passport.certificates.map((cert) => (
               <div
                 key={cert.cert_code}
