@@ -196,7 +196,7 @@ export function KraepelinPage() {
 
       {/* SETUP STAGE */}
       {stage === 'setup' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 sm:p-8 space-y-6">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">
               Tes Ketelitian Angka (Kraepelin &amp; Pauli)
@@ -207,7 +207,7 @@ export function KraepelinPage() {
             </p>
           </div>
 
-          <div className="bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4 text-sm text-[#18181B] dark:text-slate-200 space-y-1.5">
+          <div className="bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 text-sm text-[#18181B] dark:text-slate-200 space-y-1.5">
             <p className="font-bold text-xs uppercase tracking-wider text-[#0F766E] dark:text-teal-400">
               Aturan Pengerjaan
             </p>
@@ -235,7 +235,7 @@ export function KraepelinPage() {
                     className={`text-left p-4 rounded-xl border transition-all cursor-pointer ${
                       active
                         ? 'bg-teal-50/70 dark:bg-teal-950/50 border-[#0F766E] ring-2 ring-[#0F766E]/20'
-                        : 'bg-[#F6F5F1] dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-800 hover:border-[#0F766E]'
+                        : 'bg-[#F4F4F1] dark:bg-slate-900 border-[#D4D4CE] dark:border-[#282E3D] hover:border-[#0F766E]'
                     }`}
                   >
                     <p className="text-sm font-bold text-[#18181B] dark:text-white">{p.label}</p>
@@ -257,7 +257,7 @@ export function KraepelinPage() {
 
       {/* RUNNING STAGE */}
       {stage === 'running' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 sm:p-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
               <span className="text-xs font-semibold text-[#71717A] dark:text-slate-400">
@@ -274,7 +274,7 @@ export function KraepelinPage() {
                 className={`px-3.5 py-2 rounded-xl border font-mono-tabular text-sm font-bold flex items-center gap-1.5 ${
                   secondsLeft <= 5
                     ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 text-rose-700 dark:text-rose-300'
-                    : 'bg-[#F6F5F1] dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-white'
+                    : 'bg-[#F4F4F1] dark:bg-slate-900 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-white'
                 }`}
               >
                 <Clock className="w-4 h-4" />
@@ -288,16 +288,16 @@ export function KraepelinPage() {
 
           {/* Active Pair Focus Card */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            <div className="md:col-span-5 bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center space-y-3">
+            <div className="md:col-span-5 bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 flex flex-col items-center justify-center space-y-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#71717A] dark:text-slate-400">
                 Jumlahkan Dua Angka Ini
               </span>
               <div className="flex items-center gap-4 text-5xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white">
-                <span className="w-16 h-16 rounded-2xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 flex items-center justify-center">
+                <span className="w-16 h-16 rounded-2xl bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-center">
                   {topDigit}
                 </span>
                 <span className="text-2xl text-[#0F766E]">+</span>
-                <span className="w-16 h-16 rounded-2xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 flex items-center justify-center">
+                <span className="w-16 h-16 rounded-2xl bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-center">
                   {bottomDigit}
                 </span>
               </div>
@@ -313,7 +313,7 @@ export function KraepelinPage() {
                   key={num}
                   type="button"
                   onClick={() => handleDigitInput(num)}
-                  className="h-14 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 hover:bg-[#0F766E] hover:text-white hover:border-[#0F766E] text-xl font-bold font-mono-tabular text-[#18181B] dark:text-white transition-colors cursor-pointer"
+                  className="h-14 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 hover:bg-[#0F766E] hover:text-white hover:border-[#0F766E] text-xl font-bold font-mono-tabular text-[#18181B] dark:text-white transition-colors cursor-pointer"
                 >
                   {num}
                 </button>
@@ -326,7 +326,7 @@ export function KraepelinPage() {
       {/* RESULT STAGE */}
       {stage === 'result' && (
         <section className="space-y-6">
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 sm:p-8 space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <Badge tone="emerald">
@@ -344,7 +344,7 @@ export function KraepelinPage() {
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+              <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
                 <span className="text-xs text-[#71717A] dark:text-slate-400 block">
                   Total Terjawab
                 </span>
@@ -394,7 +394,7 @@ export function KraepelinPage() {
             </div>
 
             {/* Per-Column Speed & Accuracy Curve */}
-            <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 space-y-4">
+            <div className="pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D] space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-[#0F766E]" />
@@ -434,7 +434,7 @@ export function KraepelinPage() {
                 const activeStat = cols.find((s) => s.columnIndex === activeColIndex) ?? null;
 
                 return (
-                  <div className="rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900/70 p-3">
+                  <div className="rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900/70 p-3">
                     <svg
                       viewBox={`0 0 ${chartW} ${chartH}`}
                       className="w-full h-40 select-none"
@@ -544,7 +544,7 @@ export function KraepelinPage() {
                   return (
                     <div
                       key={stat.columnIndex}
-                      className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-2"
+                      className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-2"
                     >
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-[#18181B] dark:text-white">
@@ -572,7 +572,7 @@ export function KraepelinPage() {
 
       {/* Riwayat & Tren Ketahanan (BL-26) */}
       {stage !== 'running' && history.length > 0 && (
-        <section className="rounded-2xl border border-[#E4E4E7] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm space-y-4">
+        <section className="rounded-2xl border border-[#E4E4E7] dark:border-[#282E3D] bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <History className="h-5 w-5 text-blue-600 dark:text-blue-400" />

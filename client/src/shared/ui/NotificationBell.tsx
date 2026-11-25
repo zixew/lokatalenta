@@ -76,7 +76,7 @@ export function NotificationBell() {
         aria-expanded={open}
         aria-haspopup="true"
         title="Notifikasi"
-        className="relative p-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+        className="relative p-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
       >
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
@@ -87,8 +87,8 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed inset-x-3 top-16 sm:inset-x-auto sm:absolute sm:right-0 sm:top-auto sm:mt-2 sm:w-96 rounded-2xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 shadow-xl z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2">
+        <div className="fixed inset-x-3 top-16 sm:inset-x-auto sm:absolute sm:right-0 sm:top-auto sm:mt-2 sm:w-96 rounded-2xl bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] shadow-xl z-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-2">
             <div>
               <p className="text-sm font-bold text-[#18181B] dark:text-white">Notifikasi</p>
               <p className="text-[11px] text-[#71717A] dark:text-slate-400">
@@ -119,7 +119,7 @@ export function NotificationBell() {
                   key={n.id}
                   type="button"
                   onClick={() => handleItemClick(n)}
-                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-[#F6F5F1] dark:hover:bg-slate-800/60 transition-colors cursor-pointer ${
+                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-[#F4F4F1] dark:hover:bg-slate-800/60 transition-colors cursor-pointer ${
                     !n.is_read ? 'bg-teal-50/40 dark:bg-teal-950/20' : ''
                   }`}
                 >

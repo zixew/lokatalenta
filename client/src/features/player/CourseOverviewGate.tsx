@@ -68,7 +68,7 @@ export function CourseOverviewGate({
         {/* Left: Course Summary, Curriculum Flow & Reviews */}
         <div className="lg:col-span-8 space-y-6">
           {/* Course Summary Card */}
-          <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-5">
+          <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 sm:p-8 space-y-5">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="blue">{course.category}</Badge>
               <Badge tone="slate">{course.level}</Badge>
@@ -89,29 +89,29 @@ export function CourseOverviewGate({
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-[#E5E3DC] dark:border-slate-800 text-xs">
-              <div className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D] text-xs">
+              <div className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60">
                 <span className="text-[#71717A] dark:text-slate-400 block">Total Siswa</span>
                 <span className="font-bold text-sm text-[#18181B] dark:text-white inline-flex items-center gap-1.5 mt-1">
                   <Users className="w-3.5 h-3.5 text-[#0F766E]" />
                   {totalStudents} Pelajar
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60">
+              <div className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60">
                 <span className="text-[#71717A] dark:text-slate-400 block">Alur Modul</span>
                 <span className="font-bold text-sm text-[#18181B] dark:text-white inline-flex items-center gap-1.5 mt-1">
                   <Layers className="w-3.5 h-3.5 text-[#0F766E]" />
                   {modules.length} Modul
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60">
+              <div className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60">
                 <span className="text-[#71717A] dark:text-slate-400 block">Materi &amp; Soal</span>
                 <span className="font-bold text-sm text-[#18181B] dark:text-white inline-flex items-center gap-1.5 mt-1">
                   <BookOpen className="w-3.5 h-3.5 text-[#0F766E]" />
                   {totalLessons} Bagian
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60">
+              <div className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60">
                 <span className="text-[#71717A] dark:text-slate-400 block">Estimasi</span>
                 <span className="font-bold text-sm text-[#18181B] dark:text-white inline-flex items-center gap-1.5 mt-1">
                   <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
@@ -122,7 +122,7 @@ export function CourseOverviewGate({
           </section>
 
           {/* Alur Modul (Curriculum Roadmap) */}
-          <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-lg font-bold text-[#18181B] dark:text-white">
@@ -145,12 +145,12 @@ export function CourseOverviewGate({
                 return (
                   <div
                     key={mod.id}
-                    className="border border-[#E5E3DC] dark:border-slate-800 rounded-xl overflow-hidden"
+                    className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl overflow-hidden"
                   >
                     <button
                       type="button"
                       onClick={() => setOpenModuleId(isOpen ? null : mod.id)}
-                      className="w-full px-4 py-3.5 bg-[#F6F5F1] dark:bg-slate-800/60 flex items-center justify-between gap-3 text-left cursor-pointer"
+                      className="w-full px-4 py-3.5 bg-[#F4F4F1] dark:bg-slate-800/60 flex items-center justify-between gap-3 text-left cursor-pointer"
                     >
                       <div className="min-w-0">
                         <p className="text-xs font-semibold text-[#0F766E] dark:text-teal-400">
@@ -199,7 +199,7 @@ export function CourseOverviewGate({
           </section>
 
           {/* Ulasan & Review Pelajar */}
-          <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-lg font-bold text-[#18181B] dark:text-white">
                 Ulasan Pelajar ({reviews.length})
@@ -221,7 +221,7 @@ export function CourseOverviewGate({
                 {reviews.map((r) => (
                   <div
                     key={r.id}
-                    className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 space-y-1.5"
+                    className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] space-y-1.5"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-xs font-bold text-[#18181B] dark:text-white">
@@ -244,7 +244,7 @@ export function CourseOverviewGate({
 
         {/* Right: Sticky Enroll CTA Card */}
         <aside className="lg:col-span-4 lg:sticky lg:top-24">
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5 shadow-xs">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5 shadow-xs">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[#0F766E] dark:text-teal-400">
                 Program Pembelajaran

@@ -72,7 +72,7 @@ export function CertificatePage() {
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="h-96 bg-white border border-[#E5E3DC] rounded-2xl animate-pulse" />
+        <div className="h-96 bg-white border border-[#D4D4CE] rounded-2xl animate-pulse" />
       </div>
     );
   }
@@ -159,7 +159,7 @@ export function CertificatePage() {
       <div className="bg-white border-2 border-[#18181B] rounded-2xl p-8 sm:p-14 shadow-sm relative overflow-hidden">
         <div className="border border-[#CBD5E1] rounded-xl p-6 sm:p-10 space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E3DC] pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D4D4CE] pb-6">
             <div className="flex items-center gap-3">
               <BrandLogo className="w-10 h-10" />
               <div>
@@ -197,7 +197,7 @@ export function CertificatePage() {
           </div>
 
           {/* Footer / Signature */}
-          <div className="pt-8 border-t border-[#E5E3DC] flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+          <div className="pt-8 border-t border-[#D4D4CE] flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
               <span className="text-xs text-[#71717A] block">Diterbitkan pada</span>
               <span className="text-sm font-semibold text-[#18181B]">{issuedDate}</span>

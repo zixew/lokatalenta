@@ -59,7 +59,7 @@ export function StudentCohortCard({ userId, courses }: StudentCohortCardProps) {
   });
 
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+    <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-5 sm:p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -86,7 +86,7 @@ export function StudentCohortCard({ userId, courses }: StudentCohortCardProps) {
           value={inviteCode}
           onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
           placeholder="Masukkan kode undangan (mis. LOKA-XXXXXX)"
-          className="flex-1 px-3.5 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-sm font-mono-tabular uppercase text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+          className="flex-1 px-3.5 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-sm font-mono-tabular uppercase text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
         />
         <Button type="submit" size="sm" disabled={joinMut.isPending || !inviteCode.trim()}>
           {joinMut.isPending ? 'Memproses...' : 'Gabung Cohort'}
@@ -110,7 +110,7 @@ export function StudentCohortCard({ userId, courses }: StudentCohortCardProps) {
             return (
               <div
                 key={cohort.id}
-                className="p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">

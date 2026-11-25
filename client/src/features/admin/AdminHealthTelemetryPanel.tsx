@@ -29,7 +29,7 @@ export function AdminHealthTelemetryPanel() {
 
   return (
     <div className="space-y-6">
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -55,7 +55,7 @@ export function AdminHealthTelemetryPanel() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-1">
+          <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-1">
             <span className="text-xs text-[#71717A] dark:text-slate-400">Versi Aplikasi</span>
             <p className="text-lg font-extrabold font-mono-tabular text-[#18181B] dark:text-white">
               v{pkg.version}
@@ -63,7 +63,7 @@ export function AdminHealthTelemetryPanel() {
             <Badge tone="emerald">{snapshot?.mode ?? 'Memeriksa...'}</Badge>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-1">
+          <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-1">
             <span className="text-xs text-[#71717A] dark:text-slate-400 flex items-center gap-1">
               <Database className="w-3.5 h-3.5" /> Latensi Database
             </span>
@@ -77,7 +77,7 @@ export function AdminHealthTelemetryPanel() {
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-1">
+          <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-1">
             <span className="text-xs text-[#71717A] dark:text-slate-400 flex items-center gap-1">
               <Server className="w-3.5 h-3.5" /> Service Worker / PWA
             </span>
@@ -89,7 +89,7 @@ export function AdminHealthTelemetryPanel() {
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-1">
+          <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-1">
             <span className="text-xs text-[#71717A] dark:text-slate-400">Aktivitas 24 Jam</span>
             <p className="text-lg font-extrabold font-mono-tabular text-[#18181B] dark:text-white">
               {snapshot?.attempts24h !== undefined
@@ -105,8 +105,8 @@ export function AdminHealthTelemetryPanel() {
         </div>
       </section>
 
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-3">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-500" />
             <div>
@@ -131,7 +131,7 @@ export function AdminHealthTelemetryPanel() {
             Tidak ada error runtime client yang tercatat pada sesi browser ini (sessionStorage).
           </div>
         ) : (
-          <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+          <div className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
             {errors.map((err) => (
               <div
                 key={err.id}

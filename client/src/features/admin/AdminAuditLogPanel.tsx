@@ -64,8 +64,8 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
   );
 
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+      <div className="px-6 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-[#0F766E]" />
@@ -91,7 +91,7 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
         </div>
       </div>
 
-      <div className="px-6 py-3 border-b border-[#E5E3DC] dark:border-slate-800 bg-[#FAFAF9] dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div className="px-6 py-3 border-b border-[#D4D4CE] dark:border-[#282E3D] bg-[#FAFAF9] dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex flex-wrap gap-1.5">
           {ACTION_FILTERS.map((item) => (
             <button
@@ -104,7 +104,7 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
               className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                 actionFilter === item.value
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-white dark:bg-slate-800 border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  : 'bg-white dark:bg-slate-800 border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               {item.label}
@@ -121,7 +121,7 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
               setPage(1);
             }}
             placeholder="Cari aktor atau target..."
-            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-[#E5E3DC] dark:border-slate-700 rounded-lg text-xs text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg text-xs text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           />
         </div>
       </div>
@@ -132,7 +132,7 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
         </div>
       ) : (
         <>
-          <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+          <div className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
             {pagedLogs.map((log) => (
               <div
                 key={log.id}
@@ -163,7 +163,7 @@ export function AdminAuditLogPanel({ logs, onExportCsv }: AdminAuditLogPanelProp
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="px-6 py-3 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+            <div className="px-6 py-3 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
               <span>
                 Halaman {safePage} dari {totalPages}
               </span>

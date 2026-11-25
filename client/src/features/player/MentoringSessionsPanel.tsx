@@ -43,7 +43,7 @@ export function MentoringSessionsPanel({
 
   if (sessions.length === 0) {
     return (
-      <div className="p-6 text-center rounded-xl border border-dashed border-[#E5E3DC] dark:border-slate-700">
+      <div className="p-6 text-center rounded-xl border border-dashed border-[#D4D4CE] dark:border-[#282E3D]">
         <Video className="w-7 h-7 text-[#71717A] mx-auto mb-2 opacity-70" />
         <p className="text-sm font-medium text-[#18181B] dark:text-white">
           Belum ada jadwal sesi live untuk kursus ini
@@ -65,7 +65,7 @@ export function MentoringSessionsPanel({
         return (
           <div
             key={s.id}
-            className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 space-y-2.5"
+            className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] space-y-2.5"
           >
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>

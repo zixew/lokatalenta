@@ -64,7 +64,7 @@ export function AssignmentPanel({
 
   if (visibleAssignments.length === 0) {
     return (
-      <div className="p-6 text-center rounded-xl border border-dashed border-[#E5E3DC] dark:border-slate-700">
+      <div className="p-6 text-center rounded-xl border border-dashed border-[#D4D4CE] dark:border-[#282E3D]">
         <ClipboardList className="w-7 h-7 text-[#71717A] mx-auto mb-2 opacity-70" />
         <p className="text-sm font-medium text-[#18181B] dark:text-white">
           Belum ada tugas untuk materi ini
@@ -192,7 +192,7 @@ function AssignmentCard({
   const canSubmit = (!requiresFile || Boolean(fileUrl)) && !uploading && !submitMut.isPending;
 
   return (
-    <div className="p-4 sm:p-5 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/50 border border-[#E5E3DC] dark:border-slate-700 space-y-4">
+    <div className="p-4 sm:p-5 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/50 border border-[#D4D4CE] dark:border-[#282E3D] space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -217,14 +217,14 @@ function AssignmentCard({
       </div>
 
       {/* 3 Guide Tabs: Yang Harus Dikerjakan | Cara Mengerjakan | Kriteria Penilaian (1-5) */}
-      <div className="flex flex-wrap gap-1.5 border-b border-[#E5E3DC] dark:border-slate-700 pb-2.5">
+      <div className="flex flex-wrap gap-1.5 border-b border-[#D4D4CE] dark:border-[#282E3D] pb-2.5">
         <button
           type="button"
           onClick={() => setGuideTab('brief')}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
             guideTab === 'brief'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#E5E3DC] dark:border-slate-700'
+              : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#D4D4CE] dark:border-[#282E3D]'
           }`}
         >
           <ListChecks className="w-3.5 h-3.5" />
@@ -237,7 +237,7 @@ function AssignmentCard({
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
             guideTab === 'howto'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#E5E3DC] dark:border-slate-700'
+              : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#D4D4CE] dark:border-[#282E3D]'
           }`}
         >
           <Compass className="w-3.5 h-3.5" />
@@ -250,7 +250,7 @@ function AssignmentCard({
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
             guideTab === 'rubric'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#E5E3DC] dark:border-slate-700'
+              : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#D4D4CE] dark:border-[#282E3D]'
           }`}
         >
           <Star className="w-3.5 h-3.5" />
@@ -259,7 +259,7 @@ function AssignmentCard({
       </div>
 
       {/* Tab Content */}
-      <div className="p-3.5 rounded-xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 text-xs">
+      <div className="p-3.5 rounded-xl bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-xs">
         {guideTab === 'brief' && (
           <div className="space-y-1.5 text-[#18181B] dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
             <p className="font-bold text-[#0F766E] dark:text-teal-400">
@@ -290,7 +290,7 @@ function AssignmentCard({
               {rubric.map((item) => (
                 <div
                   key={item.stars}
-                  className="p-2.5 rounded-lg bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700"
+                  className="p-2.5 rounded-lg bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D]"
                 >
                   <div className="flex items-center gap-1.5 font-bold text-[#18181B] dark:text-white">
                     <span className="text-amber-500">
@@ -365,7 +365,7 @@ function AssignmentCard({
             onChange={(e) => setText(e.target.value)}
             rows={2}
             placeholder="Catatan tambahan untuk mentor (opsional)..."
-            className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           />
 
           <div className="flex flex-wrap items-center justify-between gap-2">

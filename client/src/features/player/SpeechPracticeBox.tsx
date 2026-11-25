@@ -88,7 +88,7 @@ export function SpeechPracticeBox({ lines }: { lines: VoiceLine[] }) {
   };
 
   return (
-    <div className="rounded-2xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] p-5 space-y-4">
+    <div className="rounded-2xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] p-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Mic className="w-4 h-4 text-[#0F766E]" />
@@ -112,7 +112,7 @@ export function SpeechPracticeBox({ lines }: { lines: VoiceLine[] }) {
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
               selectedIdx === i
                 ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#18181B] dark:text-slate-200 border-[#E5E3DC] dark:border-slate-700'
+                : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#18181B] dark:text-slate-200 border-[#D4D4CE] dark:border-[#282E3D]'
             }`}
           >
             {line.text}
@@ -120,7 +120,7 @@ export function SpeechPracticeBox({ lines }: { lines: VoiceLine[] }) {
         ))}
       </div>
 
-      <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 space-y-2">
+      <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 space-y-2">
         <p className="text-lg font-extrabold text-[#18181B] dark:text-white">{current.text}</p>
         {current.romaji && (
           <p className="text-xs font-semibold text-[#0F766E] dark:text-teal-400">

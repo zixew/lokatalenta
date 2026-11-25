@@ -61,7 +61,7 @@ export function SearchablePicker({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full px-3 py-2 text-left rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-[#18181B] dark:text-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-[#0F766E] cursor-pointer"
+        className="w-full px-3 py-2 text-left rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-sm text-[#18181B] dark:text-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-[#0F766E] cursor-pointer"
       >
         <div className="min-w-0">
           <span className="block truncate font-medium">
@@ -77,8 +77,8 @@ export function SearchablePicker({
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 mt-1 rounded-xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 shadow-xl z-40 overflow-hidden">
-          <div className="p-2 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center gap-2">
+        <div className="absolute left-0 right-0 mt-1 rounded-xl bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] shadow-xl z-40 overflow-hidden">
+          <div className="p-2 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-[#71717A] shrink-0" />
             <input
               type="text"
@@ -115,7 +115,7 @@ export function SearchablePicker({
                       setOpen(false);
                       setQuery('');
                     }}
-                    className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2 text-xs hover:bg-[#F6F5F1] dark:hover:bg-slate-800 cursor-pointer ${
+                    className={`w-full px-3 py-2 text-left flex items-center justify-between gap-2 text-xs hover:bg-[#F4F4F1] dark:hover:bg-slate-800 cursor-pointer ${
                       isSelected ? 'bg-teal-50/70 dark:bg-teal-950/30 font-semibold' : ''
                     }`}
                   >

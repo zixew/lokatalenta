@@ -112,15 +112,15 @@ export function LessonExtrasPanel({
   if (!user) return null;
 
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
-      <div className="flex flex-wrap items-center gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
+    <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5">
+      <div className="flex flex-wrap items-center gap-2 border-b border-[#D4D4CE] dark:border-[#282E3D] pb-3">
         <button
           type="button"
           onClick={() => setTab('qa')}
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
             tab === 'qa'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5" />
@@ -133,7 +133,7 @@ export function LessonExtrasPanel({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
             tab === 'assignments'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
           }`}
         >
           <ClipboardList className="w-3.5 h-3.5" />
@@ -146,7 +146,7 @@ export function LessonExtrasPanel({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
             tab === 'mentor_chat'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
           }`}
         >
           <MessageCircle className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ export function LessonExtrasPanel({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
             tab === 'live_sessions'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Video className="w-3.5 h-3.5" />
@@ -172,7 +172,7 @@ export function LessonExtrasPanel({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
             tab === 'reviews'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Star className="w-3.5 h-3.5" />
@@ -213,7 +213,7 @@ export function LessonExtrasPanel({
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               placeholder="Tanyakan sesuatu atau berikan tanggapan tentang materi ini..."
-              className="flex-1 px-3.5 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="flex-1 px-3.5 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
             <Button type="submit" size="sm" disabled={addCommentMut.isPending}>
               <Send className="w-3.5 h-3.5" />
@@ -237,7 +237,7 @@ export function LessonExtrasPanel({
                   return (
                     <div
                       key={c.id}
-                      className="p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900/60 space-y-2.5"
+                      className="p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900/60 space-y-2.5"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-2">
@@ -288,7 +288,7 @@ export function LessonExtrasPanel({
                           {replies.map((r) => (
                             <div
                               key={r.id}
-                              className="p-2.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 space-y-1"
+                              className="p-2.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] space-y-1"
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-1.5">
@@ -338,7 +338,7 @@ export function LessonExtrasPanel({
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder="Tulis balasan untuk pertanyaan ini..."
-                            className="flex-1 px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                            className="flex-1 px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                           />
                           <Button type="submit" size="sm" disabled={addCommentMut.isPending}>
                             Kirim Balasan
@@ -361,7 +361,7 @@ export function LessonExtrasPanel({
               e.preventDefault();
               submitReviewMut.mutate();
             }}
-            className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900/60 space-y-3"
+            className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900/60 space-y-3"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-[#18181B] dark:text-white">
@@ -392,7 +392,7 @@ export function LessonExtrasPanel({
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
               placeholder="Bagikan pengalaman belajar Anda di kursus ini..."
-              className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
             <div className="flex items-center justify-between">
               <span className="text-xs text-emerald-700 dark:text-emerald-400">
@@ -409,7 +409,7 @@ export function LessonExtrasPanel({
               {reviews.map((rev) => (
                 <div
                   key={rev.id}
-                  className="p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-800 space-y-1"
+                  className="p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] space-y-1"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[#18181B] dark:text-white">

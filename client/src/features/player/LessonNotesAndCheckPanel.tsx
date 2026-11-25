@@ -85,7 +85,7 @@ export function LessonNotesAndCheckPanel({
   };
 
   return (
-    <div className="rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1]/70 dark:bg-slate-900/60 p-4 sm:p-5 space-y-4">
+    <div className="rounded-2xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1]/70 dark:bg-slate-900/60 p-4 sm:p-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <button
@@ -94,7 +94,7 @@ export function LessonNotesAndCheckPanel({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border cursor-pointer transition-colors ${
               activeTab === 'check'
                 ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700'
+                : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#D4D4CE] dark:border-[#282E3D]'
             }`}
           >
             <HelpCircle className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export function LessonNotesAndCheckPanel({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border cursor-pointer transition-colors ${
               activeTab === 'notes'
                 ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700'
+                : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#D4D4CE] dark:border-[#282E3D]'
             }`}
           >
             <StickyNote className="w-3.5 h-3.5" />
@@ -135,7 +135,7 @@ export function LessonNotesAndCheckPanel({
                   className={`w-full text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm transition-colors cursor-pointer ${
                     isSelected
                       ? 'bg-teal-50 dark:bg-teal-950/60 border-[#0F766E] text-[#18181B] dark:text-white font-semibold'
-                      : 'bg-white dark:bg-[#161B22] border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                      : 'bg-white dark:bg-[#161B22] border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                   }`}
                 >
                   {opt}
@@ -180,7 +180,7 @@ export function LessonNotesAndCheckPanel({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Tulis rangkuman, rumus cepat, atau catatan pribadi untuk materi ini..."
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           />
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] text-[#71717A] dark:text-slate-400">

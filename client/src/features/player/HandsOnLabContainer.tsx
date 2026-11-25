@@ -21,8 +21,8 @@ export function HandsOnLabContainer({
   const [activeLab, setActiveLab] = useState<LabTab>(defaultLab);
 
   return (
-    <section className="rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+    <section className="rounded-2xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] overflow-hidden">
+      <div className="px-5 py-3.5 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {activeLab === 'sql' ? (
             <Database className="w-4 h-4 text-[#0F766E]" />
@@ -38,7 +38,7 @@ export function HandsOnLabContainer({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-lg bg-[#F6F5F1] dark:bg-slate-800 p-0.5">
+          <div className="inline-flex rounded-lg bg-[#F4F4F1] dark:bg-slate-800 p-0.5">
             <button
               type="button"
               onClick={() => {
@@ -89,7 +89,7 @@ export function HandsOnLabContainer({
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="px-2.5 py-1 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#52525B] dark:text-slate-300 inline-flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#52525B] dark:text-slate-300 inline-flex items-center gap-1 cursor-pointer"
           >
             {expanded ? (
               <>

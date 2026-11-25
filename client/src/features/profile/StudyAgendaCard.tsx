@@ -32,7 +32,7 @@ export function StudyAgendaCard({ items }: StudyAgendaCardProps) {
   };
 
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+    <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-5 sm:p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -60,7 +60,7 @@ export function StudyAgendaCard({ items }: StudyAgendaCardProps) {
               className={`px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer ${
                 filter === f.id
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                  : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
               }`}
             >
               {f.label}
@@ -81,7 +81,7 @@ export function StudyAgendaCard({ items }: StudyAgendaCardProps) {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className={`p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 border-l-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              className={`p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 border-l-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                 item.urgency === 'live'
                   ? 'border-l-rose-500'
                   : item.urgency === 'soon'

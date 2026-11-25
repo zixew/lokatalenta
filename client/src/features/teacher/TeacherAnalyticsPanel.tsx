@@ -158,7 +158,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
 
   return (
     <div className="space-y-4">
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <div className="flex items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -173,25 +173,25 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+          <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
             <div className="text-[11px] text-[#71717A] dark:text-slate-400">Total Enrollment</div>
             <div className="text-xl font-bold font-mono-tabular text-[#18181B] dark:text-white mt-0.5">
               {analytics.totalEnrollments}
             </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+          <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
             <div className="text-[11px] text-[#71717A] dark:text-slate-400">Tingkat Kelulusan (≥70%)</div>
             <div className="text-xl font-bold font-mono-tabular text-emerald-700 dark:text-emerald-400 mt-0.5">
               {analytics.passRatePct}%
             </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+          <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
             <div className="text-[11px] text-[#71717A] dark:text-slate-400">Rata-rata Nilai Tes</div>
             <div className="text-xl font-bold font-mono-tabular text-[#0F766E] dark:text-teal-400 mt-0.5">
               {analytics.avgScore}
             </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+          <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
             <div className="text-[11px] text-[#71717A] dark:text-slate-400">Rata-rata Progres Materi</div>
             <div className="text-xl font-bold font-mono-tabular text-[#18181B] dark:text-white mt-0.5">
               {analytics.avgCompletionPct}%
@@ -200,7 +200,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 space-y-3">
+          <div className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wide text-[#71717A] dark:text-slate-400">
               Funnel Progres &amp; Drop-off per Kursus
             </h3>
@@ -233,7 +233,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
             )}
           </div>
 
-          <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 space-y-3">
+          <div className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wide text-[#71717A] dark:text-slate-400">
               Distribusi Kategori Bank Soal
             </h3>
@@ -244,7 +244,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
                 {analytics.categoryBreakdown.map((cat) => (
                   <div
                     key={cat.category}
-                    className="px-3 py-2 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 flex items-center gap-2 text-xs"
+                    className="px-3 py-2 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] flex items-center gap-2 text-xs"
                   >
                     <span className="font-semibold text-[#18181B] dark:text-white">{cat.category}</span>
                     <Badge tone="slate">{cat.count} soal</Badge>
@@ -257,7 +257,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
       </div>
 
       {/* Analitik Butir Soal (Item Analysis) */}
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -272,7 +272,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
             <select
               value={activeQuiz?.quizId ?? ''}
               onChange={(e) => setSelectedQuizId(e.target.value)}
-              className="px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800 text-[#18181B] dark:text-white max-w-xs"
+              className="px-3 py-1.5 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-800 text-[#18181B] dark:text-white max-w-xs"
             >
               {quizOptions.map((opt) => (
                 <option key={opt.quizId} value={opt.quizId}>
@@ -295,7 +295,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b border-[#E5E3DC] dark:border-slate-800 text-[#71717A] dark:text-slate-400">
+                <tr className="border-b border-[#D4D4CE] dark:border-[#282E3D] text-[#71717A] dark:text-slate-400">
                   <th className="py-2 pr-3 font-semibold">#</th>
                   <th className="py-2 pr-3 font-semibold">Pertanyaan</th>
                   <th className="py-2 pr-3 font-semibold">Kategori</th>
@@ -304,7 +304,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
                   <th className="py-2 font-semibold">Tingkat Kesulitan</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {displayedItemRows.map((row, idx) => {
                   const difficulty =
                     row.total_answered === 0
@@ -315,7 +315,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
                       ? { label: 'Sedang', tone: 'amber' as const }
                       : { label: 'Sulit', tone: 'rose' as const };
                   return (
-                    <tr key={row.question_id} className="hover:bg-[#F6F5F1]/60 dark:hover:bg-slate-800/40">
+                    <tr key={row.question_id} className="hover:bg-[#F4F4F1]/60 dark:hover:bg-slate-800/40">
                       <td className="py-2.5 pr-3 font-mono-tabular text-[#71717A]">{idx + 1}</td>
                       <td className="py-2.5 pr-3 max-w-md">
                         <p className="text-[#18181B] dark:text-white line-clamp-1">
@@ -344,7 +344,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
       </div>
 
       {/* Clickable Student Drill-Down List */}
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-3">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <div>
             <h3 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -361,7 +361,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
         {studentProgress.length === 0 ? (
           <p className="text-xs text-[#71717A] dark:text-slate-400">Belum ada data siswa.</p>
         ) : (
-          <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800 max-h-64 overflow-y-auto">
+          <div className="divide-y divide-[#D4D4CE] dark:divide-slate-800 max-h-64 overflow-y-auto">
             {studentProgress.map((st, idx) => {
               const pct =
                 st.total_lessons > 0
@@ -372,7 +372,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
                   key={`${st.student_email}-${st.course_title}-${idx}`}
                   type="button"
                   onClick={() => setSelectedStudent(st)}
-                  className="w-full py-2.5 px-2 flex items-center justify-between gap-3 text-left hover:bg-[#F6F5F1] dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer"
+                  className="w-full py-2.5 px-2 flex items-center justify-between gap-3 text-left hover:bg-[#F4F4F1] dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer"
                 >
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-[#18181B] dark:text-white truncate">
@@ -413,7 +413,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
           onClick={() => setSelectedStudent(null)}
         >
           <div
-            className="w-full max-w-md rounded-2xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 p-6 space-y-4 shadow-xl"
+            className="w-full max-w-md rounded-2xl bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] p-6 space-y-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-2">
@@ -435,7 +435,7 @@ export function TeacherAnalyticsPanel({ studentProgress, courses }: TeacherAnaly
               </button>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-2 text-xs">
+            <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-2 text-xs">
               <div className="flex justify-between gap-2">
                 <span className="text-[#71717A] dark:text-slate-400">Kursus</span>
                 <span className="font-semibold text-[#18181B] dark:text-white text-right">

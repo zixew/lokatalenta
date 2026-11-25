@@ -145,7 +145,7 @@ export default function TypingTestPage() {
       </div>
 
       {/* Controls */}
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-[#71717A] dark:text-slate-400 mr-1">
             Durasi:
@@ -158,7 +158,7 @@ export default function TypingTestPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 durationSec === d
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                  : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
               }`}
             >
               {d} Detik
@@ -178,7 +178,7 @@ export default function TypingTestPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 presetId === p.id
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                  : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
               }`}
             >
               {p.category}
@@ -189,7 +189,7 @@ export default function TypingTestPage() {
 
       {/* Live Metrics Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
           <span className="text-xs text-[#71717A] dark:text-slate-400 flex items-center gap-1">
             <Timer className="w-3.5 h-3.5" /> Sisa Waktu
           </span>
@@ -197,19 +197,19 @@ export default function TypingTestPage() {
             {timeLeft}s
           </p>
         </div>
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
           <span className="text-xs text-[#71717A] dark:text-slate-400">Kecepatan (WPM)</span>
           <p className="text-2xl font-extrabold font-mono-tabular text-[#0F766E] dark:text-teal-400 mt-1">
             {metrics.wpm} <span className="text-xs font-medium">WPM</span>
           </p>
         </div>
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
           <span className="text-xs text-[#71717A] dark:text-slate-400">Akurasi Ketik</span>
           <p className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1">
             {metrics.accuracyPct}%
           </p>
         </div>
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
           <span className="text-xs text-[#71717A] dark:text-slate-400">Karakter / Salah</span>
           <p className="text-2xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-1">
             {metrics.cpm} <span className="text-xs font-medium text-rose-500">({metrics.errorCount} err)</span>
@@ -218,7 +218,7 @@ export default function TypingTestPage() {
       </div>
 
       {/* Prompt Display & Input */}
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-bold uppercase tracking-wider text-[#0F766E] dark:text-teal-400">
             {activePreset.title}
@@ -238,7 +238,7 @@ export default function TypingTestPage() {
         </div>
 
         <div
-          className="p-4 sm:p-5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 font-mono text-sm sm:text-base leading-relaxed select-none break-words"
+          className="p-4 sm:p-5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] font-mono text-sm sm:text-base leading-relaxed select-none break-words"
           aria-label="Teks target latihan mengetik"
         >
           {activePreset.text.split('').map((ch, idx) => {
@@ -270,12 +270,12 @@ export default function TypingTestPage() {
           onChange={(e) => handleInputChange(e.target.value)}
           disabled={status === 'finished'}
           placeholder="Mulai ketik teks di atas di sini — timer otomatis berjalan pada ketukan pertama..."
-          className="w-full p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E] disabled:opacity-60"
+          className="w-full p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm font-mono text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E] disabled:opacity-60"
         />
       </section>
 
       {/* History */}
-      <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
           <Award className="w-4 h-4 text-[#0F766E]" />
           Riwayat Latihan Mengetik ({history.length})
@@ -288,7 +288,7 @@ export default function TypingTestPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="border-b border-[#E5E3DC] dark:border-slate-800 text-[#71717A] dark:text-slate-400">
+              <thead className="border-b border-[#D4D4CE] dark:border-[#282E3D] text-[#71717A] dark:text-slate-400">
                 <tr>
                   <th className="py-2 pr-4">Paket</th>
                   <th className="py-2 pr-4">WPM</th>
@@ -297,7 +297,7 @@ export default function TypingTestPage() {
                   <th className="py-2">Durasi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {history.slice(0, 8).map((item) => (
                   <tr key={item.id}>
                     <td className="py-2.5 pr-4 font-medium text-[#18181B] dark:text-white">

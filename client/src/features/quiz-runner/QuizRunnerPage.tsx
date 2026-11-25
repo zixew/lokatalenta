@@ -854,7 +854,7 @@ export function QuizRunnerPage() {
               Ragu-ragu
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 inline-block" />
+              <span className="w-3 h-3 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-[#282E3D] inline-block" />
               Kosong
             </div>
           </div>

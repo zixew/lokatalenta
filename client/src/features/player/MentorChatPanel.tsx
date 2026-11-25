@@ -64,7 +64,7 @@ export function MentorChatPanel({
         <Badge tone="emerald">1-on-1 Privat</Badge>
       </div>
 
-      <div className="max-h-72 overflow-y-auto space-y-2.5 p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/50 border border-[#E5E3DC] dark:border-slate-700">
+      <div className="max-h-72 overflow-y-auto space-y-2.5 p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/50 border border-[#D4D4CE] dark:border-[#282E3D]">
         {messages.length === 0 ? (
           <p className="text-xs text-[#71717A] dark:text-slate-400 text-center py-6">
             Belum ada pesan konsultasi. Tanyakan kendala belajar atau hasil latihan Anda kepada mentor.
@@ -81,7 +81,7 @@ export function MentorChatPanel({
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs space-y-1 ${
                     isMine
                       ? 'bg-[#0F766E] text-white'
-                      : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-200'
+                      : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-200'
                   }`}
                 >
                   <p className="font-semibold text-[11px] opacity-85">
@@ -108,7 +108,7 @@ export function MentorChatPanel({
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Tulis pesan konsultasi pribadi untuk mentor..."
-          className="flex-1 px-3.5 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+          className="flex-1 px-3.5 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
         />
         <Button type="submit" size="sm" disabled={sendMut.isPending}>
           <Send className="w-3.5 h-3.5" />

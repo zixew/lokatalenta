@@ -49,7 +49,7 @@ export function MilestoneToast({
         className={`fixed bottom-5 right-5 z-50 max-w-sm w-[calc(100vw-2.5rem)] rounded-2xl border p-4 shadow-lg backdrop-blur-sm flex items-start gap-3 ${
           isModule
             ? 'bg-emerald-950/95 border-emerald-700 text-white'
-            : 'bg-white/95 dark:bg-[#161B22]/95 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-white'
+            : 'bg-white/95 dark:bg-[#161B22]/95 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-white'
         }`}
       >
         <div

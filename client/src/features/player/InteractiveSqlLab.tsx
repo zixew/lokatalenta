@@ -44,7 +44,7 @@ export function InteractiveSqlLab() {
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
               scenarioIdx === idx
                 ? 'bg-[#0F766E] text-white'
-                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             {idx + 1}. {sc.title}
@@ -57,7 +57,7 @@ export function InteractiveSqlLab() {
         className={`p-3.5 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
           passed
             ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
-            : 'bg-[#F6F5F1] dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-800 text-[#18181B] dark:text-slate-200'
+            : 'bg-[#F4F4F1] dark:bg-slate-900 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-200'
         }`}
       >
         <div className="space-y-0.5">
@@ -128,7 +128,7 @@ export function InteractiveSqlLab() {
             }
           }}
           placeholder="Tulis query SELECT ... FROM karyawan ..."
-          className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-tabular text-xs text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+          className="w-full px-3.5 py-2.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 font-mono-tabular text-xs text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
         />
         <div className="flex items-center justify-between gap-2">
           <span className="text-[11px] text-[#71717A] dark:text-slate-400">
@@ -151,9 +151,9 @@ export function InteractiveSqlLab() {
           <div className="flex items-center justify-between">
             <Badge tone="slate">{result.rows.length} baris dikembalikan</Badge>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-[#E5E3DC] dark:border-slate-800">
+          <div className="overflow-x-auto rounded-xl border border-[#D4D4CE] dark:border-[#282E3D]">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-[#71717A] dark:text-slate-400">
+              <thead className="bg-[#F4F4F1] dark:bg-slate-900 border-b border-[#D4D4CE] dark:border-[#282E3D] text-[#71717A] dark:text-slate-400">
                 <tr>
                   {result.columns.map((col) => (
                     <th key={col} className="px-3.5 py-2 font-mono-tabular font-semibold">
@@ -162,7 +162,7 @@ export function InteractiveSqlLab() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {result.rows.length === 0 ? (
                   <tr>
                     <td

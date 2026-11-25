@@ -83,13 +83,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               aria-label="Ganti tema terang atau gelap"
               title={theme === 'light' ? 'Aktifkan Mode Gelap' : 'Aktifkan Mode Terang'}
-              className="p-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              className="p-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </button>
 
             {user ? (
-              <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-[#282E3D]">
                 {user.role === 'admin' ? (
                   <div className="hidden sm:block text-right leading-tight">
                     <p className="text-sm font-semibold text-[#18181B] dark:text-white max-w-[140px] truncate">
@@ -141,7 +141,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setMobileMenuOpen((v) => !v)}
               aria-label="Menu navigasi"
-              className="lg:hidden p-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              className="lg:hidden p-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -150,7 +150,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
         {/* Mobile/Tablet Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] px-4 py-4 space-y-3">
+          <div className="lg:hidden border-t border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] px-4 py-4 space-y-3">
             <nav className="flex flex-col gap-1">
               {user?.role === 'admin' ? (
                 <Link

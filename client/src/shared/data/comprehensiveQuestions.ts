@@ -9,7 +9,7 @@ const svgDataUrl = (svg: string) =>
 
 const IMG_ROTATION_90 = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <path d="M55 25 L55 85 M55 25 L42 40 M55 25 L68 40" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -34,7 +34,7 @@ const IMG_ROTATION_90 = svgDataUrl(`
 
 const IMG_SIDES_COUNT = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <polygon points="55,22 88,82 22,82" fill="none" stroke="#18181B" stroke-width="3"/>
@@ -62,7 +62,7 @@ const IMG_SIDES_COUNT = svgDataUrl(`
 
 const IMG_MATRIX_3X3 = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" width="360" height="320">
-  <rect width="360" height="320" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="360" height="320" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <rect x="20" y="20" width="90" height="80" rx="6" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
   <circle cx="65" cy="60" r="18" fill="none" stroke="#18181B" stroke-width="3"/>
   <rect x="135" y="20" width="90" height="80" rx="6" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
@@ -88,7 +88,7 @@ const IMG_MATRIX_3X3 = svgDataUrl(`
 
 const IMG_LINES_COUNT = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <line x1="30" y1="25" x2="30" y2="85" stroke="#18181B" stroke-width="4" stroke-linecap="round"/>
@@ -113,7 +113,7 @@ const IMG_LINES_COUNT = svgDataUrl(`
 
 const IMG_ODD_ONE_OUT = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(15,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <text x="10" y="20" font-family="sans-serif" font-size="12" font-weight="bold" fill="#71717A">A</text>
@@ -144,7 +144,7 @@ const IMG_ODD_ONE_OUT = svgDataUrl(`
 
 const IMG_HALF_SHADE_ROTATE = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <rect x="25" y="25" width="60" height="60" fill="none" stroke="#18181B" stroke-width="3"/>
@@ -169,7 +169,7 @@ const IMG_HALF_SHADE_ROTATE = svgDataUrl(`
 
 const IMG_DOTS_ALTERNATE = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <circle cx="55" cy="55" r="24" fill="none" stroke="#18181B" stroke-width="3"/>
@@ -197,7 +197,7 @@ const IMG_DOTS_ALTERNATE = svgDataUrl(`
 
 const IMG_MIRROR_TRIANGLE = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" width="420" height="150">
-  <rect width="420" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="420" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <polygon points="30,85 30,25 85,85" fill="#0F766E" stroke="#18181B" stroke-width="3"/>
@@ -213,7 +213,7 @@ const IMG_MIRROR_TRIANGLE = svgDataUrl(`
 
 const IMG_CROSS_DIAGONAL = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <line x1="25" y1="25" x2="85" y2="85" stroke="#18181B" stroke-width="4"/>
@@ -238,7 +238,7 @@ const IMG_CROSS_DIAGONAL = svgDataUrl(`
 
 const IMG_NESTED_SIZE = svgDataUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 150" width="640" height="150">
-  <rect width="640" height="150" rx="10" fill="#F6F5F1" stroke="#CBD5E1" stroke-width="2"/>
+  <rect width="640" height="150" rx="10" fill="#F4F4F1" stroke="#CBD5E1" stroke-width="2"/>
   <g transform="translate(20,20)">
     <rect width="110" height="110" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
     <circle cx="55" cy="55" r="34" fill="none" stroke="#18181B" stroke-width="3"/>

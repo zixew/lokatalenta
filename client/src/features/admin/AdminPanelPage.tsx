@@ -650,7 +650,7 @@ export function AdminPanelPage() {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-950/50 text-[#0F766E] dark:text-teal-400 flex items-center justify-center">
             <Users className="w-5 h-5" />
           </div>
@@ -662,7 +662,7 @@ export function AdminPanelPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-[#059669] dark:text-emerald-400 flex items-center justify-center">
             <BookOpen className="w-5 h-5" />
           </div>
@@ -674,7 +674,7 @@ export function AdminPanelPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-[#D97706] dark:text-amber-400 flex items-center justify-center">
             <Shield className="w-5 h-5" />
           </div>
@@ -689,7 +689,7 @@ export function AdminPanelPage() {
 
       {/* Pure-SVG Grafik Distribusi Role & Status Kursus (BL-40D) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4 sm:p-5 flex items-center gap-5">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 sm:p-5 flex items-center gap-5">
           {(() => {
             const total = Math.max(1, userDistribution.total);
             const r = 28;
@@ -699,7 +699,7 @@ export function AdminPanelPage() {
             const adminLen = (userDistribution.admin / total) * c;
             return (
               <svg width="76" height="76" viewBox="0 0 76 76" className="shrink-0 -rotate-90" aria-label="Grafik distribusi role pengguna">
-                <circle cx="38" cy="38" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-[#E5E3DC] dark:text-slate-800" />
+                <circle cx="38" cy="38" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-[#D4D4CE] dark:text-slate-800" />
                 {userDistribution.total > 0 && (
                   <>
                     <circle
@@ -767,7 +767,7 @@ export function AdminPanelPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4 sm:p-5 flex items-center gap-5">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 sm:p-5 flex items-center gap-5">
           {(() => {
             const total = Math.max(1, courseDistribution.total);
             const r = 28;
@@ -776,7 +776,7 @@ export function AdminPanelPage() {
             const draftLen = (courseDistribution.draft / total) * c;
             return (
               <svg width="76" height="76" viewBox="0 0 76 76" className="shrink-0 -rotate-90" aria-label="Grafik status publikasi kursus">
-                <circle cx="38" cy="38" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-[#E5E3DC] dark:text-slate-800" />
+                <circle cx="38" cy="38" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-[#D4D4CE] dark:text-slate-800" />
                 {courseDistribution.total > 0 && (
                   <>
                     <circle
@@ -847,14 +847,14 @@ export function AdminPanelPage() {
       )}
 
       {/* Section Switcher Tabs */}
-      <div className="flex flex-nowrap md:flex-wrap overflow-x-auto gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
+      <div className="flex flex-nowrap md:flex-wrap overflow-x-auto gap-2 border-b border-[#D4D4CE] dark:border-[#282E3D] pb-3">
         <button
           type="button"
           onClick={() => setActiveTab('users')}
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'users'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -866,7 +866,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'courses'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <BookOpen className="w-4 h-4" />
@@ -878,7 +878,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'cohorts'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -890,7 +890,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'community'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
@@ -902,7 +902,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'certificates'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Award className="w-4 h-4" />
@@ -914,7 +914,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'broadcasts'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Megaphone className="w-4 h-4" />
@@ -926,7 +926,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'audit'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <ClipboardList className="w-4 h-4" />
@@ -938,7 +938,7 @@ export function AdminPanelPage() {
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 cursor-pointer ${
             activeTab === 'health'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -948,9 +948,9 @@ export function AdminPanelPage() {
 
       {/* TAB 1: USER MANAGEMENT */}
       {activeTab === 'users' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
           {/* Role & Status Distribution Summary Bar */}
-          <div className="px-4 sm:px-5 py-3.5 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#E5E3DC] dark:border-slate-800 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="px-4 sm:px-5 py-3.5 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#D4D4CE] dark:border-[#282E3D] grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span className="font-semibold text-[#52525B] dark:text-slate-300">
@@ -971,7 +971,7 @@ export function AdminPanelPage() {
                   </span>
                 </div>
               </div>
-              <div className="h-2 rounded-full bg-[#E5E3DC] dark:bg-slate-800 overflow-hidden flex">
+              <div className="h-2 rounded-full bg-[#D4D4CE] dark:bg-slate-800 overflow-hidden flex">
                 {userDistribution.total > 0 && (
                   <>
                     <div
@@ -1007,7 +1007,7 @@ export function AdminPanelPage() {
                   </span>
                 </div>
               </div>
-              <div className="h-2 rounded-full bg-[#E5E3DC] dark:bg-slate-800 overflow-hidden flex">
+              <div className="h-2 rounded-full bg-[#D4D4CE] dark:bg-slate-800 overflow-hidden flex">
                 {userDistribution.total > 0 && (
                   <>
                     <div
@@ -1024,7 +1024,7 @@ export function AdminPanelPage() {
             </div>
           </div>
 
-          <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 space-y-3">
+          <div className="p-4 sm:p-5 border-b border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
                 <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1036,7 +1036,7 @@ export function AdminPanelPage() {
                     setUserPage(1);
                   }}
                   placeholder="Cari nama atau email pengguna..."
-                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
 
@@ -1052,7 +1052,7 @@ export function AdminPanelPage() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                       roleFilter === r
                         ? 'bg-[#0F766E] text-white'
-                        : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                        : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                     }`}
                   >
                     {r === 'all'
@@ -1077,7 +1077,7 @@ export function AdminPanelPage() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                       statusFilter === st
                         ? 'bg-[#18181B] dark:bg-white text-white dark:text-[#18181B]'
-                        : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                        : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                     }`}
                   >
                     {st === 'all' ? 'Semua Status' : st === 'active' ? 'Aktif' : 'Nonaktif'}
@@ -1102,7 +1102,7 @@ export function AdminPanelPage() {
           </div>
 
           {/* Mobile Stacked Cards (390px) */}
-          <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
+          <div className="md:hidden divide-y divide-[#D4D4CE] dark:divide-slate-800">
             {pagedProfiles.length === 0 ? (
               <div className="px-4 py-8 text-center text-xs text-[#71717A]">
                 Tidak ada pengguna yang sesuai dengan filter.
@@ -1139,7 +1139,7 @@ export function AdminPanelPage() {
                           className={`py-1.5 rounded-md text-xs font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                             p.role === role
                               ? 'bg-[#0F766E] text-white'
-                              : 'border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                              : 'border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                           }`}
                         >
                           {role === 'student' ? 'Pelajar' : role === 'teacher' ? 'Pengajar' : role === 'recruiter' ? 'Rekruter' : 'Admin'}
@@ -1179,7 +1179,7 @@ export function AdminPanelPage() {
 
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
+              <thead className="bg-[#F4F4F1] dark:bg-slate-900 border-b border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
                 <tr>
                   <th className="px-6 py-3">Pengguna</th>
                   <th className="px-6 py-3">Role Saat Ini</th>
@@ -1187,7 +1187,7 @@ export function AdminPanelPage() {
                   <th className="px-6 py-3 text-right">Status Akun</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {pagedProfiles.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-8 text-center text-xs text-[#71717A]">
@@ -1217,7 +1217,7 @@ export function AdminPanelPage() {
                         </Badge>
                       </td>
                       <td className="px-6 py-3.5">
-                        <div className="inline-flex rounded-lg border border-[#E5E3DC] dark:border-slate-700 overflow-hidden">
+                        <div className="inline-flex rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] overflow-hidden">
                           {(['student', 'teacher', 'recruiter', 'admin'] as UserRole[]).map((roleOpt) => {
                             const isSelf = p.id === currentUser?.id;
                             return (
@@ -1297,7 +1297,7 @@ export function AdminPanelPage() {
           </div>
 
           {totalUserPages > 1 && (
-            <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+            <div className="px-6 py-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
               <span>
                 Halaman {safeUserPage} dari {totalUserPages} ({filteredProfiles.length} pengguna)
               </span>
@@ -1328,8 +1328,8 @@ export function AdminPanelPage() {
 
       {/* TAB 2: COURSE MODERATION */}
       {activeTab === 'courses' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-          <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 space-y-3">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
                 <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1341,7 +1341,7 @@ export function AdminPanelPage() {
                     setCoursePage(1);
                   }}
                   placeholder="Cari judul kursus atau nama pengajar..."
-                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
 
@@ -1357,7 +1357,7 @@ export function AdminPanelPage() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                       publishFilter === st
                         ? 'bg-[#0F766E] text-white'
-                        : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                        : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                     }`}
                   >
                     {st === 'all' ? 'Semua Status' : st === 'published' ? 'Terbit' : 'Draft'}
@@ -1378,7 +1378,7 @@ export function AdminPanelPage() {
                   className={`px-2.5 py-1 rounded-full text-xs font-medium border cursor-pointer ${
                     categoryFilter === cat
                       ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                      : 'bg-[#F6F5F1] dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                      : 'bg-[#F4F4F1] dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                   }`}
                 >
                   {cat}
@@ -1388,7 +1388,7 @@ export function AdminPanelPage() {
           </div>
 
           {/* Mobile Stacked Cards (390px) — Courses */}
-          <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
+          <div className="md:hidden divide-y divide-[#D4D4CE] dark:divide-slate-800">
             {pagedCourses.length === 0 ? (
               <div className="px-4 py-8 text-center text-xs text-[#71717A]">
                 Tidak ada kursus yang sesuai dengan filter.
@@ -1444,7 +1444,7 @@ export function AdminPanelPage() {
 
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
+              <thead className="bg-[#F4F4F1] dark:bg-slate-900 border-b border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
                 <tr>
                   <th className="px-6 py-3">Kursus</th>
                   <th className="px-6 py-3">Kategori</th>
@@ -1452,7 +1452,7 @@ export function AdminPanelPage() {
                   <th className="px-6 py-3 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {pagedCourses.map((c) => (
                   <tr key={c.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
                     <td className="px-6 py-3.5">
@@ -1502,7 +1502,7 @@ export function AdminPanelPage() {
           </div>
 
           {totalCoursePages > 1 && (
-            <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+            <div className="px-6 py-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
               <span>
                 Halaman {safeCoursePage} dari {totalCoursePages} ({filteredCourses.length} kursus)
               </span>
@@ -1533,8 +1533,8 @@ export function AdminPanelPage() {
 
       {/* TAB: COMMUNITY MODERATION */}
       {activeTab === 'community' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-          <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 space-y-3">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
                 <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1546,7 +1546,7 @@ export function AdminPanelPage() {
                     setCommunityPage(1);
                   }}
                   placeholder="Cari judul, isi, atau penulis postingan..."
-                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <Badge tone="slate">{filteredCommunityPosts.length} Postingan</Badge>
@@ -1564,7 +1564,7 @@ export function AdminPanelPage() {
                   className={`px-2.5 py-1 rounded-full text-xs font-medium border cursor-pointer ${
                     communityCategoryFilter === cat
                       ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                      : 'bg-[#F6F5F1] dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                      : 'bg-[#F4F4F1] dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                   }`}
                 >
                   {cat}
@@ -1575,8 +1575,8 @@ export function AdminPanelPage() {
 
           {isCommunityLoading ? (
             <div className="p-6 space-y-3">
-              <div className="h-20 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
-              <div className="h-20 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-20 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-20 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
             </div>
           ) : filteredCommunityPosts.length === 0 ? (
             <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
@@ -1584,7 +1584,7 @@ export function AdminPanelPage() {
             </div>
           ) : (
             <>
-              <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <div className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {pagedCommunityPosts.map((post) => (
                   <div
                     key={post.id}
@@ -1649,7 +1649,7 @@ export function AdminPanelPage() {
                 ))}
               </div>
               {totalCommunityPages > 1 && (
-                <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+                <div className="px-6 py-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
                   <span>
                     Halaman {safeCommunityPage} dari {totalCommunityPages} ({filteredCommunityPosts.length} postingan)
                   </span>
@@ -1682,8 +1682,8 @@ export function AdminPanelPage() {
 
       {/* TAB: CERTIFICATES MANAGEMENT */}
       {activeTab === 'certificates' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-          <div className="p-4 sm:p-5 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 text-[#71717A] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -1694,7 +1694,7 @@ export function AdminPanelPage() {
                   setCertPage(1);
                 }}
                 placeholder="Cari kode sertifikat, penerima, atau kursus..."
-                className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             </div>
 
@@ -1710,7 +1710,7 @@ export function AdminPanelPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
                     certStatusFilter === st
                       ? 'bg-[#0F766E] text-white'
-                      : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                      : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                   }`}
                 >
                   {st === 'all' ? 'Semua Status' : st === 'valid' ? 'Aktif' : 'Dicabut'}
@@ -1721,8 +1721,8 @@ export function AdminPanelPage() {
 
           {isCertsLoading ? (
             <div className="p-6 space-y-3">
-              <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
-              <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-16 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-16 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
             </div>
           ) : filteredCertificates.length === 0 ? (
             <div className="p-8 text-center text-sm text-[#71717A] dark:text-slate-400">
@@ -1731,7 +1731,7 @@ export function AdminPanelPage() {
           ) : (
             <>
               {/* Mobile Cards */}
-              <div className="md:hidden divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <div className="md:hidden divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {pagedCertificates.map((cert) => {
                   const isRevoked = Boolean(cert.revoked_at);
                   return (
@@ -1760,7 +1760,7 @@ export function AdminPanelPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           to={`/verify/${encodeURIComponent(cert.cert_code)}`}
-                          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#0F766E] dark:text-teal-400 hover:bg-[#F6F5F1] dark:hover:bg-slate-800"
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#0F766E] dark:text-teal-400 hover:bg-[#F4F4F1] dark:hover:bg-slate-800"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                           Lihat Verifikasi
@@ -1788,7 +1788,7 @@ export function AdminPanelPage() {
               {/* Desktop Table */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
+                  <thead className="bg-[#F4F4F1] dark:bg-slate-900 border-b border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
                     <tr>
                       <th className="px-6 py-3">Kode Sertifikat</th>
                       <th className="px-6 py-3">Penerima &amp; Kursus</th>
@@ -1797,7 +1797,7 @@ export function AdminPanelPage() {
                       <th className="px-6 py-3 text-right">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                  <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                     {pagedCertificates.map((cert) => {
                       const isRevoked = Boolean(cert.revoked_at);
                       return (
@@ -1865,7 +1865,7 @@ export function AdminPanelPage() {
                 </table>
               </div>
               {totalCertPages > 1 && (
-                <div className="px-6 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
+                <div className="px-6 py-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
                   <span>
                     Halaman {safeCertPage} dari {totalCertPages} ({filteredCertificates.length} sertifikat)
                   </span>
@@ -1898,8 +1898,8 @@ export function AdminPanelPage() {
 
       {/* TAB: SUPERVISI COHORT */}
       {activeTab === 'cohorts' && (
-        <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-          <div className="px-4 sm:px-5 py-4 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+          <div className="px-4 sm:px-5 py-4 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-[#18181B] dark:text-white">
                 Supervisi Cohort Lintas Mentor
@@ -1918,7 +1918,7 @@ export function AdminPanelPage() {
             </div>
           </div>
 
-          <div className="p-4 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-col sm:flex-row gap-3">
+          <div className="p-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -1926,14 +1926,14 @@ export function AdminPanelPage() {
                 value={cohortSearch}
                 onChange={(e) => setCohortSearch(e.target.value)}
                 placeholder="Cari nama cohort, mentor, kursus, atau kode undangan..."
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
               />
             </div>
             <select
               value={cohortStatusFilter}
               onChange={(e) => setCohortStatusFilter(e.target.value as 'all' | 'active' | 'archived')}
               aria-label="Filter status cohort"
-              className="px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+              className="px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
             >
               <option value="all">Semua Status</option>
               <option value="active">Aktif</option>
@@ -1953,7 +1953,7 @@ export function AdminPanelPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-[#E5E3DC] dark:border-slate-800 text-xs uppercase text-[#71717A] dark:text-slate-400 bg-[#FAFAF9] dark:bg-slate-900/40">
+                  <tr className="border-b border-[#D4D4CE] dark:border-[#282E3D] text-xs uppercase text-[#71717A] dark:text-slate-400 bg-[#FAFAF9] dark:bg-slate-900/40">
                     <th className="py-3 px-4 font-semibold">Cohort</th>
                     <th className="py-3 px-4 font-semibold">Mentor</th>
                     <th className="py-3 px-4 font-semibold">Kursus</th>
@@ -1963,7 +1963,7 @@ export function AdminPanelPage() {
                     <th className="py-3 px-4 font-semibold text-right">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                   {filteredCohorts.map((cohort) => (
                     <tr key={cohort.id} className="hover:bg-[#FAFAF9] dark:hover:bg-slate-900/30">
                       <td className="py-3 px-4">
@@ -2016,7 +2016,7 @@ export function AdminPanelPage() {
       {/* TAB: PENGUMUMAN GLOBAL */}
       {activeTab === 'broadcasts' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <section className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-4 h-fit">
+          <section className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-5 space-y-4 h-fit">
             <div>
               <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                 <Megaphone className="w-4 h-4 text-[#0F766E]" />
@@ -2045,7 +2045,7 @@ export function AdminPanelPage() {
                   value={broadcastTitle}
                   onChange={(e) => setBroadcastTitle(e.target.value)}
                   placeholder="Contoh: Pemeliharaan Terjadwal Minggu Ini"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
                 />
               </div>
 
@@ -2059,7 +2059,7 @@ export function AdminPanelPage() {
                   value={broadcastMessage}
                   onChange={(e) => setBroadcastMessage(e.target.value)}
                   placeholder="Tuliskan detail informasi singkat dan jelas untuk pengguna..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
                 />
               </div>
 
@@ -2071,7 +2071,7 @@ export function AdminPanelPage() {
                   <select
                     value={broadcastTargetRole}
                     onChange={(e) => setBroadcastTargetRole(e.target.value as BroadcastTargetRole)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
                   >
                     <option value="all">Semua Pengguna</option>
                     <option value="student">Pelajar</option>
@@ -2087,7 +2087,7 @@ export function AdminPanelPage() {
                   <select
                     value={broadcastSeverity}
                     onChange={(e) => setBroadcastSeverity(e.target.value as BroadcastSeverity)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white"
                   >
                     <option value="info">Info</option>
                     <option value="warning">Peringatan</option>
@@ -2110,8 +2110,8 @@ export function AdminPanelPage() {
             </form>
           </section>
 
-          <section className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between">
+          <section className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+            <div className="px-5 py-4 bg-[#FAFAF9] dark:bg-slate-900/50 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-[#18181B] dark:text-white">
                   Daftar Pengumuman Global
@@ -2132,7 +2132,7 @@ export function AdminPanelPage() {
                 Belum ada pengumuman global yang dibuat.
               </div>
             ) : (
-              <div className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+              <div className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                 {allBroadcasts.map((item) => (
                   <div
                     key={item.id}
@@ -2225,8 +2225,8 @@ export function AdminPanelPage() {
           aria-modal="true"
           aria-label="Pratinjau Kursus"
         >
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-xl">
-            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-start justify-between gap-3">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-xl">
+            <div className="px-5 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-start justify-between gap-3">
               <div className="space-y-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone="blue">Mode Pratinjau (Hanya Baca)</Badge>
@@ -2264,11 +2264,11 @@ export function AdminPanelPage() {
 
                 {isPreviewLoading ? (
                   <div className="space-y-2">
-                    <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
-                    <div className="h-16 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+                    <div className="h-16 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
+                    <div className="h-16 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
                   </div>
                 ) : (previewCourseDetail?.modules ?? previewCourse.modules ?? []).length === 0 ? (
-                  <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 text-xs text-[#71717A] dark:text-slate-400 text-center">
+                  <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 text-xs text-[#71717A] dark:text-slate-400 text-center">
                     Kursus ini belum memiliki modul atau pelajaran.
                   </div>
                 ) : (
@@ -2277,9 +2277,9 @@ export function AdminPanelPage() {
                       (mod, mIdx) => (
                         <div
                           key={mod.id}
-                          className="border border-[#E5E3DC] dark:border-slate-800 rounded-xl overflow-hidden"
+                          className="border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl overflow-hidden"
                         >
-                          <div className="px-4 py-2.5 bg-[#F6F5F1] dark:bg-slate-900/70 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2">
+                          <div className="px-4 py-2.5 bg-[#F4F4F1] dark:bg-slate-900/70 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-2">
                             <span className="text-xs font-bold text-[#18181B] dark:text-white">
                               Modul {mIdx + 1}: {mod.title}
                             </span>
@@ -2292,7 +2292,7 @@ export function AdminPanelPage() {
                               Belum ada pelajaran di modul ini.
                             </div>
                           ) : (
-                            <ul className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                            <ul className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                               {mod.lessons.map((lesson, lIdx) => (
                                 <li
                                   key={lesson.id}
@@ -2335,7 +2335,7 @@ export function AdminPanelPage() {
               </div>
             </div>
 
-            <div className="px-5 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-end gap-2 bg-[#FAFAF9] dark:bg-slate-900/40">
+            <div className="px-5 py-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-end gap-2 bg-[#FAFAF9] dark:bg-slate-900/40">
               <Button variant="secondary" size="sm" onClick={() => setPreviewCourse(null)}>
                 Tutup Pratinjau
               </Button>
@@ -2358,7 +2358,7 @@ export function AdminPanelPage() {
               if (!revokeReason.trim()) return;
               revokeCertMut.mutate({ certId: revokeTarget.id, reason: revokeReason });
             }}
-            className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl"
+            className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl"
           >
             <div className="flex items-start justify-between gap-2">
               <div>
@@ -2393,7 +2393,7 @@ export function AdminPanelPage() {
                 value={revokeReason}
                 onChange={(e) => setRevokeReason(e.target.value)}
                 placeholder="Contoh: Ditemukan pelanggaran integritas ujian atau kesalahan penerbitan data..."
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500"
               />
             </div>
 
@@ -2428,8 +2428,8 @@ export function AdminPanelPage() {
           aria-modal="true"
           aria-label="Detail Postingan Komunitas"
         >
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-xl">
-            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-start justify-between gap-3">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-xl">
+            <div className="px-5 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-start justify-between gap-3">
               <div className="space-y-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone="blue">{previewPost.category}</Badge>
@@ -2458,7 +2458,7 @@ export function AdminPanelPage() {
                 {previewPost.content}
               </p>
             </div>
-            <div className="px-5 py-3.5 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2 bg-[#FAFAF9] dark:bg-slate-900/40">
+            <div className="px-5 py-3.5 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-2 bg-[#FAFAF9] dark:bg-slate-900/40">
               <Button
                 variant="danger"
                 size="sm"
@@ -2488,8 +2488,8 @@ export function AdminPanelPage() {
           aria-modal="true"
           aria-label="Detail Inspeksi"
         >
-          <div className="bg-white dark:bg-[#161B22] border-l border-[#E5E3DC] dark:border-slate-800 w-full max-w-md h-full flex flex-col shadow-2xl">
-            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#161B22] border-l border-[#D4D4CE] dark:border-[#282E3D] w-full max-w-md h-full flex flex-col shadow-2xl">
+            <div className="px-5 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-3">
               <h2 className="text-base font-bold text-[#18181B] dark:text-white">
                 {drawerTarget.type === 'user' ? 'Detail Pengguna' : 'Detail Kursus'}
               </h2>
@@ -2535,7 +2535,7 @@ export function AdminPanelPage() {
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-2 text-xs">
+                  <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-2 text-xs">
                     <div>
                       <span className="text-[#71717A] dark:text-slate-400 block">ID Pengguna</span>
                       <span className="font-mono text-[#18181B] dark:text-slate-200 break-all">
@@ -2582,7 +2582,7 @@ export function AdminPanelPage() {
                             className={`py-2 rounded-lg text-xs font-semibold cursor-pointer ${
                               drawerTarget.user.role === roleOpt
                                 ? 'bg-[#0F766E] text-white'
-                                : 'border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                                : 'border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                             }`}
                           >
                             {roleOpt === 'student'
@@ -2635,7 +2635,7 @@ export function AdminPanelPage() {
                     {drawerTarget.course.description}
                   </p>
 
-                  <div className="p-3.5 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-1.5 text-xs">
+                  <div className="p-3.5 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-1.5 text-xs">
                     <div>
                       <span className="text-[#71717A] dark:text-slate-400 block">Slug</span>
                       <span className="font-mono text-[#18181B] dark:text-slate-200">

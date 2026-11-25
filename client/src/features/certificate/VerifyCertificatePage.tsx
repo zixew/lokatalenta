@@ -38,7 +38,7 @@ export function VerifyCertificatePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-6">
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-5">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 sm:p-8 space-y-5">
         <div className="flex items-center gap-3">
           <BrandLogo className="w-10 h-10 shrink-0" />
           <div>
@@ -58,7 +58,7 @@ export function VerifyCertificatePage() {
             className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
               verifyTab === 'certificate'
                 ? 'bg-[#0F766E] text-white'
-                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
             }`}
           >
             <Award className="w-3.5 h-3.5" />
@@ -70,7 +70,7 @@ export function VerifyCertificatePage() {
             className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${
               verifyTab === 'passport'
                 ? 'bg-[#0F766E] text-white'
-                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
@@ -87,7 +87,7 @@ export function VerifyCertificatePage() {
                 value={inputCode}
                 onChange={(e) => setInputCode(e.target.value)}
                 placeholder="Masukkan nomor sertifikat (contoh: LT-XXXX-XXXX-2026)"
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             ) : (
               <input
@@ -95,7 +95,7 @@ export function VerifyCertificatePage() {
                 value={passportIdInput}
                 onChange={(e) => setPassportIdInput(e.target.value)}
                 placeholder="Masukkan ID Talent Passport kandidat (UUID)"
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             )}
           </div>
@@ -107,7 +107,7 @@ export function VerifyCertificatePage() {
         {certCode.trim() && (
           <div className="pt-2">
             {isLoading ? (
-              <div className="h-32 rounded-xl bg-[#F6F5F1] dark:bg-slate-800 animate-pulse" />
+              <div className="h-32 rounded-xl bg-[#F4F4F1] dark:bg-slate-800 animate-pulse" />
             ) : cert ? (
               (() => {
                 const certRecord = cert as CertificateWithRevocation;
@@ -208,7 +208,7 @@ export function VerifyCertificatePage() {
           </div>
         )}
 
-        <div className="pt-2 border-t border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-[#71717A] dark:text-slate-400">
+        <div className="pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-2 text-xs text-[#71717A] dark:text-slate-400">
           <span className="inline-flex items-center gap-1.5">
             <Award className="w-3.5 h-3.5 text-[#0F766E]" />
             LokaTalenta Credential Verification

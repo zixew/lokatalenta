@@ -110,7 +110,7 @@ export function TeacherCohortPanel({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       {/* Left: Create Cohort */}
-      <section className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <section className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-[#0F766E]" />
           <h2 className="text-base font-bold text-[#18181B] dark:text-white">
@@ -135,7 +135,7 @@ export function TeacherCohortPanel({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: BUMN Batch 2026 - Kelas Intensif"
-              className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
 
@@ -164,7 +164,7 @@ export function TeacherCohortPanel({
               max={500}
               value={maxMembers}
               onChange={(e) => setMaxMembers(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
 
@@ -176,7 +176,7 @@ export function TeacherCohortPanel({
       </section>
 
       {/* Right: Cohort List */}
-      <section className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <section className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-bold text-[#18181B] dark:text-white">
@@ -211,7 +211,7 @@ export function TeacherCohortPanel({
             {cohorts.map((cohort) => (
               <div
                 key={cohort.id}
-                className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-3"
+                className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 space-y-3"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
@@ -234,8 +234,8 @@ export function TeacherCohortPanel({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#E5E3DC] dark:border-slate-800">
-                  <code className="px-2.5 py-1 rounded-md bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 text-xs font-bold font-mono-tabular text-[#0F766E] dark:text-teal-400">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D]">
+                  <code className="px-2.5 py-1 rounded-md bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-xs font-bold font-mono-tabular text-[#0F766E] dark:text-teal-400">
                     {cohort.invite_code}
                   </code>
                   <div className="flex flex-wrap items-center gap-2">
@@ -298,8 +298,8 @@ export function TeacherCohortPanel({
           aria-modal="true"
           aria-label={`Anggota Cohort ${selectedCohort.name}`}
         >
-          <div className="w-full max-w-lg bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-3">
+          <div className="w-full max-w-lg bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl shadow-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold text-[#18181B] dark:text-white">
                   Anggota Cohort: {selectedCohort.name}
@@ -331,7 +331,7 @@ export function TeacherCohortPanel({
                 members.map((member) => (
                   <div
                     key={member.user_id}
-                    className="p-3 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex items-center justify-between gap-3"
+                    className="p-3 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 flex items-center justify-between gap-3"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#18181B] dark:text-white truncate">

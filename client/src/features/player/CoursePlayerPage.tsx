@@ -183,7 +183,7 @@ export function CoursePlayerPage() {
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        <div className="h-96 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl animate-pulse" />
+        <div className="h-96 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -300,10 +300,10 @@ export function CoursePlayerPage() {
                     }}
                     className={`w-full text-left p-3 rounded-xl border text-sm transition-colors flex items-start gap-2.5 ${
                       locked
-                        ? 'bg-slate-50 dark:bg-slate-900/30 border-[#E5E3DC] dark:border-slate-800 text-[#94A3B8] dark:text-slate-500 opacity-65 cursor-not-allowed'
+                        ? 'bg-slate-50 dark:bg-slate-900/30 border-[#D4D4CE] dark:border-[#282E3D] text-[#94A3B8] dark:text-slate-500 opacity-65 cursor-not-allowed'
                         : isActive
                         ? 'bg-teal-50/70 dark:bg-teal-950/50 border-[#0F766E] text-[#18181B] dark:text-white cursor-pointer'
-                        : 'bg-white dark:bg-slate-900/60 border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'
+                        : 'bg-white dark:bg-slate-900/60 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer'
                     }`}
                   >
                     <div className="mt-0.5 shrink-0">
@@ -494,7 +494,7 @@ export function CoursePlayerPage() {
                 </p>
               </div>
 
-              <div className="bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              <div className="bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div>
                   <span className="text-xs text-[#71717A] dark:text-slate-400 block">Durasi Pengerjaan</span>
                   <span className="font-bold text-[#18181B] dark:text-white">
@@ -610,7 +610,7 @@ export function CoursePlayerPage() {
 
               {/* Recent Attempts for this Quiz */}
               {attempts.filter((a) => a.quiz_id === activeLesson.quiz!.id).length > 0 && (
-                <div className="pt-6 border-t border-[#E5E3DC] dark:border-slate-800 space-y-3">
+                <div className="pt-6 border-t border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
                   <h3 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                     <Trophy className="w-4 h-4 text-[#D97706]" />
                     Riwayat Pengerjaan Anda
@@ -621,7 +621,7 @@ export function CoursePlayerPage() {
                       .map((att) => (
                         <div
                           key={att.id}
-                          className="flex items-center justify-between p-3.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-sm"
+                          className="flex items-center justify-between p-3.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-sm"
                         >
                           <div>
                             <span className="font-semibold text-[#18181B] dark:text-white">
@@ -645,13 +645,13 @@ export function CoursePlayerPage() {
               )}
               {/* Coursera / Dicoding Bottom Back & Continue Bar for Quiz */}
               {(prevLesson || nextLesson) && (
-                <div className="pt-6 border-t border-[#E5E3DC] dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="pt-6 border-t border-[#D4D4CE] dark:border-[#282E3D] grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     {prevLesson && (
                       <button
                         type="button"
                         onClick={() => setActiveLessonId(prevLesson.id)}
-                        className="w-full text-left p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer"
+                        className="w-full text-left p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer"
                       >
                         <ArrowLeft className="w-4 h-4 text-[#71717A] shrink-0" />
                         <div className="min-w-0">
@@ -674,7 +674,7 @@ export function CoursePlayerPage() {
                         className={`w-full text-right p-3.5 rounded-xl border transition-colors flex items-center justify-end gap-3 ${
                           isLessonDone(activeLesson)
                             ? 'border-[#0F766E] bg-[#0F766E] text-white hover:bg-[#115E59] cursor-pointer'
-                            : 'border-[#E5E3DC] dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-[#94A3B8] dark:text-slate-500 cursor-not-allowed'
+                            : 'border-[#D4D4CE] dark:border-[#282E3D] bg-slate-50 dark:bg-slate-900/40 text-[#94A3B8] dark:text-slate-500 cursor-not-allowed'
                         }`}
                       >
                         <div className="min-w-0">
@@ -699,7 +699,7 @@ export function CoursePlayerPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-[#E5E3DC] dark:border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-[#D4D4CE] dark:border-[#282E3D] pb-4">
                 <div>
                   <Badge tone="slate">
                     {activeLesson.type === 'video' ? 'Materi Video' : 'Materi Bacaan'}
@@ -732,8 +732,8 @@ export function CoursePlayerPage() {
               </div>
 
               {activeLesson.voice_lines && activeLesson.voice_lines.length > 0 && (
-                <div className="bg-[#F6F5F1] dark:bg-slate-900/70 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-5 space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
+                <div className="bg-[#F4F4F1] dark:bg-slate-900/70 border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#D4D4CE] dark:border-[#282E3D] pb-3">
                     <div className="flex items-center gap-2">
                       <Volume2 className="w-4 h-4 text-[#0F766E] dark:text-teal-400" />
                       <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
@@ -751,7 +751,7 @@ export function CoursePlayerPage() {
                         className={`px-2.5 py-1 rounded-lg font-semibold border cursor-pointer ${
                           flashcardMode
                             ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                            : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-200'
+                            : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-200'
                         }`}
                       >
                         {flashcardMode ? 'Mode Daftar Audio' : 'Mode Flashcard'}
@@ -766,7 +766,7 @@ export function CoursePlayerPage() {
                         className={`px-2.5 py-1 rounded-lg font-semibold border cursor-pointer ${
                           speechMode
                             ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                            : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-200'
+                            : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-200'
                         }`}
                       >
                         Latihan Bicara
@@ -784,7 +784,7 @@ export function CoursePlayerPage() {
                           className={`px-2.5 py-1 rounded-lg font-semibold border cursor-pointer ${
                             writingMode
                               ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                              : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-200'
+                              : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-200'
                           }`}
                         >
                           Latihan Menulis
@@ -799,7 +799,7 @@ export function CoursePlayerPage() {
                           className={`px-2 py-0.5 rounded font-mono-tabular font-semibold border cursor-pointer ${
                             speechRate === rate
                               ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                              : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                              : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                           }`}
                         >
                           {rate === 0.8 ? '0.8x' : '1.0x'}
@@ -819,7 +819,7 @@ export function CoursePlayerPage() {
                       {activeLesson.voice_lines.map((line, idx) => (
                         <div
                           key={idx}
-                          className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-3.5 flex items-center justify-between gap-3"
+                          className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-3.5 flex items-center justify-between gap-3"
                         >
                           <div className="min-w-0 space-y-0.5">
                             <p className="text-sm sm:text-base font-bold text-[#18181B] dark:text-white">
@@ -880,7 +880,7 @@ export function CoursePlayerPage() {
               )}
 
               {/* Coursera / Dicoding Bottom Back & Continue Bar */}
-              <div className="pt-6 border-t border-[#E5E3DC] dark:border-slate-800 space-y-4">
+              <div className="pt-6 border-t border-[#D4D4CE] dark:border-[#282E3D] space-y-4">
                 <div className="flex items-center justify-between text-xs text-[#71717A] dark:text-slate-400">
                   <span>Estimasi baca: {activeLesson.duration_minutes} menit</span>
                   {!nextLesson && user && !isMentorPreview && (
@@ -901,7 +901,7 @@ export function CoursePlayerPage() {
                         <button
                           type="button"
                           onClick={() => setActiveLessonId(prevLesson.id)}
-                          className="w-full text-left p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer"
+                          className="w-full text-left p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer"
                         >
                           <ArrowLeft className="w-4 h-4 text-[#71717A] shrink-0" />
                           <div className="min-w-0">
@@ -991,9 +991,9 @@ export function CoursePlayerPage() {
             role="dialog"
             aria-modal="true"
             aria-label="Daftar Materi"
-            className="w-full max-w-sm h-full bg-white dark:bg-[#161B22] border-l border-[#E5E3DC] dark:border-slate-800 shadow-xl flex flex-col"
+            className="w-full max-w-sm h-full bg-white dark:bg-[#161B22] border-l border-[#D4D4CE] dark:border-[#282E3D] shadow-xl flex flex-col"
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E3DC] dark:border-slate-800">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D]">
               <span className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                 <ListOrdered className="w-4 h-4 text-[#0F766E]" />
                 Daftar Materi

@@ -145,7 +145,7 @@ export function TryoutPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+                  : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
               }`}
             >
               {cat === 'ALL' ? 'Semua Kategori' : cat}
@@ -164,7 +164,7 @@ export function TryoutPage() {
             return (
               <div
                 key={ev.id}
-                className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4"
+                className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export function TryoutPage() {
                   </span>
                 </div>
 
-                <div className="pt-3 border-t border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div className="pt-3 border-t border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-3">
                   <span className="text-xs font-medium text-[#0F766E] dark:text-teal-400">
                     {ev.prizeNote}
                   </span>
@@ -263,7 +263,7 @@ export function TryoutPage() {
           })}
         </div>
 
-        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <Trophy className="w-4 h-4 text-amber-500" />
@@ -283,7 +283,7 @@ export function TryoutPage() {
               id="tryout-leaderboard-event-select"
               value={selectedLeaderboardEventId}
               onChange={(e) => setSelectedLeaderboardEventId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg text-xs font-medium bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full px-3 py-2 rounded-lg text-xs font-medium bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             >
               <option value="GLOBAL">Global XP (Semua Aktivitas)</option>
               {events.map((ev) => (
@@ -299,7 +299,7 @@ export function TryoutPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-11 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800"
+                  className="h-11 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]"
                 />
               ))}
             </div>
@@ -314,7 +314,7 @@ export function TryoutPage() {
               {leaderboard.map((entry, idx) => (
                 <div
                   key={entry.user_id}
-                  className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2 text-xs"
+                  className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-2 text-xs"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="w-6 h-6 rounded-full bg-[#0F766E]/10 text-[#0F766E] dark:text-teal-400 font-bold flex items-center justify-center shrink-0">

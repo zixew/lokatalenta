@@ -9,7 +9,7 @@ interface BadgeProps {
 export function Badge({ tone = 'slate', children, className = '' }: BadgeProps) {
   const tones: Record<NonNullable<BadgeProps['tone']>, string> = {
     slate:
-      'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+      'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#282E3D]',
     blue: 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',
     emerald:
       'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',

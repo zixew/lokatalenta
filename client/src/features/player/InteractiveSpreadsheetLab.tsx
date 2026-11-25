@@ -37,7 +37,7 @@ export function InteractiveSpreadsheetLab({
       String(scenario.expectedValue).trim().toLowerCase();
 
   return (
-    <div className="rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] p-4 sm:p-5 space-y-4">
+    <div className="rounded-2xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] p-4 sm:p-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Table2 className="w-4 h-4 text-[#0F766E]" />
@@ -73,7 +73,7 @@ export function InteractiveSpreadsheetLab({
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   scenarioIdx === idx
                     ? 'bg-[#0F766E] text-white'
-                    : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                    : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                 }`}
               >
                 {sc.title}
@@ -86,7 +86,7 @@ export function InteractiveSpreadsheetLab({
             className={`p-3.5 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               isTargetCorrect
                 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100'
-                : 'bg-[#F6F5F1] dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-800 text-[#18181B] dark:text-slate-200'
+                : 'bg-[#F4F4F1] dark:bg-slate-900 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-slate-200'
             }`}
           >
             <div className="space-y-1">
@@ -131,7 +131,7 @@ export function InteractiveSpreadsheetLab({
 
           {/* Formula Bar */}
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-2 rounded-lg bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 font-mono-tabular text-xs font-bold text-[#0F766E] dark:text-teal-400 shrink-0">
+            <span className="px-2.5 py-2 rounded-lg bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] font-mono-tabular text-xs font-bold text-[#0F766E] dark:text-teal-400 shrink-0">
               {selectedCell} | fx
             </span>
             <input
@@ -142,22 +142,22 @@ export function InteractiveSpreadsheetLab({
                 setCells((prev) => ({ ...prev, [selectedCell]: e.target.value }))
               }
               placeholder="Ketik angka, teks, atau rumus (=SUM(...), =IF(...), =VLOOKUP(...))"
-              className="flex-1 px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 font-mono text-xs text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="flex-1 px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 font-mono text-xs text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
 
           {/* Interactive Spreadsheet Grid */}
-          <div className="overflow-x-auto rounded-xl border border-[#E5E3DC] dark:border-slate-800">
+          <div className="overflow-x-auto rounded-xl border border-[#D4D4CE] dark:border-[#282E3D]">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800">
-                  <th className="w-10 px-2.5 py-2 text-center font-mono-tabular text-[#71717A] border-r border-[#E5E3DC] dark:border-slate-800">
+                <tr className="bg-[#F4F4F1] dark:bg-slate-900 border-b border-[#D4D4CE] dark:border-[#282E3D]">
+                  <th className="w-10 px-2.5 py-2 text-center font-mono-tabular text-[#71717A] border-r border-[#D4D4CE] dark:border-[#282E3D]">
                     #
                   </th>
                   {scenario.cols.map((col) => (
                     <th
                       key={col}
-                      className="px-3 py-2 text-center font-mono-tabular font-bold text-[#52525B] dark:text-slate-300 border-r last:border-r-0 border-[#E5E3DC] dark:border-slate-800"
+                      className="px-3 py-2 text-center font-mono-tabular font-bold text-[#52525B] dark:text-slate-300 border-r last:border-r-0 border-[#D4D4CE] dark:border-[#282E3D]"
                     >
                       {col}
                     </th>
@@ -170,9 +170,9 @@ export function InteractiveSpreadsheetLab({
                   return (
                     <tr
                       key={rowNum}
-                      className="border-b last:border-b-0 border-[#E5E3DC] dark:border-slate-800"
+                      className="border-b last:border-b-0 border-[#D4D4CE] dark:border-[#282E3D]"
                     >
-                      <td className="px-2.5 py-2 text-center font-mono-tabular font-semibold bg-[#F6F5F1] dark:bg-slate-900 text-[#71717A] border-r border-[#E5E3DC] dark:border-slate-800">
+                      <td className="px-2.5 py-2 text-center font-mono-tabular font-semibold bg-[#F4F4F1] dark:bg-slate-900 text-[#71717A] border-r border-[#D4D4CE] dark:border-[#282E3D]">
                         {rowNum}
                       </td>
                       {scenario.cols.map((col) => {
@@ -189,7 +189,7 @@ export function InteractiveSpreadsheetLab({
                           <td
                             key={cellId}
                             onClick={() => setSelectedCell(cellId)}
-                            className={`px-3 py-2 border-r last:border-r-0 border-[#E5E3DC] dark:border-slate-800 cursor-pointer transition-colors ${
+                            className={`px-3 py-2 border-r last:border-r-0 border-[#D4D4CE] dark:border-[#282E3D] cursor-pointer transition-colors ${
                               isSelected
                                 ? 'bg-teal-50 dark:bg-teal-950/50 ring-2 ring-inset ring-[#0F766E] font-semibold'
                                 : isTarget

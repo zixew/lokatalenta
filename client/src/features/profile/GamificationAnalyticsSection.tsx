@@ -74,7 +74,7 @@ export function GamificationAnalyticsSection({
   return (
     <div className="space-y-6">
       {/* Gamification XP, Level & Streak */}
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-400 flex items-center justify-center">
@@ -99,7 +99,7 @@ export function GamificationAnalyticsSection({
         <ProgressBar value={stats.levelProgressPct} tone="emerald" />
 
         {/* Weekly Learning Goal */}
-        <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 space-y-2.5">
+        <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] space-y-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-bold text-[#18181B] dark:text-white inline-flex items-center gap-1.5">
               <Target className="w-4 h-4 text-[#0F766E]" />
@@ -109,7 +109,7 @@ export function GamificationAnalyticsSection({
               aria-label="Ubah target mingguan"
               value={weeklyGoal}
               onChange={(e) => handleGoalChange(Number(e.target.value))}
-              className="px-2.5 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22]"
+              className="px-2.5 py-1 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22]"
             >
               {[3, 5, 10, 15].map((g) => (
                 <option key={g} value={g}>
@@ -128,7 +128,7 @@ export function GamificationAnalyticsSection({
               className={`p-3 rounded-xl border flex items-start gap-2.5 ${
                 b.unlocked
                   ? 'bg-teal-50/60 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800'
-                  : 'bg-[#F6F5F1] dark:bg-slate-800/40 border-[#E5E3DC] dark:border-slate-800 opacity-60'
+                  : 'bg-[#F4F4F1] dark:bg-slate-800/40 border-[#D4D4CE] dark:border-[#282E3D] opacity-60'
               }`}
             >
               <Award
@@ -147,7 +147,7 @@ export function GamificationAnalyticsSection({
 
       {/* Leaderboard */}
       {leaderboard.length > 0 && (
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
             <Medal className="w-4 h-4 text-amber-500" />
             Papan Peringkat Pelajar (Leaderboard)
@@ -161,7 +161,7 @@ export function GamificationAnalyticsSection({
                   className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${
                     isMe
                       ? 'bg-teal-50/60 dark:bg-teal-950/20 border-[#0F766E]/40'
-                      : 'bg-[#F6F5F1] dark:bg-slate-800/50 border-[#E5E3DC] dark:border-slate-700'
+                      : 'bg-[#F4F4F1] dark:bg-slate-800/50 border-[#D4D4CE] dark:border-[#282E3D]'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -186,7 +186,7 @@ export function GamificationAnalyticsSection({
       )}
 
       {/* Score Trend & CSV Export */}
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-[#0F766E]" />
@@ -213,7 +213,7 @@ export function GamificationAnalyticsSection({
                   <span className="text-[11px] font-mono-tabular font-bold text-[#18181B] dark:text-white">
                     {score}%
                   </span>
-                  <div className="w-full max-w-[36px] bg-[#F6F5F1] dark:bg-slate-800 rounded-t-lg overflow-hidden h-24 flex items-end">
+                  <div className="w-full max-w-[36px] bg-[#F4F4F1] dark:bg-slate-800 rounded-t-lg overflow-hidden h-24 flex items-end">
                     <div
                       className={`w-full rounded-t-lg transition-all ${
                         score >= 70 ? 'bg-[#0F766E]' : 'bg-amber-500'

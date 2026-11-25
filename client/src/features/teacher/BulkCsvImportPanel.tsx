@@ -72,7 +72,7 @@ export function BulkCsvImportPanel({ selectedQuizId, onImported, onError }: Bulk
   };
 
   return (
-    <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+    <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -90,7 +90,7 @@ export function BulkCsvImportPanel({ selectedQuizId, onImported, onError }: Bulk
           <Button type="button" variant="secondary" size="sm" onClick={handleDownloadTemplate}>
             Unduh Template
           </Button>
-          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-xs font-semibold text-[#18181B] dark:text-white hover:bg-[#F6F5F1] dark:hover:bg-slate-800 cursor-pointer">
+          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#18181B] dark:text-white hover:bg-[#F4F4F1] dark:hover:bg-slate-800 cursor-pointer">
             <Upload className="w-3.5 h-3.5" />
             Pilih File .CSV
             <input type="file" accept=".csv,text/csv" onChange={handleFileUpload} className="hidden" />
@@ -103,7 +103,7 @@ export function BulkCsvImportPanel({ selectedQuizId, onImported, onError }: Bulk
         value={csvText}
         onChange={(e) => setCsvText(e.target.value)}
         placeholder={SAMPLE_QUESTIONS_CSV_TEMPLATE}
-        className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#FBFBF9] dark:bg-slate-900 font-mono text-xs text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+        className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#FBFBF9] dark:bg-slate-900 font-mono text-xs text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
       />
 
       {parsed.errors.length > 0 && (
@@ -126,7 +126,7 @@ export function BulkCsvImportPanel({ selectedQuizId, onImported, onError }: Bulk
             {parsed.questions.map((q, idx) => (
               <div
                 key={idx}
-                className="p-2.5 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-xs"
+                className="p-2.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-xs"
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Badge tone="slate">{q.category_tag}</Badge>

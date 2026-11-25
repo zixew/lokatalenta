@@ -282,7 +282,7 @@ export function StarInterviewLab() {
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
               scenarioIdx === idx
                 ? 'bg-[#0F766E] text-white'
-                : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             {idx + 1}. {sc.title}
@@ -291,7 +291,7 @@ export function StarInterviewLab() {
       </div>
 
       {/* Prompt & Timer Header */}
-      <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 space-y-3">
+      <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1 flex-1 min-w-[240px]">
             <div className="flex flex-wrap items-center gap-2">
@@ -312,7 +312,7 @@ export function StarInterviewLab() {
               className={`px-3 py-1.5 rounded-lg border text-xs font-mono-tabular font-bold flex items-center gap-1.5 ${
                 overRecommended
                   ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300'
-                  : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-white'
+                  : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-white'
               }`}
               title={`Rekomendasi durasi: ${scenario.recommendedMinutes} menit`}
             >
@@ -344,7 +344,7 @@ export function StarInterviewLab() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#E5E3DC] dark:border-slate-800">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#D4D4CE] dark:border-[#282E3D]">
           <div className="flex items-center gap-3 text-xs">
             <span className="text-[#52525B] dark:text-slate-300">
               Skor Kelengkapan STAR:{' '}
@@ -373,7 +373,7 @@ export function StarInterviewLab() {
         </div>
 
         {showSample && (
-          <div className="p-3 rounded-lg bg-white dark:bg-slate-800/80 border border-[#E5E3DC] dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div className="p-3 rounded-lg bg-white dark:bg-slate-800/80 border border-[#D4D4CE] dark:border-[#282E3D] grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div>
               <span className="font-bold text-[#0F766E]">S:</span> {scenario.sampleOutline.situation}
             </div>
@@ -395,7 +395,7 @@ export function StarInterviewLab() {
         {starBoxes.map((box) => (
           <div
             key={box.key}
-            className="p-3.5 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-2"
+            className="p-3.5 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900/50 space-y-2"
           >
             <div className="flex items-center justify-between gap-2">
               <label
@@ -423,14 +423,14 @@ export function StarInterviewLab() {
                 box.onChange(e.target.value);
               }}
               placeholder={box.placeholder}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]/30"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#FAF9F6] dark:bg-slate-800 text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]/30"
             />
           </div>
         ))}
       </div>
 
       {/* Competency Checklist + Save */}
-      <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-3">
+      <div className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h4 className="text-xs font-bold uppercase tracking-wide text-[#52525B] dark:text-slate-300">
             Checklist Kompetensi Jawaban ({checkedIds.length}/{scenario.checklist.length})
@@ -452,7 +452,7 @@ export function StarInterviewLab() {
                 className={`flex items-start gap-2 p-2.5 rounded-lg border text-xs cursor-pointer transition-colors ${
                   checked
                     ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
-                    : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300'
+                    : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
                 }`}
               >
                 <input
@@ -490,7 +490,7 @@ export function StarInterviewLab() {
 
       {/* Recent Saved Attempts */}
       {attempts.length > 0 && (
-        <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-slate-900/40 space-y-2.5">
+        <div className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900/40 space-y-2.5">
           <h4 className="text-xs font-bold uppercase tracking-wide text-[#71717A] dark:text-slate-400 flex items-center gap-1.5">
             <History className="w-3.5 h-3.5 text-[#0F766E]" />
             Riwayat Latihan STAR Terbaru
@@ -499,7 +499,7 @@ export function StarInterviewLab() {
             {attempts.slice(0, 4).map((att) => (
               <div
                 key={att.id}
-                className="p-2.5 rounded-lg bg-[#F6F5F1] dark:bg-slate-800/80 border border-[#E5E3DC] dark:border-slate-700 flex flex-wrap items-center justify-between gap-2 text-xs"
+                className="p-2.5 rounded-lg bg-[#F4F4F1] dark:bg-slate-800/80 border border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-2 text-xs"
               >
                 <div>
                   <span className="font-semibold text-[#18181B] dark:text-white">

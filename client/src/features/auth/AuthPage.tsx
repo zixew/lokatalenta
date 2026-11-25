@@ -79,7 +79,7 @@ export function AuthPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 sm:p-8 shadow-xs">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-[#18181B] dark:text-white">
               {isRecovery
@@ -141,7 +141,7 @@ export function AuthPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Contoh: Rizco Renova"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             )}
@@ -161,7 +161,7 @@ export function AuthPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nama@email.com"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             )}
@@ -197,7 +197,7 @@ export function AuthPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Minimal 6 karakter"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             )}
@@ -218,7 +218,7 @@ export function AuthPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Ulangi password baru"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm text-[#18181B] dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             )}
@@ -236,7 +236,7 @@ export function AuthPage() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-[#E5E3DC] dark:border-slate-800 text-center text-sm text-[#52525B] dark:text-slate-400">
+          <div className="mt-6 pt-5 border-t border-[#D4D4CE] dark:border-[#282E3D] text-center text-sm text-[#52525B] dark:text-slate-400">
             {isForgot || isRecovery
               ? 'Ingat kata sandi Anda?'
               : isRegister

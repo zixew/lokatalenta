@@ -194,7 +194,7 @@ export function TopbarNav({ role, isLoggedIn, isActive }: TopbarNavProps) {
           </button>
 
           {moreOpen && (
-            <div className="absolute left-0 mt-1.5 w-52 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl shadow-lg py-1.5 z-50">
+            <div className="absolute left-0 mt-1.5 w-52 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl shadow-lg py-1.5 z-50">
               {overflowItems.map((item) => (
                 <Link
                   key={item.to}

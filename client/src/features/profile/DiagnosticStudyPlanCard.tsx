@@ -14,7 +14,7 @@ export function DiagnosticStudyPlanCard({
   const steps = buildDiagnosticStudyPlan(attempts, courses);
 
   return (
-    <section className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+    <section className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
@@ -35,7 +35,7 @@ export function DiagnosticStudyPlanCard({
         {steps.map((step, idx) => (
           <div
             key={step.id}
-            className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
           >
             <div className="space-y-1.5 min-w-0">
               <div className="flex flex-wrap items-center gap-2">

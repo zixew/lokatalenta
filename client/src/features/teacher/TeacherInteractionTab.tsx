@@ -225,7 +225,7 @@ export function TeacherInteractionTab({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
             subTab === 'qa'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5" />
@@ -238,7 +238,7 @@ export function TeacherInteractionTab({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
             subTab === 'chat'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <MessageCircle className="w-3.5 h-3.5" />
@@ -251,7 +251,7 @@ export function TeacherInteractionTab({
           className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
             subTab === 'live'
               ? 'bg-[#0F766E] text-white'
-              : 'bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-[#52525B] dark:text-slate-300'
+              : 'bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300'
           }`}
         >
           <Video className="w-3.5 h-3.5" />
@@ -261,7 +261,7 @@ export function TeacherInteractionTab({
 
       {/* SUBTAB 1: Q&A INBOX */}
       {subTab === 'qa' && (
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-bold text-[#18181B] dark:text-white">
               Pertanyaan Pelajar di Materi Kursus
@@ -273,7 +273,7 @@ export function TeacherInteractionTab({
                 className={`px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
                   qaFilter === 'unanswered'
                     ? 'bg-[#0F766E] text-white'
-                    : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                    : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                 }`}
               >
                 Belum Dijawab ({unansweredCount})
@@ -284,7 +284,7 @@ export function TeacherInteractionTab({
                 className={`px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
                   qaFilter === 'all'
                     ? 'bg-[#0F766E] text-white'
-                    : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                    : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                 }`}
               >
                 Semua ({allComments.length})
@@ -316,7 +316,7 @@ export function TeacherInteractionTab({
 
       {/* SUBTAB 2: PRIVATE 1-ON-1 CHAT */}
       {subTab === 'chat' && (
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
           <h2 className="text-base font-bold text-[#18181B] dark:text-white">
             Konsultasi Privat 1-on-1 Siswa
           </h2>
@@ -352,7 +352,7 @@ export function TeacherInteractionTab({
       {subTab === 'live' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Live Sessions */}
-          <div className="lg:col-span-6 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="lg:col-span-6 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <Video className="w-4 h-4 text-[#0F766E]" />
               Jadwalkan Sesi Live (Office Hours)
@@ -382,7 +382,7 @@ export function TeacherInteractionTab({
                 <select
                   value={annCohortId}
                   onChange={(e) => setAnnCohortId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                 >
                   <option value="">Semua Peserta</option>
                   {cohorts
@@ -408,7 +408,7 @@ export function TeacherInteractionTab({
                   value={sessTitle}
                   onChange={(e) => setSessTitle(e.target.value)}
                   placeholder="Contoh: Klinik Soal Deret Angka"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                 />
               </div>
               <div>
@@ -424,7 +424,7 @@ export function TeacherInteractionTab({
                   value={sessTopic}
                   onChange={(e) => setSessTopic(e.target.value)}
                   placeholder="Topik pembahasan singkat..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -441,7 +441,7 @@ export function TeacherInteractionTab({
                     required
                     value={sessDate}
                     onChange={(e) => setSessDate(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                   />
                 </div>
                 <div>
@@ -459,7 +459,7 @@ export function TeacherInteractionTab({
                     value={sessMax}
                     onChange={(e) => setSessMax(Number(e.target.value) || 20)}
                     placeholder="Kuota"
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                   />
                 </div>
               </div>
@@ -476,7 +476,7 @@ export function TeacherInteractionTab({
                   value={sessUrl}
                   onChange={(e) => setSessUrl(e.target.value)}
                   placeholder="https://meet.google.com/..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                 />
               </div>
               <Button type="submit" disabled={createSessionMut.isPending} className="w-full">
@@ -484,13 +484,13 @@ export function TeacherInteractionTab({
               </Button>
             </form>
 
-            <div className="space-y-2 pt-2 border-t border-[#E5E3DC] dark:border-slate-800">
+            <div className="space-y-2 pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D]">
               {sessions.map((s) => {
                 const count = bookings.filter((b) => b.session_id === s.id).length;
                 return (
                   <div
                     key={s.id}
-                    className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 flex items-start justify-between gap-2"
+                    className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] flex items-start justify-between gap-2"
                   >
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-[#18181B] dark:text-white truncate">
@@ -523,7 +523,7 @@ export function TeacherInteractionTab({
           </div>
 
           {/* Course Announcements */}
-          <div className="lg:col-span-6 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="lg:col-span-6 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <Megaphone className="w-4 h-4 text-[#0F766E]" />
               Kirim Pengumuman Kursus
@@ -553,7 +553,7 @@ export function TeacherInteractionTab({
                 <select
                   value={annCohortId}
                   onChange={(e) => setAnnCohortId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#18181B] dark:text-white"
                 >
                   <option value="">Semua Peserta</option>
                   {cohorts
@@ -571,7 +571,7 @@ export function TeacherInteractionTab({
                 value={annTitle}
                 onChange={(e) => setAnnTitle(e.target.value)}
                 placeholder="Judul Pengumuman (mis. Pembaruan Bank Soal Terbaru)"
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800"
               />
               <textarea
                 rows={3}
@@ -579,14 +579,14 @@ export function TeacherInteractionTab({
                 value={annContent}
                 onChange={(e) => setAnnContent(e.target.value)}
                 placeholder="Isi pengumuman untuk seluruh siswa terdaftar..."
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800"
               />
               <Button type="submit" disabled={createAnnMut.isPending} className="w-full">
                 Kirim Pengumuman
               </Button>
             </form>
 
-            <div className="space-y-2 pt-2 border-t border-[#E5E3DC] dark:border-slate-800">
+            <div className="space-y-2 pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D]">
               {cohorts.length > 0 && announcements.length > 0 && (
                 <div className="flex items-center justify-between gap-2 pb-1">
                   <span className="text-[11px] font-semibold text-[#71717A] dark:text-slate-400">
@@ -595,7 +595,7 @@ export function TeacherInteractionTab({
                   <select
                     value={annCohortFilter}
                     onChange={(e) => setAnnCohortFilter(e.target.value)}
-                    className="px-2 py-1 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-800 text-[#18181B] dark:text-white"
+                    className="px-2 py-1 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-800 text-[#18181B] dark:text-white"
                   >
                     <option value="all">Semua Target</option>
                     <option value="public">Semua Peserta</option>
@@ -610,7 +610,7 @@ export function TeacherInteractionTab({
               {filteredAnnouncements.map((a) => (
                 <div
                   key={a.id}
-                  className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/60 border border-[#E5E3DC] dark:border-slate-700 flex items-start justify-between gap-2"
+                  className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/60 border border-[#D4D4CE] dark:border-[#282E3D] flex items-start justify-between gap-2"
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5">
@@ -699,7 +699,7 @@ function MentorQaReplyCard({
   });
 
   return (
-    <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/50 border border-[#E5E3DC] dark:border-slate-700 space-y-2.5">
+    <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/50 border border-[#D4D4CE] dark:border-[#282E3D] space-y-2.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="text-xs font-bold text-[#18181B] dark:text-white">
@@ -745,7 +745,7 @@ function MentorQaReplyCard({
           value={reply}
           onChange={(e) => setReply(e.target.value)}
           placeholder="Tulis jawaban mentor untuk siswa ini..."
-          className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22]"
+          className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22]"
         />
         <Button type="submit" size="sm" disabled={replyMut.isPending}>
           <Send className="w-3.5 h-3.5" />
@@ -790,7 +790,7 @@ function MentorThreadCard({
   });
 
   return (
-    <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-800/50 border border-[#E5E3DC] dark:border-slate-700 space-y-3">
+    <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-800/50 border border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-bold text-[#18181B] dark:text-white">
           {courseTitle} • Pelajar: {messages.find((m) => m.sender_role === 'student')?.sender_name ?? 'Pelajar'}
@@ -799,7 +799,7 @@ function MentorThreadCard({
       </div>
       <div className="space-y-1.5 max-h-40 overflow-y-auto">
         {messages.map((m) => (
-          <div key={m.id} className="text-xs bg-white dark:bg-[#161B22] p-2.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700">
+          <div key={m.id} className="text-xs bg-white dark:bg-[#161B22] p-2.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D]">
             <span className="font-bold text-[#0F766E] dark:text-teal-400">{m.sender_name}: </span>
             <span className="text-[#18181B] dark:text-slate-200">{m.message}</span>
           </div>
@@ -818,7 +818,7 @@ function MentorThreadCard({
           value={reply}
           onChange={(e) => setReply(e.target.value)}
           placeholder="Balas konsultasi privat pelajar..."
-          className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22]"
+          className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22]"
         />
         <Button type="submit" size="sm" disabled={sendMut.isPending}>
           Balas

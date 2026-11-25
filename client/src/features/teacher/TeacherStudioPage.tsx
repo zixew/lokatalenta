@@ -568,13 +568,13 @@ export function TeacherStudioPage() {
 
       {/* Quick Mentor Health Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
           <span className="text-xs text-[#71717A] dark:text-slate-400 block">Total Program</span>
           <span className="text-xl font-extrabold font-mono-tabular text-[#18181B] dark:text-white mt-0.5 block">
             {courses.length}
           </span>
         </div>
-        <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4">
           <span className="text-xs text-[#71717A] dark:text-slate-400 block">Siswa Aktif</span>
           <span className="text-xl font-extrabold font-mono-tabular text-[#0F766E] mt-0.5 block">
             {studentProgress.length}
@@ -583,7 +583,7 @@ export function TeacherStudioPage() {
         <button
           type="button"
           onClick={() => setActiveTab('assignments')}
-          className="text-left bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 hover:border-[#0F766E] rounded-xl p-4 transition-colors cursor-pointer"
+          className="text-left bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] hover:border-[#0F766E] rounded-xl p-4 transition-colors cursor-pointer"
         >
           <span className="text-xs text-[#71717A] dark:text-slate-400 block">Tugas Perlu Dinilai</span>
           <span className="text-xl font-extrabold font-mono-tabular text-amber-600 mt-0.5 block">
@@ -593,7 +593,7 @@ export function TeacherStudioPage() {
         <button
           type="button"
           onClick={() => setActiveTab('interaction')}
-          className="text-left bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 hover:border-[#0F766E] rounded-xl p-4 transition-colors cursor-pointer"
+          className="text-left bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] hover:border-[#0F766E] rounded-xl p-4 transition-colors cursor-pointer"
         >
           <span className="text-xs text-[#71717A] dark:text-slate-400 block">Q&amp;A Belum Dijawab</span>
           <span className="text-xl font-extrabold font-mono-tabular text-rose-600 mt-0.5 block">
@@ -603,7 +603,7 @@ export function TeacherStudioPage() {
       </div>
 
       {/* Studio Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-[#D4D4CE] dark:border-[#282E3D] pb-3">
         {[
           { id: 'courses' as StudioTab, label: 'Kursus, Modul & Materi', icon: Layers, badge: 0 },
           { id: 'questions' as StudioTab, label: 'Bank Soal & Waktu Tes', icon: PlusCircle, badge: 0 },
@@ -631,7 +631,7 @@ export function TeacherStudioPage() {
               className={`px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer ${
                 active
                   ? 'bg-[#0F766E] text-white'
-                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#E5E3DC] dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border border-[#D4D4CE] dark:border-[#282E3D] hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -657,7 +657,7 @@ export function TeacherStudioPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left: Quiz Selection & Timer Settings + Existing Questions */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+            <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
               <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#0F766E]" />
                 Pilih Tes &amp; Atur Waktu Pengerjaan
@@ -686,7 +686,7 @@ export function TeacherStudioPage() {
                     max={180}
                     value={quizDuration}
                     onChange={(e) => setQuizDuration(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
                 <div>
@@ -699,7 +699,7 @@ export function TeacherStudioPage() {
                     max={100}
                     value={quizPassingScore}
                     onChange={(e) => setQuizPassingScore(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -709,7 +709,7 @@ export function TeacherStudioPage() {
                   type="checkbox"
                   checked={quizUseSubtests}
                   onChange={(e) => setQuizUseSubtests(e.target.checked)}
-                  className="w-4 h-4 rounded border-[#E5E3DC] accent-[#0F766E]"
+                  className="w-4 h-4 rounded border-[#D4D4CE] accent-[#0F766E]"
                 />
                 Kelompokkan soal berdasarkan Subtest
               </label>
@@ -725,7 +725,7 @@ export function TeacherStudioPage() {
             </div>
 
             {/* Existing Questions List */}
-            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-3">
+            <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-[#18181B] dark:text-white">Daftar Soal Saat Ini</h3>
                 <Badge tone="blue">{activeQuestions.length} Soal</Badge>
@@ -736,12 +736,12 @@ export function TeacherStudioPage() {
                   value={questionSearch}
                   onChange={(e) => setQuestionSearch(e.target.value)}
                   placeholder="Cari teks soal..."
-                  className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
                 <select
                   value={questionCategoryFilter}
                   onChange={(e) => setQuestionCategoryFilter(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 >
                   {extractUniqueCategories(activeQuestions).map((cat) => (
                     <option key={cat} value={cat}>
@@ -758,7 +758,7 @@ export function TeacherStudioPage() {
                 ).map((q, idx) => (
                   <div
                     key={q.id}
-                    className="p-3 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 flex items-start justify-between gap-2"
+                    className="p-3 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 flex items-start justify-between gap-2"
                   >
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -826,7 +826,7 @@ export function TeacherStudioPage() {
           </div>
 
           {/* Right: Question Builder with Image Upload */}
-          <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-5">
+          <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-5">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-bold text-[#18181B] dark:text-white">
@@ -863,7 +863,7 @@ export function TeacherStudioPage() {
                     value={qCategory}
                     onChange={(e) => setQCategory(e.target.value)}
                     placeholder="Contoh: Verbal, Numerik, Logika, Spasial"
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
                 <div>
@@ -873,7 +873,7 @@ export function TeacherStudioPage() {
                   <select
                     value={qType}
                     onChange={(e) => setQType(e.target.value as 'mcq' | 'short_answer')}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     <option value="mcq">Pilihan Ganda (A–E)</option>
                     <option value="short_answer">Isian Singkat / Formula</option>
@@ -891,12 +891,12 @@ export function TeacherStudioPage() {
                   value={qText}
                   onChange={(e) => setQText(e.target.value)}
                   placeholder="Tuliskan teks soal di sini..."
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
 
               {/* Image Attachment (Collapsible) */}
-              <div className="rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 overflow-hidden">
+              <div className="rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setShowImagePanel((v) => !v)}
@@ -914,12 +914,12 @@ export function TeacherStudioPage() {
                   />
                 </button>
                 {(showImagePanel || Boolean(qImageUrl)) && (
-                  <div className="px-4 pb-4 pt-1 space-y-3 border-t border-[#E5E3DC] dark:border-slate-800">
+                  <div className="px-4 pb-4 pt-1 space-y-3 border-t border-[#D4D4CE] dark:border-[#282E3D]">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-[11px] text-[#71717A] dark:text-slate-400">
                         Unggah gambar atau tempel URL gambar
                       </span>
-                      <label className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#18181B] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
+                      <label className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#18181B] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
                         {uploadingImg ? 'Mengunggah...' : 'Pilih File Gambar'}
                         <input
                           type="file"
@@ -934,14 +934,14 @@ export function TeacherStudioPage() {
                       value={qImageUrl}
                       onChange={(e) => setQImageUrl(e.target.value)}
                       placeholder="Atau tempel tautan gambar (https://...)"
-                      className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                      className="w-full px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     />
                     {qImageUrl && (
                       <div className="relative inline-block">
                         <img
                           src={qImageUrl}
                           alt="Pratinjau gambar soal"
-                          className="max-h-40 rounded-lg border border-[#E5E3DC] dark:border-slate-800"
+                          className="max-h-40 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D]"
                         />
                         <button
                           type="button"
@@ -957,7 +957,7 @@ export function TeacherStudioPage() {
               </div>
 
               {/* Listening Audio (Collapsible) */}
-              <div className="rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900 overflow-hidden">
+              <div className="rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setShowAudioPanel((v) => !v)}
@@ -975,7 +975,7 @@ export function TeacherStudioPage() {
                   />
                 </button>
                 {(showAudioPanel || Boolean(qAudioText)) && (
-                  <div className="px-4 pb-4 pt-2 space-y-3 border-t border-[#E5E3DC] dark:border-slate-800">
+                  <div className="px-4 pb-4 pt-2 space-y-3 border-t border-[#D4D4CE] dark:border-[#282E3D]">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-[11px] text-[#71717A] dark:text-slate-400">
                         Pilih bahasa &amp; kalimat audio
@@ -985,7 +985,7 @@ export function TeacherStudioPage() {
                         onChange={(e) =>
                           setQAudioLang(e.target.value as 'ja-JP' | 'en-US' | 'ko-KR')
                         }
-                        className="px-2.5 py-1 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                        className="px-2.5 py-1 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-xs"
                       >
                         <option value="en-US">Bahasa Inggris (en-US)</option>
                         <option value="ja-JP">Bahasa Jepang (ja-JP)</option>
@@ -997,14 +997,14 @@ export function TeacherStudioPage() {
                       value={qAudioText}
                       onChange={(e) => setQAudioText(e.target.value)}
                       placeholder="Tuliskan kalimat yang akan dibacakan oleh sistem suara..."
-                      className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                      className="w-full px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     />
                   </div>
                 )}
               </div>
 
               {qType === 'short_answer' ? (
-                <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-800 bg-[#F6F5F1] dark:bg-slate-900 space-y-3">
+                <div className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900 space-y-3">
                   <div>
                     <label className="block text-xs font-semibold text-[#18181B] dark:text-white mb-1">
                       Jawaban yang Diterima (pisahkan variasi dengan <code className="font-mono">|</code>)
@@ -1015,7 +1015,7 @@ export function TeacherStudioPage() {
                       value={acceptedAnswersText}
                       onChange={(e) => setAcceptedAnswersText(e.target.value)}
                       placeholder="Contoh: =SUM(A1:A5) | SUM(A1:A5) | 150"
-                      className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                      className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     />
                   </div>
                   <label className="flex items-center gap-2 text-xs text-[#52525B] dark:text-slate-300 cursor-pointer">
@@ -1047,7 +1047,7 @@ export function TeacherStudioPage() {
                         value={o.val}
                         onChange={(e) => o.set(e.target.value)}
                         placeholder={`Opsi ${o.key}`}
-                        className="w-full px-3 py-1.5 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                        className="w-full px-3 py-1.5 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                       />
                     </div>
                   ))}
@@ -1063,7 +1063,7 @@ export function TeacherStudioPage() {
                     <select
                       value={correctOpt}
                       onChange={(e) => setCorrectOpt(e.target.value as QuizOption['key'])}
-                      className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                      className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     >
                       {['A', 'B', 'C', 'D', 'E'].map((k) => (
                         <option key={k} value={k}>
@@ -1083,7 +1083,7 @@ export function TeacherStudioPage() {
                     value={explanation}
                     onChange={(e) => setExplanation(e.target.value)}
                     placeholder="Jelaskan alasan jawaban yang benar..."
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -1110,7 +1110,7 @@ export function TeacherStudioPage() {
             </form>
 
             {/* Live Student Preview Split-Pane */}
-            <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800">
+            <div className="pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                 <div className="space-y-1.5">
                   <p className="text-xs font-bold text-[#18181B] dark:text-white flex items-center gap-1.5">
@@ -1121,7 +1121,7 @@ export function TeacherStudioPage() {
                     Pratinjau langsung tampilan soal seperti yang dilihat siswa di Quiz Runner.
                   </p>
                 </div>
-                <div className="p-4 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900/70 space-y-3">
+                <div className="p-4 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900/70 space-y-3">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <Badge tone="emerald">{qCategory || 'Umum'}</Badge>
                     <Badge tone="slate">
@@ -1138,7 +1138,7 @@ export function TeacherStudioPage() {
                     <img
                       src={qImageUrl}
                       alt="Pratinjau siswa"
-                      className="max-h-36 rounded-lg border border-[#E5E3DC] dark:border-slate-700"
+                      className="max-h-36 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D]"
                     />
                   )}
                   {qType === 'short_answer' ? (
@@ -1147,7 +1147,7 @@ export function TeacherStudioPage() {
                         type="text"
                         disabled
                         placeholder="Ketik jawaban singkat / formula Anda..."
-                        className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-[#71717A]"
+                        className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-xs text-[#71717A]"
                       />
                       {acceptedAnswersText.trim() && (
                         <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
@@ -1169,7 +1169,7 @@ export function TeacherStudioPage() {
                           className={`px-3 py-1.5 rounded-lg border text-xs flex items-center gap-2 ${
                             correctOpt === o.key
                               ? 'border-[#0F766E] bg-teal-50/70 dark:bg-teal-950/30 text-[#18181B] dark:text-white'
-                              : 'border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                              : 'border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                           }`}
                         >
                           <span className="font-mono-tabular font-bold">{o.key}.</span>
@@ -1184,7 +1184,7 @@ export function TeacherStudioPage() {
           </div>
 
           <div className="lg:col-span-12">
-            <div className="rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] overflow-hidden">
+            <div className="rounded-2xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] overflow-hidden">
               <button
                 type="button"
                 onClick={() => setShowCsvPanel((v) => !v)}
@@ -1201,7 +1201,7 @@ export function TeacherStudioPage() {
                 />
               </button>
               {showCsvPanel && (
-                <div className="border-t border-[#E5E3DC] dark:border-slate-800">
+                <div className="border-t border-[#D4D4CE] dark:border-[#282E3D]">
                   <BulkCsvImportPanel
                     selectedQuizId={selectedQuizId}
                     onImported={(count) => showSuccess(`${count} soal berhasil diimpor dari CSV ke bank soal.`)}
@@ -1218,7 +1218,7 @@ export function TeacherStudioPage() {
       {activeTab === 'courses' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left: Create Course */}
-          <div className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="lg:col-span-5 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-4">
             <h2 className="text-base font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <BookPlus className="w-4 h-4 text-[#0F766E]" />
               Buat Kursus / Paket Baru
@@ -1241,7 +1241,7 @@ export function TeacherStudioPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Contoh: Latihan Psikotes Perbankan"
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
 
@@ -1251,7 +1251,7 @@ export function TeacherStudioPage() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     <option value="Kursus Terstruktur">Kursus Terstruktur</option>
                     <option value="Latihan Langsung">Latihan Langsung</option>
@@ -1267,7 +1267,7 @@ export function TeacherStudioPage() {
                     step={0.5}
                     value={estimatedHours}
                     onChange={(e) => setEstimatedHours(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -1277,7 +1277,7 @@ export function TeacherStudioPage() {
                 <select
                   value={level}
                   onChange={(e) => setLevel(e.target.value as Course['level'])}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 >
                   <option value="Semua Level">Semua Level</option>
                   <option value="Pemula">Pemula</option>
@@ -1295,7 +1295,7 @@ export function TeacherStudioPage() {
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
 
@@ -1306,7 +1306,7 @@ export function TeacherStudioPage() {
           </div>
 
           {/* Right: Module & Lesson Builder */}
-          <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-6">
+          <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl p-6 space-y-6">
             <div>
               <h2 className="text-base font-bold text-[#18181B] dark:text-white">
                 Susun Modul &amp; Materi Kursus
@@ -1333,7 +1333,7 @@ export function TeacherStudioPage() {
             />
 
             {selectedCourse && (
-              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D]">
                 <div className="text-xs text-[#52525B] dark:text-slate-300">
                   Kursus aktif: <strong className="text-[#18181B] dark:text-white">{selectedCourse.title}</strong>
                 </div>
@@ -1373,7 +1373,7 @@ export function TeacherStudioPage() {
                 value={moduleTitle}
                 onChange={(e) => setModuleTitle(e.target.value)}
                 placeholder="Nama modul baru (contoh: Modul 4: Tes Ketelitian)"
-                className="flex-1 px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="flex-1 px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
               <Button type="submit" variant="secondary" disabled={addModuleMut.isPending}>
                 + Tambah Modul
@@ -1386,7 +1386,7 @@ export function TeacherStudioPage() {
                 e.preventDefault();
                 if (targetModuleId) addLessonMut.mutate();
               }}
-              className="space-y-3 pt-4 border-t border-[#E5E3DC] dark:border-slate-800"
+              className="space-y-3 pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D]"
             >
               <h3 className="text-sm font-bold text-[#18181B] dark:text-white">Tambah Materi ke Modul</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1397,7 +1397,7 @@ export function TeacherStudioPage() {
                   <select
                     value={targetModuleId}
                     onChange={(e) => setTargetModuleId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     {(selectedCourse?.modules ?? []).map((m) => (
                       <option key={m.id} value={m.id}>
@@ -1413,7 +1413,7 @@ export function TeacherStudioPage() {
                   <select
                     value={lessonType}
                     onChange={(e) => setLessonType(e.target.value as Lesson['type'])}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm bg-white dark:bg-[#161B22] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     <option value="article">Artikel Bacaan</option>
                     <option value="video">Video Pembelajaran</option>
@@ -1433,7 +1433,7 @@ export function TeacherStudioPage() {
                     value={lessonTitle}
                     onChange={(e) => setLessonTitle(e.target.value)}
                     placeholder="Judul materi atau judul tes"
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
                 <div>
@@ -1445,7 +1445,7 @@ export function TeacherStudioPage() {
                     min={1}
                     value={lessonDuration}
                     onChange={(e) => setLessonDuration(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -1460,7 +1460,7 @@ export function TeacherStudioPage() {
                     value={lessonVideoUrl}
                     onChange={(e) => setLessonVideoUrl(e.target.value)}
                     placeholder="https://www.youtube.com/embed/..."
-                    className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               )}
@@ -1474,7 +1474,7 @@ export function TeacherStudioPage() {
                   required
                   value={lessonContent}
                   onChange={(e) => setLessonContent(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
 
@@ -1484,7 +1484,7 @@ export function TeacherStudioPage() {
                     type="checkbox"
                     checked={lessonUseSubtests}
                     onChange={(e) => setLessonUseSubtests(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#E5E3DC] accent-[#0F766E]"
+                    className="w-4 h-4 rounded border-[#D4D4CE] accent-[#0F766E]"
                   />
                   Gunakan pengelompokan Subtest pada latihan ini
                 </label>
@@ -1497,7 +1497,7 @@ export function TeacherStudioPage() {
 
             {/* Full CRUD Module & Lesson Structure Manager */}
             {selectedCourse && (selectedCourse.modules ?? []).length > 0 && (
-              <div className="pt-5 border-t border-[#E5E3DC] dark:border-slate-800 space-y-3">
+              <div className="pt-5 border-t border-[#D4D4CE] dark:border-[#282E3D] space-y-3">
                 <h3 className="text-sm font-bold text-[#18181B] dark:text-white">
                   Kelola, Urutkan &amp; Edit Modul / Materi
                 </h3>
@@ -1519,10 +1519,10 @@ export function TeacherStudioPage() {
                         setDragModuleId(null);
                         reorderModulesMut.mutate({ courseId: selectedCourse.id, ids });
                       }}
-                      className={`p-3.5 rounded-xl border bg-[#F6F5F1] dark:bg-slate-900/60 space-y-2.5 transition-colors ${
+                      className={`p-3.5 rounded-xl border bg-[#F4F4F1] dark:bg-slate-900/60 space-y-2.5 transition-colors ${
                         dragModuleId === mod.id
                           ? 'border-[#0F766E] opacity-70'
-                          : 'border-[#E5E3DC] dark:border-slate-800'
+                          : 'border-[#D4D4CE] dark:border-[#282E3D]'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -1605,7 +1605,7 @@ export function TeacherStudioPage() {
                             className={`px-3 py-2 rounded-lg bg-white dark:bg-[#161B22] border flex items-center justify-between gap-2 text-xs transition-colors ${
                               dragLesson?.lessonId === les.id
                                 ? 'border-[#0F766E] opacity-70'
-                                : 'border-[#E5E3DC] dark:border-slate-800'
+                                : 'border-[#D4D4CE] dark:border-[#282E3D]'
                             }`}
                           >
                             <span className="truncate text-[#18181B] dark:text-slate-200 flex items-center gap-1.5">
@@ -1683,7 +1683,7 @@ export function TeacherStudioPage() {
       {/* Edit Lesson Modal */}
       {editingLesson && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-lg">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-lg">
             <h3 className="text-lg font-bold text-[#18181B] dark:text-white">Edit Materi</h3>
             <div className="space-y-3">
               <div>
@@ -1694,7 +1694,7 @@ export function TeacherStudioPage() {
                   type="text"
                   value={editLessonTitle}
                   onChange={(e) => setEditLessonTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <div>
@@ -1706,7 +1706,7 @@ export function TeacherStudioPage() {
                   min={1}
                   value={editLessonDuration}
                   onChange={(e) => setEditLessonDuration(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <div>
@@ -1717,7 +1717,7 @@ export function TeacherStudioPage() {
                   type="url"
                   value={editLessonVideo}
                   onChange={(e) => setEditLessonVideo(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
               <div>
@@ -1728,7 +1728,7 @@ export function TeacherStudioPage() {
                   rows={4}
                   value={editLessonContent}
                   onChange={(e) => setEditLessonContent(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-[#18181B] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 />
               </div>
             </div>
@@ -1752,8 +1752,8 @@ export function TeacherStudioPage() {
         <div className="space-y-6">
           <TeacherAnalyticsPanel studentProgress={studentProgress} courses={courses} />
 
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-2xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-[#18181B] dark:text-white">Progres Belajar Siswa</h2>
               <p className="text-xs text-[#71717A] dark:text-slate-400 mt-0.5">
@@ -1798,7 +1798,7 @@ export function TeacherStudioPage() {
             )}
           </div>
           {studentProgress.length > 0 && (
-            <div className="px-6 py-3 border-b border-[#E5E3DC] dark:border-slate-800 flex flex-col sm:flex-row gap-2">
+            <div className="px-6 py-3 border-b border-[#D4D4CE] dark:border-[#282E3D] flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1 max-w-md">
                 <Search className="w-3.5 h-3.5 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -1806,7 +1806,7 @@ export function TeacherStudioPage() {
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                   placeholder="Cari nama siswa, email, atau kursus..."
-                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-[#F6F5F1] dark:bg-slate-900"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-[#F4F4F1] dark:bg-slate-900"
                 />
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -1818,7 +1818,7 @@ export function TeacherStudioPage() {
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
                       studentFilter === f
                         ? 'bg-[#0F766E] text-white'
-                        : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
+                        : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#52525B] dark:text-slate-300'
                     }`}
                   >
                     {f === 'all' ? 'Semua' : f === 'passed' ? 'Lulus (≥70%)' : 'Belum Tes'}
@@ -1835,7 +1835,7 @@ export function TeacherStudioPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F6F5F1] dark:bg-slate-900 border-b border-[#E5E3DC] dark:border-slate-800 text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
+                <thead className="bg-[#F4F4F1] dark:bg-slate-900 border-b border-[#D4D4CE] dark:border-[#282E3D] text-xs font-semibold text-[#71717A] dark:text-slate-400 uppercase">
                   <tr>
                     <th className="px-6 py-3">Siswa</th>
                     <th className="px-6 py-3">Kursus</th>
@@ -1843,7 +1843,7 @@ export function TeacherStudioPage() {
                     <th className="px-6 py-3">Nilai Tes Terakhir</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E5E3DC] dark:divide-slate-800">
+                <tbody className="divide-y divide-[#D4D4CE] dark:divide-slate-800">
                   {studentProgress
                     .filter((row) => {
                       if (

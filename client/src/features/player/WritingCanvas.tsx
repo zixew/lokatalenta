@@ -81,7 +81,7 @@ export function WritingCanvas({ lines }: { lines: VoiceLine[] }) {
   };
 
   return (
-    <div className="rounded-2xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-[#161B22] p-5 space-y-4">
+    <div className="rounded-2xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] p-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <PenTool className="w-4 h-4 text-[#0F766E]" />
@@ -129,7 +129,7 @@ export function WritingCanvas({ lines }: { lines: VoiceLine[] }) {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
                 selectedIdx === i
                   ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                  : 'bg-[#F6F5F1] dark:bg-slate-800 text-[#18181B] dark:text-slate-200 border-[#E5E3DC] dark:border-slate-700'
+                  : 'bg-[#F4F4F1] dark:bg-slate-800 text-[#18181B] dark:text-slate-200 border-[#D4D4CE] dark:border-[#282E3D]'
               }`}
             >
               {line.text}
@@ -140,13 +140,13 @@ export function WritingCanvas({ lines }: { lines: VoiceLine[] }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
         <div className="sm:col-span-7 flex justify-center">
-          <div className="relative w-full max-w-[256px] aspect-square rounded-2xl border-2 border-dashed border-[#0F766E]/40 bg-[#F6F5F1] dark:bg-slate-900 overflow-hidden touch-none">
+          <div className="relative w-full max-w-[256px] aspect-square rounded-2xl border-2 border-dashed border-[#0F766E]/40 bg-[#F4F4F1] dark:bg-slate-900 overflow-hidden touch-none">
             {/* Crosshair grid lines */}
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-px border-t border-dashed border-slate-300 dark:border-slate-700" />
+              <div className="w-full h-px border-t border-dashed border-slate-300 dark:border-[#282E3D]" />
             </div>
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="h-full w-px border-l border-dashed border-slate-300 dark:border-slate-700" />
+              <div className="h-full w-px border-l border-dashed border-slate-300 dark:border-[#282E3D]" />
             </div>
             {/* Faint character guide */}
             {showGuide && (
