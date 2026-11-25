@@ -29,8 +29,10 @@ import { MilestoneToast } from '../../shared/ui/MilestoneToast';
 import { ProgressBar } from '../../shared/ui/ProgressBar';
 import { useAuthStore } from '../auth/useAuthStore';
 import { CourseOverviewGate } from './CourseOverviewGate';
+import { CourseCurriculumRail } from './CourseCurriculumRail';
 import { FlashcardDeck } from './FlashcardDeck';
 import { HandsOnLabContainer } from './HandsOnLabContainer';
+import { LessonTheatrePlayer } from './LessonTheatrePlayer';
 import { isTechnicalSqlCourse } from './sqlSandboxEngine';
 import { isTechnicalSpreadsheetCourse } from './spreadsheetEngine';
 import { LessonNotesAndCheckPanel } from './LessonNotesAndCheckPanel';
@@ -99,6 +101,8 @@ export function CoursePlayerPage() {
   const [writingMode, setWritingMode] = useState(false);
   const [speechMode, setSpeechMode] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [isTheatreMode, setIsTheatreMode] = useState(false);
+  const [isSyllabusCollapsed, setIsSyllabusCollapsed] = useState(false);
   const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
   const [milestoneToast, setMilestoneToast] = useState<{
     visible: boolean;
@@ -458,12 +462,18 @@ export function CoursePlayerPage() {
       )}
 
       {/* 2-Column Learning Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className={`grid grid-cols-1 ${isTheatreMode ? 'lg:grid-cols-12 gap-4' : isSyllabusCollapsed ? 'lg:grid-cols-12 gap-4' : 'lg:grid-cols-12 gap-6'} items-start`}>
         {/* Main Content Area */}
         <div
           className={`${
-            isFocusMode ? 'lg:col-span-12 max-w-4xl mx-auto w-full' : 'lg:col-span-8'
-          } bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6`}
+            isFocusMode
+              ? 'lg:col-span-12 max-w-4xl mx-auto w-full'
+              : isTheatreMode
+              ? 'lg:col-span-12'
+              : isSyllabusCollapsed
+              ? 'lg:col-span-11'
+              : 'lg:col-span-8'
+          } bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-5 sm:p-7 space-y-6 transition-all duration-150`}
         >
           {!activeLesson ? (
             <p className="text-sm text-[#71717A] dark:text-slate-400">Belum ada materi di kursus ini.</p>
@@ -707,15 +717,14 @@ export function CoursePlayerPage() {
               </div>
 
               {activeLesson.video_url && (
-                <div className="aspect-video w-full rounded-xl overflow-hidden border border-[#E5E3DC] dark:border-slate-800 bg-slate-900">
-                  <iframe
-                    src={activeLesson.video_url}
-                    title={activeLesson.title}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+                <LessonTheatrePlayer
+                  videoUrl={activeLesson.video_url}
+                  title={activeLesson.title}
+                  lessonId={activeLesson.id}
+                  isTheatreMode={isTheatreMode}
+                  onToggleTheatre={() => setIsTheatreMode((prev) => !prev)}
+                  isCompleted={completedIds.includes(activeLesson.id)}
+                />
               )}
 
               <div className="prose prose-slate dark:prose-invert max-w-none text-[15px] leading-relaxed text-[#334155] dark:text-slate-300 whitespace-pre-line">
@@ -949,10 +958,23 @@ export function CoursePlayerPage() {
           )}
         </div>
 
-        {/* Right Sidebar: Syllabus & Progress */}
-        {!isFocusMode && (
-          <aside className="hidden lg:block lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-5 lg:sticky lg:top-24">
-            {renderCurriculumContent()}
+        {/* Right Sidebar: Syllabus & Progress (Modular & Collapsible Rail) */}
+        {!isFocusMode && !isTheatreMode && (
+          <aside className={`hidden lg:block ${isSyllabusCollapsed ? 'lg:col-span-1' : 'lg:col-span-4'} lg:sticky lg:top-24 transition-all duration-150`}>
+            <CourseCurriculumRail
+              modules={course.modules ?? []}
+              activeLessonId={activeLesson?.id ?? null}
+              completedIds={completedIds}
+              isLessonDone={isLessonDone}
+              isLessonLocked={isLessonLocked}
+              isMentorPreview={isMentorPreview}
+              completedCount={completedCount}
+              totalLessons={allLessons.length}
+              progressPct={progressPct}
+              onSelectLesson={(lessonId) => setActiveLessonId(lessonId)}
+              isCollapsed={isSyllabusCollapsed}
+              onToggleCollapse={() => setIsSyllabusCollapsed((prev) => !prev)}
+            />
           </aside>
         )}
       </div>
