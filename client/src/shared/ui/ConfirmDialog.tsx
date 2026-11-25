@@ -66,7 +66,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descId : undefined}
-        className="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-700 shadow-xl p-6 text-[#18181B] dark:text-slate-100"
+        className="relative w-full max-w-md rounded-lg bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] shadow-xl p-6 text-[#18181B] dark:text-slate-100 animate-in fade-in zoom-in-95 duration-150 ease-out"
       >
         <button
           type="button"

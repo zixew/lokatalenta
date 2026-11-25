@@ -14,15 +14,15 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2';
+    'inline-flex items-center justify-center gap-2 font-medium rounded-md transition-[background-color,border-color,transform] duration-150 ease-out active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2';
 
   const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
-    primary: 'bg-[#0F766E] text-white hover:bg-[#115E59] shadow-xs',
+    primary: 'bg-[#0F766E] text-white hover:bg-[#115E59] active:bg-[#0D524C] shadow-xs',
     secondary:
-      'bg-white dark:bg-[#161B22] text-[#18181B] dark:text-slate-100 border border-[#E5E3DC] dark:border-slate-700 hover:bg-[#F6F5F1] dark:hover:bg-slate-800',
+      'bg-white dark:bg-[#161B22] text-[#18181B] dark:text-slate-100 border border-[#D4D4CE] dark:border-[#282E3D] hover:bg-[#F4F4F1] dark:hover:bg-slate-800',
     ghost:
       'bg-transparent text-[#52525B] dark:text-slate-300 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 hover:text-[#18181B] dark:hover:text-white',
-    danger: 'bg-[#E11D48] text-white hover:bg-[#BE123C]',
+    danger: 'bg-[#E11D48] text-white hover:bg-[#BE123C] active:bg-[#9F1239]',
     amber:
       'bg-[#FEF3C7] dark:bg-amber-950/60 text-[#92400E] dark:text-amber-300 border border-[#FDE68A] dark:border-amber-800 hover:bg-[#FDE68A]',
   };
