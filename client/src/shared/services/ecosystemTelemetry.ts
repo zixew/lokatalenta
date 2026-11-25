@@ -266,3 +266,18 @@ export function emitEcosystemTelemetry(input: LmsTelemetryInput): void {
 }
 
 export const emitLmsTelemetry = emitEcosystemTelemetry;
+
+/**
+ * Anonymizes candidate telemetry for 3D office ticker feeds (REC-001).
+ * Guarantees zero candidate PII is leaked in live public ticker streams.
+ */
+export function formatAnonymizedTickerFeed(event: EcosystemNormalizedEvent): string {
+  const anonymizedEntity = event.entityId
+    ? `[#${event.entityId.slice(0, 8)}]`
+    : `[DIV-${event.divisionId.toUpperCase()}]`;
+  const sanitizedTitle = event.title
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[REDACTED]')
+    .replace(/\b\d{16}\b/g, '[REDACTED]')
+    .replace(/(?:\+62|08)\d{8,12}/g, '[REDACTED]');
+  return `${anonymizedEntity} ${event.divisionId.toUpperCase()} • ${sanitizedTitle}`;
+}

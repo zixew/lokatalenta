@@ -1,5 +1,6 @@
 import type { RecruiterCandidate, AssessmentInvitation } from '../../shared/types/lms';
 import { sanitizeUserText } from '../../shared/lib/securityGuards';
+import { sanitizeCsvCell } from '../../shared/lib/securityGuards';
 import { emitEcosystemTelemetry } from '../../shared/services/ecosystemTelemetry';
 
 const SHORTLIST_STORAGE_KEY = 'lokatalenta_recruiter_shortlist';
@@ -316,14 +317,26 @@ export function buildInviteUrl(tokenOrInvite: string | AssessmentInvitation, qui
 export function exportShortlistCsv(candidates: RecruiterCandidate[]): string {
   const headers = ['ID', 'Nama', 'Email', 'Kategori', 'Kesiapan', 'Skor Kognitif', 'Skor Logika', 'Skor Kraepelin WPM'];
   const rows = candidates.map((c) => [
-    `"${c.id}"`,
-    `"${c.full_name}"`,
-    `"${c.email}"`,
-    `"${c.category}"`,
-    `"${c.readiness_status}"`,
+    sanitizeCsvCell(c.id),
+    sanitizeCsvCell(c.full_name),
+    sanitizeCsvCell(c.email),
+    sanitizeCsvCell(c.category),
+    sanitizeCsvCell(c.readiness_status),
     c.radar_scores.kognitif,
     c.radar_scores.logika,
     c.kraepelin_summary?.speed_wpm || 0,
   ]);
   return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+}
+
+/**
+ * Computes percentile rank (1-99) of a candidate against a multi-cohort distribution.
+ * BL-224 Multi-cohort percentile curves.
+ */
+export function computeCohortPercentile(score: number, allScores: number[]): number {
+  if (!allScores || allScores.length === 0) return 50;
+  const strictlyBelow = allScores.filter((s) => s < score).length;
+  const equalTo = allScores.filter((s) => s === score).length;
+  const percentile = ((strictlyBelow + 0.5 * equalTo) / allScores.length) * 100;
+  return Math.round(Math.max(1, Math.min(99, percentile)));
 }
