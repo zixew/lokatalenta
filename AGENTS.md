@@ -184,3 +184,48 @@ Setiap agen telah dibekali dengan **keahlian komprehensif** (*core competencies,
 2. **Kepatuhan Absolut Antar-Divisi:**
    - Setiap divisi wajib mematuhi *Quality Gates* pada Bagian 8, protokol *Auto-Swarm* pada Bagian 7, serta SOP rinci di [`.agents/rules/git-commit-squash-sop.md`](file:///Users/a2299/Documents/Projects/lms-psikotes/.agents/rules/git-commit-squash-sop.md).
 
+---
+
+## 10. PROTOKOL WAJIB: DESIGN TASTE BEFORE PIXELS (ANTI-GENERIC AI AESTHETIC)
+
+> [!IMPORTANT]
+> **MANDATORY DESIGN PROTOCOL FOR ALL AGENTS:**  
+> *"You set design taste before pixels. No generic AI aesthetic. Read the room, commit to a direction, then specify the system."*  
+> Seluruh agen dan subagent perancang antarmuka **WAJIB** menerapkan 5 langkah berikut sebelum menyentuh file CSS / TSX:
+
+### 1. Design Read (Tepat 1 Kalimat)
+Rumuskan secara tegas:
+`"Reading this as: <page kind> for <audience>, with a <vibe> language, leaning toward <aesthetic family>."`  
+*(Jika ambigu antara dua arah nyata, tanyakan TEPAT SATU pertanyaan klarifikasi ke pengguna lalu berhenti menunggu jawaban. Jika tidak ambigu, dilarang bertanya).*
+
+### 2. Three Dials (Skala 1–10 dengan Justifikasi Rasional)
+- **`DESIGN_VARIANCE`** (1 = Simetri Sempurna … 10 = Artsy Chaos): Default LokaTalenta **3 – 4** (Terstruktur, presisi instrumen kerja).
+- **`MOTION_INTENSITY`** (1 = Statis Total … 10 = Sinematik): Default LokaTalenta **2 – 3** (Mikro-interaksi cepat 150ms–200ms `ease-out`, nol goyangan melayang).
+- **`VISUAL_DENSITY`** (1 = Galeri Bernapas Luas … 10 = Kokpit Pesawat Padat): Default LokaTalenta **7 – 8** (Visibilitas data tinggi, kisi tabular angka monospace).
+
+### 3. Anti-Default Lock (Kunci Larangan Bawaan AI)
+Secara mutlak **DILARANG** menggunakan default AI generik:
+- ❌ Gradasi biru-ke-ungu / cyan / pink tanpa alasan identitas brand.
+- ❌ Kombinasi *Inter + slate* default tanpa tipografi terkurasi.
+- ❌ Tiga kartu fitur seragam yang di-*copy-paste*.
+- ❌ *Glassmorphism / backdrop-blur* berlebihan di semua komponen.
+- ❌ Latar belakang krem kekuningan (*fake parchment*) atau *pill soup* (`rounded-full` di semua elemen).
+- ❌ Tombol mengambang kartunis (`hover:-translate-y-0.5`).
+
+### 4. Taste System (Spesifikasi Konkret)
+- **Aesthetic Name:** *Industrial Precision Workbench* (Alat kerja profesional performa tinggi).
+- **Signature Element:** Header instrumen telemetri dengan angka monospace tabular (`font-mono-tabular`) dan indikator status solid.
+- **Palette Roles:** Canvas Light `#F3F3F0` / Dark `#0E1015`, Surface `#FFFFFF` / `#151821`, Docked `#E8E8E3` / `#1B1F2B`, Border `#D4D4CE` / `#282E3D`.
+- **Type Pairing:** Heading `Plus Jakarta Sans` (bold 700, tracking -0.03em), Data `JetBrains Mono` (tabular-nums), Body `Inter` (regular 500).
+- **Motion Intent:** Gated oleh `MOTION_INTENSITY`. Hanya klik dan transisi laci yang bergerak; seluruh layout konten solid menapak bumi.
+- **Non-Goals:** Menolak hiasan tanpa fungsi (*purpose-gate*), menolak paywall, menolak animasi lambat.
+
+### 5. First-Build Checklist
+1. Token semantik divalidasi di `index.css`.
+2. Kerangka tata letak berdensitas tinggi (Top Bar, Metric Strip, Work Surface).
+3. Batas 1px tegas dan radius proporsional (`rounded-md` / `rounded-lg`).
+4. Angka metrik berstandar monospace tabular.
+5. Uji aksesibilitas kontras WCAG 2.1 AA ($\ge 4.5:1$) dan `prefers-reduced-motion`.
+
+*(Referensi lengkap: [design-taste-before-pixels-anti-slop-protocol.md](file:///Users/a2299/Documents/Projects/lokatalenta-docs/content/docs/design-taste-before-pixels-anti-slop-protocol.md) via AI UX Playground)*
+
