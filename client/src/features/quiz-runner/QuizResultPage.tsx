@@ -121,7 +121,7 @@ export function QuizResultPage() {
   if (isLoading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-10">
-        <div className="h-64 bg-white border border-[#E5E3DC] rounded-2xl animate-pulse" />
+        <div className="h-64 bg-white border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg animate-pulse" />
       </div>
     );
   }
@@ -267,7 +267,7 @@ export function QuizResultPage() {
         <div
           className={`${
             showSubtests ? 'lg:col-span-5' : 'lg:col-span-12'
-          } bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6`}
+          } bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-6 sm:p-8 flex flex-col justify-between space-y-6`}
         >
           <div className="space-y-2">
             <Badge tone={passed ? 'emerald' : 'amber'}>
@@ -283,7 +283,7 @@ export function QuizResultPage() {
             <span className="text-lg font-semibold text-[#71717A] dark:text-slate-400">/ 100</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#E5E3DC] dark:border-slate-800 text-sm">
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D] text-sm">
             <div className="bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3">
               <span className="text-xs text-emerald-700 dark:text-emerald-300 block">Jawaban Benar</span>
               <span className="text-lg font-bold font-mono-tabular text-emerald-900 dark:text-emerald-100">
@@ -301,7 +301,7 @@ export function QuizResultPage() {
 
         {/* Category Breakdown */}
         {showSubtests && (
-          <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-5">
+          <div className="lg:col-span-7 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-6 sm:p-8 space-y-5">
             <div>
               <h2 className="text-base font-bold text-[#18181B] dark:text-white">
                 Hasil per Bagian Tes
@@ -330,7 +330,7 @@ export function QuizResultPage() {
             </div>
 
             {weakestSubtest && (
-              <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-2.5">
                   <Target className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
                   <p className="text-xs text-[#52525B] dark:text-slate-300 leading-relaxed">
@@ -372,7 +372,7 @@ export function QuizResultPage() {
       </div>
 
       {/* Indikator Integritas Fokus */}
-      <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-[#0F766E] dark:text-teal-400 flex items-center justify-center shrink-0">
             <Eye className="w-5 h-5" />
@@ -406,7 +406,7 @@ export function QuizResultPage() {
         return (
           <div className="space-y-4">
             {duelChallenge && duelResult && (
-              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Badge
@@ -433,7 +433,7 @@ export function QuizResultPage() {
               </div>
             )}
 
-            <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-[#18181B] dark:text-white flex items-center gap-2">
               <Share2 className="w-4 h-4 text-[#0F766E]" />
@@ -497,7 +497,7 @@ export function QuizResultPage() {
         </div>
 
             {duelHistory.length > 0 && (
-              <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-3">
+              <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wide text-[#71717A] dark:text-slate-400">
                     Riwayat Duel 1v1 Terbaru
@@ -508,7 +508,7 @@ export function QuizResultPage() {
                   {duelHistory.slice(0, 4).map((d) => (
                     <div
                       key={d.id}
-                      className="p-3 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2 text-xs"
+                      className="p-3 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-2 text-xs"
                     >
                       <div className="min-w-0">
                         <p className="font-semibold text-[#18181B] dark:text-white truncate">
@@ -553,7 +553,7 @@ export function QuizResultPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer ${
                 filterMode === 'all'
                   ? 'bg-[#18181B] text-white border-[#18181B]'
-                  : 'bg-white text-[#52525B] border-[#E5E3DC]'
+                  : 'bg-white text-[#52525B] border-[#D4D4CE] dark:border-[#282E3D]'
               }`}
             >
               Semua Soal ({review.length})
@@ -563,7 +563,7 @@ export function QuizResultPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer ${
                 filterMode === 'wrong'
                   ? 'bg-[#E11D48] text-white border-[#E11D48]'
-                  : 'bg-white text-[#52525B] border-[#E5E3DC]'
+                  : 'bg-white text-[#52525B] border-[#D4D4CE] dark:border-[#282E3D]'
               }`}
             >
               Lihat Jawaban Salah ({wrongCount})
@@ -579,7 +579,7 @@ export function QuizResultPage() {
               className={`px-2.5 py-1 rounded-full text-xs font-semibold border cursor-pointer transition-colors ${
                 selectedSubtest === 'ALL'
                   ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700'
+                  : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#D4D4CE] dark:border-[#282E3D]'
               }`}
             >
               Semua Subtes
@@ -592,7 +592,7 @@ export function QuizResultPage() {
                 className={`px-2.5 py-1 rounded-full text-xs font-semibold border cursor-pointer transition-colors ${
                   selectedSubtest === name
                     ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                    : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700'
+                    : 'bg-white dark:bg-[#161B22] text-[#52525B] dark:text-slate-300 border-[#D4D4CE] dark:border-[#282E3D]'
                 }`}
               >
                 {name}
@@ -603,7 +603,7 @@ export function QuizResultPage() {
 
         <div className="space-y-4">
           {filteredReview.length === 0 ? (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 text-center">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-8 text-center">
               <p className="text-sm font-semibold text-emerald-900">
                 Selamat! Tidak ada jawaban yang salah pada tes ini.
               </p>
@@ -627,7 +627,7 @@ export function QuizResultPage() {
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-6 space-y-4"
+                  className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-6 space-y-4"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -673,7 +673,7 @@ export function QuizResultPage() {
                     </div>
                   )}
                   {q.image_url && (
-                    <div className="bg-white rounded-xl p-2 border border-[#E5E3DC] inline-block max-w-full">
+                    <div className="bg-white rounded-xl p-2 border border-[#D4D4CE] dark:border-[#282E3D] inline-block max-w-full">
                       <img
                         src={q.image_url}
                         alt="Gambar soal"

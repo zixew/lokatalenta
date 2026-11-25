@@ -297,7 +297,7 @@ export function QuizRunnerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F6F5F1] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F4F4F1] flex items-center justify-center">
         <div className="text-sm font-medium text-[#52525B]">Menyiapkan lembar soal...</div>
       </div>
     );
@@ -305,7 +305,7 @@ export function QuizRunnerPage() {
 
   if (loadError || !currentQuestion) {
     return (
-      <div className="min-h-screen bg-[#F6F5F1] dark:bg-[#0D1117] flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <div className="min-h-screen bg-[#F4F4F1] dark:bg-[#0D1117] flex flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-base font-semibold text-[#18181B] dark:text-white max-w-md">
           {loadError || 'Soal belum tersedia untuk kuis ini.'}
         </p>
@@ -324,8 +324,8 @@ export function QuizRunnerPage() {
     };
 
     return (
-      <div className="min-h-screen bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-2xl rounded-2xl border border-[#E5E3DC] dark:border-slate-800 bg-white dark:bg-[#161B22] p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="min-h-screen bg-[#F4F4F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-2xl rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-[#161B22] p-6 sm:p-8 shadow-sm space-y-6">
           {inviteToken && (
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F766E]/10 text-[#0F766E] dark:text-teal-300 border border-[#0F766E]/30">
               <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F766E] dark:text-teal-400" />
@@ -353,7 +353,7 @@ export function QuizRunnerPage() {
               className={`text-left rounded-xl border p-4 transition-all cursor-pointer ${
                 pendingMode === 'exam'
                   ? 'border-[#18181B] dark:border-teal-400 bg-slate-50 dark:bg-slate-800/80 ring-2 ring-[#18181B]/10 dark:ring-teal-400/20'
-                  : 'border-[#E5E3DC] dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
+                  : 'border-[#D4D4CE] dark:border-[#282E3D] hover:border-slate-400 dark:hover:border-slate-600'
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
@@ -374,7 +374,7 @@ export function QuizRunnerPage() {
               className={`text-left rounded-xl border p-4 transition-all cursor-pointer ${
                 pendingMode === 'practice'
                   ? 'border-[#0F766E] dark:border-teal-400 bg-teal-50/60 dark:bg-teal-950/30 ring-2 ring-[#0F766E]/20'
-                  : 'border-[#E5E3DC] dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
+                  : 'border-[#D4D4CE] dark:border-[#282E3D] hover:border-slate-400 dark:hover:border-slate-600'
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
@@ -390,7 +390,7 @@ export function QuizRunnerPage() {
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#E5E3DC] dark:border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#D4D4CE] dark:border-[#282E3D]">
             <Button variant="secondary" onClick={() => navigate(-1)}>
               Kembali
             </Button>
@@ -409,16 +409,16 @@ export function QuizRunnerPage() {
   const isCriticalTime = secondsLeft < 300; // < 5 minutes
 
   return (
-    <div className="min-h-screen bg-[#F6F5F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#F4F4F1] dark:bg-[#0D1117] text-[#18181B] dark:text-slate-100 flex flex-col">
       {/* Distraction-Free Sticky Exam Header */}
-      <header className="sticky top-0 z-30 bg-white dark:bg-[#161B22] border-b border-[#E5E3DC] dark:border-slate-800">
+      <header className="sticky top-0 z-30 bg-white dark:bg-[#161B22] border-b border-[#D4D4CE] dark:border-[#282E3D]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setShowLeaveWarning(true)}
               title="Keluar dari halaman latihan"
-              className="p-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0 cursor-pointer"
+              className="p-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -458,7 +458,7 @@ export function QuizRunnerPage() {
               className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-semibold ${
                 practiceMode
                   ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-200'
               }`}
               title="Mode terkunci (hanya dapat dipilih 1x sebelum memulai)"
             >
@@ -470,7 +470,7 @@ export function QuizRunnerPage() {
               type="button"
               onClick={toggleTheme}
               aria-label="Ganti tema terang atau gelap"
-              className="p-2 rounded-lg border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+              className="p-2 rounded-lg border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-800 text-[#52525B] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </button>
@@ -479,7 +479,7 @@ export function QuizRunnerPage() {
               className={`px-3 sm:px-3.5 py-1.5 rounded-lg border font-mono-tabular text-xs sm:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 ${
                 isCriticalTime
                   ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800 text-[#E11D48] dark:text-rose-300'
-                  : 'bg-slate-50 dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#18181B] dark:text-white'
+                  : 'bg-slate-50 dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#18181B] dark:text-white'
               }`}
             >
               <Clock className="w-4 h-4" />
@@ -521,8 +521,8 @@ export function QuizRunnerPage() {
       {/* Main Exam Workspace */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         {/* Question Area */}
-        <section className="lg:col-span-8 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 sm:p-8 space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E5E3DC] dark:border-slate-800 pb-4">
+        <section className="lg:col-span-8 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 sm:p-8 space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#D4D4CE] dark:border-[#282E3D] pb-4">
             <div className="flex items-center gap-2.5">
               <span className="font-mono-tabular text-sm font-bold text-[#18181B] dark:text-white">
                 Soal {currentIndex + 1} / {questions.length}
@@ -541,7 +541,7 @@ export function QuizRunnerPage() {
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
                 flagged[currentQuestion.id]
                   ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700 text-[#B45309] dark:text-amber-300'
-                  : 'bg-white dark:bg-slate-800 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                  : 'bg-white dark:bg-slate-800 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
               <Flag className="w-3.5 h-3.5" />
@@ -549,7 +549,7 @@ export function QuizRunnerPage() {
             </button>
           </div>
 
-          <div className="hidden sm:flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 text-[11px] text-[#71717A] dark:text-slate-400">
+          <div className="hidden sm:flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] text-[11px] text-[#71717A] dark:text-slate-400">
             <span>Shortcut Cepat:</span>
             <span className="font-mono-tabular">
               [1–5 / A–E] Pilih Opsi • [←/→ atau P/N] Navigasi • [F] Tandai Ragu
@@ -559,7 +559,7 @@ export function QuizRunnerPage() {
           {/* Prompt */}
           <div className="space-y-4">
             {currentQuestion.audio_text && currentQuestion.audio_lang && (
-              <div className="p-4 rounded-xl bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+              <div className="p-4 rounded-xl bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <Volume2 className="w-5 h-5 text-[#0F766E] dark:text-teal-400 shrink-0" />
                   <div>
@@ -606,7 +606,7 @@ export function QuizRunnerPage() {
               {currentQuestion.question_text}
             </p>
             {currentQuestion.image_url && (
-              <div className="bg-white rounded-xl p-3 border border-[#E5E3DC] w-full flex justify-center">
+              <div className="bg-white rounded-xl p-3 border border-[#D4D4CE] dark:border-[#282E3D] w-full flex justify-center">
                 <img
                   src={currentQuestion.image_url}
                   alt="Gambar soal"
@@ -631,7 +631,7 @@ export function QuizRunnerPage() {
                 value={answers[currentQuestion.id] ?? ''}
                 onChange={(e) => selectAnswer(currentQuestion.id, e.target.value)}
                 placeholder="Ketik jawaban singkat atau rumus (contoh: =SUM(A1:A5))..."
-                className="w-full px-4 py-3 rounded-xl border border-[#E5E3DC] dark:border-slate-700 bg-white dark:bg-slate-900 text-sm sm:text-base font-mono-tabular text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E]"
+                className="w-full px-4 py-3 rounded-xl border border-[#D4D4CE] dark:border-[#282E3D] bg-white dark:bg-slate-900 text-sm sm:text-base font-mono-tabular text-[#18181B] dark:text-slate-100 placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E]"
               />
               <p className="text-xs text-[#71717A] dark:text-slate-400">
                 Spasi berlebih di awal/akhir atau di antara kata akan dirapikan otomatis saat penilaian.
@@ -649,7 +649,7 @@ export function QuizRunnerPage() {
                     className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
                       isSelected
                         ? 'bg-teal-50 dark:bg-teal-950/50 border-[#0F766E] ring-1 ring-[#0F766E]'
-                        : 'bg-white dark:bg-slate-900/60 border-[#E5E3DC] dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        : 'bg-white dark:bg-slate-900/60 border-[#D4D4CE] dark:border-[#282E3D] hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <span
@@ -707,7 +707,7 @@ export function QuizRunnerPage() {
           )}
 
           {/* Prev / Next Controls */}
-          <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 flex items-center justify-between gap-2">
+          <div className="pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D] flex items-center justify-between gap-2">
             <Button
               variant="secondary"
               onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
@@ -740,7 +740,7 @@ export function QuizRunnerPage() {
         </section>
 
         {/* Right Panel: Question Navigator Grid */}
-        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl p-5 space-y-4 lg:sticky lg:top-24">
+        <aside className="lg:col-span-4 bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg p-5 space-y-4 lg:sticky lg:top-24">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-[#18181B] dark:text-white">Navigasi Soal</h2>
@@ -773,7 +773,7 @@ export function QuizRunnerPage() {
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer ${
                   navFilter === tab.id
                     ? 'bg-[#18181B] dark:bg-white text-white dark:text-[#18181B] border-[#18181B] dark:border-white'
-                    : 'bg-[#F6F5F1] dark:bg-slate-900 text-[#52525B] dark:text-slate-300 border-[#E5E3DC] dark:border-slate-700 hover:border-[#0F766E]'
+                    : 'bg-[#F4F4F1] dark:bg-slate-900 text-[#52525B] dark:text-slate-300 border-[#D4D4CE] dark:border-[#282E3D] hover:border-[#0F766E]'
                 }`}
               >
                 {tab.label}
@@ -814,7 +814,7 @@ export function QuizRunnerPage() {
                       const isFlagged = Boolean(flagged[q.id]);
 
                       let style =
-                        'bg-white dark:bg-slate-900 border-[#E5E3DC] dark:border-slate-700 text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800';
+                        'bg-white dark:bg-slate-900 border-[#D4D4CE] dark:border-[#282E3D] text-[#52525B] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800';
                       if (isFlagged) {
                         style =
                           'bg-amber-100 dark:bg-amber-950/70 border-amber-400 dark:border-amber-700 text-amber-900 dark:text-amber-200 font-bold';
@@ -844,7 +844,7 @@ export function QuizRunnerPage() {
           </div>
 
           {/* Legend */}
-          <div className="pt-4 border-t border-[#E5E3DC] dark:border-slate-800 grid grid-cols-3 gap-2 text-[11px] text-[#52525B] dark:text-slate-400">
+          <div className="pt-4 border-t border-[#D4D4CE] dark:border-[#282E3D] grid grid-cols-3 gap-2 text-[11px] text-[#52525B] dark:text-slate-400">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-[#0F766E] inline-block" />
               Terjawab
@@ -864,7 +864,7 @@ export function QuizRunnerPage() {
       {/* Submit Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-lg">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg max-w-md w-full p-6 space-y-5 shadow-lg">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-[#D97706] flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5" />
@@ -880,7 +880,7 @@ export function QuizRunnerPage() {
               </div>
             </div>
 
-            <div className="bg-[#F6F5F1] dark:bg-slate-900 border border-[#E5E3DC] dark:border-slate-800 rounded-xl p-4 grid grid-cols-3 gap-2 text-center text-xs">
+            <div className="bg-[#F4F4F1] dark:bg-slate-900 border border-[#D4D4CE] dark:border-[#282E3D] rounded-xl p-4 grid grid-cols-3 gap-2 text-center text-xs">
               <div>
                 <span className="block font-mono-tabular text-lg font-bold text-[#0F766E] dark:text-teal-400">
                   {answeredCount}
@@ -919,7 +919,7 @@ export function QuizRunnerPage() {
       {/* Leave Warning Dialog */}
       {showLeaveWarning && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161B22] border border-[#E5E3DC] dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-lg">
+          <div className="bg-white dark:bg-[#161B22] border border-[#D4D4CE] dark:border-[#282E3D] rounded-lg max-w-md w-full p-6 space-y-5 shadow-lg">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-[#D97706] flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5" />
