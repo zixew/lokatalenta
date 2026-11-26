@@ -40,14 +40,6 @@ function contrast(fg: string, bg: string): number {
   return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 }
 
-// UAT User Journeys
-interface UATUserJourney {
-  persona: string;
-  scenario: string;
-  expectedOutcome: string;
-  passed: boolean;
-}
-
 describe('Full Regression + SIT + UAT Suite — LokaTalenta Ecosystem v4.0.0', () => {
   beforeEach(() => {
     const memory = createMemoryStorage();
